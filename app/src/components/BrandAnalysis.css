@@ -1,0 +1,32 @@
+.brand-analysis {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.analysis-card {
+    background: var(--color-bg-tertiary);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+}
+
+.color-palette {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.color-swatch {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}

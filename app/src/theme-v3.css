@@ -1,0 +1,99 @@
+/* V3 UTILITIES - QUANTUM GLASS */
+
+/* Glass Effects */
+.glass-panel {
+    background: var(--color-bg-card);
+    backdrop-filter: var(--glass-backdrop);
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+.glass-panel:hover {
+    background: var(--color-bg-card-hover);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Gradients & Glows */
+.text-gradient {
+    background: linear-gradient(135deg, var(--color-text), var(--gray-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-animate {
+    background: linear-gradient(to right,
+            var(--primary-400),
+            var(--neon-purple),
+            var(--neon-cyan),
+            var(--primary-400));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+}
+
+.glow-primary {
+    box-shadow: var(--shadow-glow);
+}
+
+.glow-strong {
+    box-shadow: var(--shadow-glow-strong);
+}
+
+/* Spotlight Effect Container */
+.spotlight-group {
+    position: relative;
+}
+
+/* V3 Animations */
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+@keyframes float-v3 {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 20px var(--primary-500);
+    }
+
+    50% {
+        opacity: 0.7;
+        box-shadow: 0 0 10px var(--primary-500);
+    }
+}
+
+.animate-float {
+    animation: float-v3 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Background Patterns */
+.bg-grid {
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.bg-features {
+    background-image: radial-gradient(circle at center, var(--primary-900) 0%, transparent 70%);
+}
