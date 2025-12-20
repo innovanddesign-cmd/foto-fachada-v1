@@ -6,7 +6,7 @@ import { Button } from './ui/Button';
 import './PosterGeneratorV3.css';
 
 export const PosterGeneratorV3 = () => {
-    const { brandData, posterConfig, setPosterConfig, generatedBackgroundImage } = useAppStore();
+    const { brandData, posterConfig, generatedBackgroundImage } = useAppStore();
     const [qrDataUrl, setQrDataUrl] = useState<string>('');
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
