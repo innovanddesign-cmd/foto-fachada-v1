@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { QrCode, Download, Printer, Crown, Sparkles, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Download, Printer, QrCode, Sparkles } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useAppStore } from '../store/appStore';
 import { Button } from './ui/Button';
 import './PosterGeneratorV3.css';
 
-export function PosterGeneratorV3() {
-    const { brandData, links, userTier, generatedBackgroundImage, posterConfig, isGeneratingPoster } = useAppStore();
+export const PosterGeneratorV3 = () => {
+    const { brandData, posterConfig, setPosterConfig, generatedBackgroundImage } = useAppStore();
     const [qrDataUrl, setQrDataUrl] = useState<string>('');
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);

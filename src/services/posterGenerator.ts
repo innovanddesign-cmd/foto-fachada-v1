@@ -43,7 +43,7 @@ export interface PosterConfig {
  */
 export async function generatePosterDesign(
     brandData: BrandData,
-    landingUrl: string
+    _landingUrl: string
 ): Promise<PosterConfig> {
     if (!genAI) {
         // Modo demo: retorna configuración basada en el tipo de negocio

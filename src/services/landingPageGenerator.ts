@@ -14,7 +14,7 @@ interface GeneratedLandingDesign {
  */
 export async function generateLandingPageDesign(
     brandData: BrandData,
-    links: LandingLink[]
+    _links: LandingLink[]
 ): Promise<GeneratedLandingDesign> {
     if (!genAI) {
         // Modo demo: retorna configuración basada en el tipo de negocio

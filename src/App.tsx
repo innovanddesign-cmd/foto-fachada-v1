@@ -50,9 +50,6 @@ function AppContent() {
     setCurrentProject,
     landingConfig,
     setLandingConfig,
-    generatedBackgroundImage,
-    setGeneratedBackgroundImage,
-    isGeneratingDesign,
     setIsGeneratingDesign,
     addLandingToProject,
   } = useAppStore();

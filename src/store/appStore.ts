@@ -59,6 +59,8 @@ interface AppState {
     setGeneratedBackgroundImage: (image: string | null) => void;
     isGeneratingDesign: boolean;
     setIsGeneratingDesign: (generating: boolean) => void;
+    selectedTemplate: string;
+    setSelectedTemplate: (template: string) => void;
 
     // Poster design (AI-generated)
     posterConfig: any | null; // Will be PosterConfig from posterGenerator
@@ -141,6 +143,8 @@ export const useAppStore = create<AppState>()(
             setGeneratedBackgroundImage: (image) => set({ generatedBackgroundImage: image }),
             isGeneratingDesign: false,
             setIsGeneratingDesign: (generating) => set({ isGeneratingDesign: generating }),
+            selectedTemplate: 'modern',
+            setSelectedTemplate: (template) => set({ selectedTemplate: template }),
 
             // Poster design (AI-generated)
             posterConfig: null,
@@ -277,7 +281,8 @@ export const useAppStore = create<AppState>()(
                 isAnalyzing: false,
                 isGeneratingStrategies: false,
                 isGeneratingLinks: false,
-                isGeneratingDesign: false
+                isGeneratingDesign: false,
+                selectedTemplate: 'modern'
             })
         }),
         {
