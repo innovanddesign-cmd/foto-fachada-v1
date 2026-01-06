@@ -38,6 +38,10 @@ export async function generateMarketingStrategies(
         }
 
         // 2. Fallback to Client-Side Gemini (if API Key exists)
+        // IMPORTANT: This must run if:
+        // a) Backend was skipped (isProductionWithoutBackend)
+        // b) Backend was tried but failed (caught exception)
+        // c) Backend returned success=false
         if (genAI) {
             console.log('Falling back to Client-Side Gemini generation...');
             return await generateStrategiesClientSide(brandData, location, season);
