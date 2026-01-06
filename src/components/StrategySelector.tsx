@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { X, Sparkles, Users, Clock, Gamepad2, Trophy } from 'lucide-react';
 import './StrategySelector.css';
 
@@ -7,7 +7,7 @@ interface Strategy {
     title: string;
     description: string;
     category: 'gamification' | 'social-proof' | 'urgency';
-    icon: JSX.Element;
+    icon: React.ReactNode;
 }
 
 interface StrategySelectorProps {
