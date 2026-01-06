@@ -98,6 +98,7 @@ app.use('/api', generalLimiter);
 // Public Routes
 app.use('/health', healthRoutes);
 app.use('/api/health', healthRoutes);
+app.use('/l', landingsRoutes); // Public landing pages by slug
 app.use('/api/auth', authLimiter, authRoutes);
 
 // Protected Routes (Strategies made optional for dev compatibility)

@@ -20,6 +20,7 @@ interface LandingGenerationOptions {
         socials?: Record<string, string>;
     };
     bgKeyword?: string; // For Unsplash
+    externalLibraries?: string[]; // CDN URLs for external libraries
 }
 
 export class LandingGeneratorService {
@@ -28,13 +29,18 @@ export class LandingGeneratorService {
      * Generate the complete HTML for the landing page
      */
     static generateHtml(options: LandingGenerationOptions): string {
-        const { title, description, widgetCode, brandColors, contactInfo, bgKeyword } = options;
+        const { title, description, widgetCode, brandColors, contactInfo, bgKeyword, externalLibraries = [] } = options;
 
         // Generate CSS Variables for Visual DNA
         const cssVars = this.generateCssVariables(brandColors.primary);
 
         // Background Image (Unsplash Source)
         const bgImage = `https://source.unsplash.com/1600x900/?${encodeURIComponent(bgKeyword || 'abstract,texture')}`;
+
+        // Generate external library script tags
+        const externalScripts = externalLibraries
+            .map(url => `    <script src="${url}"></script>`)
+            .join('\n');
 
         return `
 <!DOCTYPE html>
@@ -65,6 +71,9 @@ export class LandingGeneratorService {
     
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- External Libraries for Widget Strategy -->
+${externalScripts}
 
     <style>
         :root {
@@ -239,6 +248,33 @@ export class LandingGeneratorService {
 </body>
 </html>
         `;
+    }
+
+    /**
+     * Get external libraries (CDN URLs) needed for a specific strategy
+     */
+    static getLibrariesForStrategy(strategyId: string): string[] {
+        const libraryMap: Record<string, string[]> = {
+            'fortune-wheel': [
+                'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js',
+                'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js'
+            ],
+            'social-wall': [
+                'https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js'
+            ],
+            'flash-offer': [
+                'https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js'
+            ],
+            'scratch-card': [
+                'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js'
+            ],
+            'memory-game': [
+                'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js'
+            ]
+        };
+
+        return libraryMap[strategyId] || [];
     }
 
     /**
