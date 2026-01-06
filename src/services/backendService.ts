@@ -27,6 +27,9 @@ export async function generateStrategiesFromBackend(
             headers['Authorization'] = `Bearer ${session.access_token}`;
         }
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout for backend
+
         const response = await fetch(`${API_URL}/strategies/generate`, {
             method: 'POST',
             headers,
@@ -35,7 +38,8 @@ export async function generateStrategiesFromBackend(
                 date,
                 location
             }),
-        });
+            signal: controller.signal
+        }).finally(() => clearTimeout(timeoutId));
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));

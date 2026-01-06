@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { BrandData, MarketingStrategy, LandingLink, StrategyGenerationResponse, LinksGenerationResponse } from '../types';
+import type { BrandData, MarketingStrategy, LandingLink, StrategyGenerationResponse, LinksGenerationResponse, Strategy } from '../types';
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
@@ -18,41 +18,108 @@ export async function generateMarketingStrategies(
     season?: string
 ): Promise<StrategyGenerationResponse> {
     try {
+        // 1. Try Backend First
         console.log('Attempting to generate strategies from backend...');
-        const backendResult = await generateStrategiesFromBackend(brandData, location, season);
-        console.log('MarketingAgent: Backend response:', backendResult);
-
-        if (backendResult.success && backendResult.strategies && backendResult.strategies.length > 0) {
-            return backendResult;
+        try {
+            const backendResult = await generateStrategiesFromBackend(brandData, location, season);
+            if (backendResult.success && backendResult.strategies && backendResult.strategies.length > 0) {
+                return backendResult;
+            }
+            console.warn('Backend generation failed:', backendResult.error);
+        } catch (backendError) {
+            console.warn('Backend unavailable:', backendError);
         }
 
-        console.warn('Backend generation failed or returned empty, falling back to client-side (if enabled) or mock');
-
-        // Fallback to existing logic if needed, or just return the error
-        if (backendResult.error) {
-            // If backend explicitly errored, we might want to show that or fall back to mock
-            console.error('Backend reported error:', backendResult.error);
+        // 2. Fallback to Client-Side Gemini (if API Key exists)
+        if (genAI) {
+            console.log('Falling back to Client-Side Gemini generation...');
+            return await generateStrategiesClientSide(brandData, location, season);
         }
 
-        // ORIGINAL LOGIC AS FALLBACK (Simulated/Mock for now if Key missing or backend fails)
-        if (!genAI) {
-            console.log('No API key found (or backend failed), using mock strategies');
-            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
-            return {
-                success: true,
-                strategies: getMockStrategies()
-            };
-        }
-
-        // ... (rest of client side logic if we want to keep it, but plan says use backend)
-        // For now, let's return the backend result error if it failed and we have no other way
-        return backendResult;
+        // 3. Fallback to Mock Data (if no API Key)
+        console.log('No API key found and backend failed, using mock strategies');
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
+        return {
+            success: true,
+            strategies: getMockStrategies()
+        };
 
     } catch (error) {
         console.error('Error generating strategies:', error);
         return {
             success: false,
             error: error instanceof Error ? error.message : 'Error al generar estrategias'
+        };
+    }
+}
+
+/**
+ * Client-side strategy generation using Gemini
+ */
+async function generateStrategiesClientSide(
+    brandData: BrandData,
+    location: string = 'España',
+    season: string = 'General'
+): Promise<StrategyGenerationResponse> {
+    try {
+        if (!genAI) throw new Error('No API Key');
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const prompt = `
+# ROLE: Creative Tech Lead at a Digital Marketing Agency
+
+You are the lead creative technologist. Your job is to INVENT and PROGRAM unique, interactive marketing experiences for local businesses.
+
+## YOUR MISSION
+Generate exactly 3 unique, creative, and FULLY IMPLEMENTABLE digital marketing strategies for:
+- **Business**: ${brandData.name} (${brandData.businessType})
+- **Style**: ${brandData.style || 'Modern'}
+- **Target Audience**: ${brandData.targetAudience || 'General public'}
+- **Context**: ${season} in ${location}
+
+## OUTPUT FORMAT (EXACT JSON)
+\`\`\`json
+{
+  "strategies": [
+    {
+      "id": "unique_id",
+      "emoji": "🎯",
+      "title": "Short Catchy Title",
+      "description": "One sentence explaining the benefit.",
+      "vibe_analysis": "Brief description of the vibe",
+      "typography": "Font name",
+      "visual_mechanic": "Mechanic name",
+      "ui_config_schema": [],
+      "code_template": "<div>Placeholder code</div>"
+    }
+  ]
+}
+\`\`\`
+Return ONLY valid JSON.
+`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
+        const json = JSON.parse(cleanedText);
+
+        return {
+            success: true,
+            strategies: json.strategies.map((s: any) => ({
+                ...s,
+                // Ensure required fields for frontend compatibility
+                reasoning: s.vibe_analysis || "AI Generated",
+                tactics: ["Strategy generated by Client-Side AI"],
+                seasonalContext: season,
+                locationContext: location
+            }))
+        };
+    } catch (error) {
+        console.error('Client-side strategy generation failed:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Client-side error'
         };
     }
 }
