@@ -87,12 +87,9 @@ async function generateStrategiesClientSide(
 ): Promise<StrategyGenerationResponse> {
     try {
         if (!genAI) throw new Error('No API Key');
-        // Use gemini-1.5-flash which supports JSON mode natively
+        // Use gemini-2.5-flash to match other working services
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
-            generationConfig: {
-                responseMimeType: 'application/json'
-            }
+            model: 'gemini-2.5-flash'
         });
 
         const prompt = `
