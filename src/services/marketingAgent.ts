@@ -17,17 +17,24 @@ export async function generateMarketingStrategies(
     location?: string,
     season?: string
 ): Promise<StrategyGenerationResponse> {
+    // Check if we are in a production environment where backend might be unreachable (localhost)
+    const isProductionWithoutBackend = window.location.hostname !== 'localhost' && !import.meta.env.VITE_API_URL;
+
     try {
-        // 1. Try Backend First
-        console.log('Attempting to generate strategies from backend...');
-        try {
-            const backendResult = await generateStrategiesFromBackend(brandData, location, season);
-            if (backendResult.success && backendResult.strategies && backendResult.strategies.length > 0) {
-                return backendResult;
+        // 1. Try Backend First (Skip if we know it will fail because it points to localhost in prod)
+        if (!isProductionWithoutBackend) {
+            console.log('Attempting to generate strategies from backend...');
+            try {
+                const backendResult = await generateStrategiesFromBackend(brandData, location, season);
+                if (backendResult.success && backendResult.strategies && backendResult.strategies.length > 0) {
+                    return backendResult;
+                }
+                console.warn('Backend generation failed:', backendResult.error);
+            } catch (backendError) {
+                console.warn('Backend unavailable or failed. Trying client-side fallback...', backendError);
             }
-            console.warn('Backend generation failed:', backendResult.error);
-        } catch (backendError) {
-            console.warn('Backend unavailable or failed. Trying client-side fallback...', backendError);
+        } else {
+            console.log('Production environment detected without dedicated backend URL. Skipping backend call.');
         }
 
         // 2. Fallback to Client-Side Gemini (if API Key exists)
