@@ -78,7 +78,6 @@ export function ProjectViewV3({ project, onBack, onCreateLanding }: ProjectViewV
     };
 
     // Calculate dynamic stats
-    const totalLinks = project.landings.reduce((acc, landing) => acc + landing.links.length, 0);
     const primaryColor = project.landings[0]?.brand?.colors?.primary || 'var(--primary-500)';
 
     return (
