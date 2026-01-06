@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { BrandData, MarketingStrategy, LandingLink, StrategyGenerationResponse, LinksGenerationResponse, Strategy } from '../types';
+import type { BrandData, MarketingStrategy, LandingLink, StrategyGenerationResponse, LinksGenerationResponse } from '../types';
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
@@ -9,16 +9,16 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
  */
 import { generateStrategiesFromBackend } from './backendService';
 
+/**
+ * Generates personalized marketing strategies based on brand data and context
  */
-const DEBUG_VERSION = 'DEBUG_V_CKPT_27_REV_2';
-
 export async function generateMarketingStrategies(
     brandData: BrandData,
     location?: string,
     season?: string
 ): Promise<StrategyGenerationResponse> {
-    console.log(`[MarketingAgent ${DEBUG_VERSION}] Generating strategies...`);
-    console.log(`[MarketingAgent ${DEBUG_VERSION}] API Key present:`, !!apiKey);
+    console.log('Generating strategies...');
+    // Check if we are in a production environment where backend might be unreachable (localhost)
     // Check if we are in a production environment where backend might be unreachable (localhost)
     const isProductionWithoutBackend = window.location.hostname !== 'localhost' && !import.meta.env.VITE_API_URL;
 
@@ -45,20 +45,19 @@ export async function generateMarketingStrategies(
         // b) Backend was tried but failed (caught exception)
         // c) Backend returned success=false
         if (genAI) {
-            console.log(`[MarketingAgent ${DEBUG_VERSION}] Falling back to Client-Side Gemini generation...`);
+            console.log('Falling back to Client-Side Gemini generation...');
             try {
                 const fallbackResult = await generateStrategiesClientSide(brandData, location, season);
-                console.log(`[MarketingAgent ${DEBUG_VERSION}] Client-side result:`, fallbackResult);
                 if (!fallbackResult.success) {
-                    console.error(`[MarketingAgent ${DEBUG_VERSION}] Client-side failed with error:`, fallbackResult.error);
+                    console.error('Client-side generation failed:', fallbackResult.error);
                 }
                 return fallbackResult;
             } catch (e) {
-                console.error(`[MarketingAgent ${DEBUG_VERSION}] UNCAUGHT Client-side exception:`, e);
-                throw e; // rethrow to hit outer catch if any
+                console.error('UNCAUGHT Client-side exception:', e);
+                throw e;
             }
         } else {
-            console.warn(`[MarketingAgent ${DEBUG_VERSION}] No 'genAI' instance found. API Key missing?`);
+            console.warn('No Gemini API key found for client-side fallback');
         }
 
         // 3. Fallback to Mock Data (if no API Key)
