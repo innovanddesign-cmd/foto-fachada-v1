@@ -1,51 +1,60 @@
 import { useEffect, useState } from 'react';
-import { Plus, Download, Loader, Printer } from 'lucide-react';
+import { Plus, Download, Printer } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
 import { downloadPrintPoster } from '../../services/pdfPosterGenerator';
+import { useAppStore } from '../../store/appStore';
+import type { LandingConfig } from '../../types';
 
-interface Landing {
+interface PosterDisplay {
     id: string;
     title: string;
-    slug: string;
-    status: 'active' | 'draft';
+    projectId: string;
+    landingId: string;
     createdAt: string;
+    landingUrl: string;
 }
 
 export function PostersList({ onGenerate }: { onGenerate: () => void }) {
-    const [landings, setLandings] = useState<Landing[]>([]);
-    const [loading, setLoading] = useState(true);
+    const projects = useAppStore(state => state.projects);
+    const [posters, setPosters] = useState<PosterDisplay[]>([]);
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
     const { addToast } = useToast();
 
     useEffect(() => {
-        loadLandings();
-    }, []);
+        loadPosters();
+    }, [projects]);
 
-    const loadLandings = async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/landings`);
-            const data = await response.json();
-            if (data.success && data.landings) {
-                setLandings(data.landings);
-            }
-        } catch (error) {
-            console.error('Error loading data for posters:', error);
-            addToast('Error cargando datos', 'error');
-        } finally {
-            setLoading(false);
-        }
+    const loadPosters = () => {
+        // Each landing can generate a poster
+        const allPosters: PosterDisplay[] = [];
+
+        projects.forEach(project => {
+            project.landings?.forEach((landing: LandingConfig) => {
+                const createdDate = landing.createdAt || project.createdAt;
+                allPosters.push({
+                    id: `poster-${landing.id}`,
+                    title: landing.name || project.name,
+                    projectId: project.id,
+                    landingId: landing.id,
+                    createdAt: createdDate instanceof Date ? createdDate.toISOString() : createdDate,
+                    landingUrl: `/p/${landing.id}`
+                });
+            });
+        });
+
+        setPosters(allPosters);
     };
 
-    const handleDownload = async (landing: Landing) => {
-        setDownloadingId(landing.id);
+    const handleDownload = async (poster: PosterDisplay) => {
+        setDownloadingId(poster.id);
         try {
             await downloadPrintPoster({
-                businessName: landing.title, // In real app, get from landing details
+                businessName: poster.title,
                 businessType: 'Comercio Local',
                 tagline: 'Escanea para ofertas exclusivas',
-                landingUrl: `https://fotofachada.app/p/${landing.slug}`,
-                primaryColor: '#6366f1', // Default primary
+                landingUrl: `https://fotofachada.app${poster.landingUrl}`,
+                primaryColor: '#6366f1',
                 phone: '+34 600 000 000',
                 address: 'Calle Principal 123'
             });
@@ -58,15 +67,7 @@ export function PostersList({ onGenerate }: { onGenerate: () => void }) {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center py-20">
-                <Loader className="animate-spin text-primary" size={40} />
-            </div>
-        );
-    }
-
-    if (landings.length === 0) {
+    if (posters.length === 0) {
         return (
             <div className="text-center py-20 bg-surface rounded-xl border border-border/50">
                 <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -98,8 +99,8 @@ export function PostersList({ onGenerate }: { onGenerate: () => void }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {landings.map((landing) => (
-                    <div key={landing.id} className="card overflow-hidden group hover:border-primary/50 transition-all">
+                {posters.map((poster) => (
+                    <div key={poster.id} className="card overflow-hidden group hover:border-primary/50 transition-all">
                         {/* Preview Area (Mock) */}
                         <div className="h-48 bg-gradient-to-br from-gray-900 to-gray-800 relative flex items-center justify-center p-6">
                             <div className="absolute inset-0 opacity-20 bg-[url('https://source.unsplash.com/random/800x600/?texture')]" />
@@ -114,17 +115,17 @@ export function PostersList({ onGenerate }: { onGenerate: () => void }) {
                         </div>
 
                         <div className="p-5">
-                            <h3 className="font-bold text-lg mb-1">{landing.title}</h3>
+                            <h3 className="font-bold text-lg mb-1">{poster.title}</h3>
                             <div className="flex items-center justify-between mt-4">
                                 <span className="text-xs text-secondary uppercase tracking-wider">PDF Listo</span>
                                 <Button
                                     variant="primary"
                                     size="sm"
-                                    onClick={() => handleDownload(landing)}
-                                    disabled={downloadingId === landing.id}
+                                    onClick={() => handleDownload(poster)}
+                                    disabled={downloadingId === poster.id}
                                 >
-                                    {downloadingId === landing.id ? (
-                                        <Loader className="animate-spin" size={16} />
+                                    {downloadingId === poster.id ? (
+                                        <Download className="animate-pulse" size={16} />
                                     ) : (
                                         <>
                                             <Download size={16} />

@@ -1,49 +1,46 @@
 import { useEffect, useState } from 'react';
-import { Plus, ExternalLink, Loader, Eye, Trash2 } from 'lucide-react';
+import { Plus, ExternalLink, Eye, Trash2 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { useToast } from '../ui/Toast';
+import { useAppStore } from '../../store/appStore';
+import type { LandingConfig } from '../../types';
 
-interface Landing {
+interface LandingDisplay {
     id: string;
     title: string;
-    slug: string;
+    projectId: string;
+    projectName: string;
     status: 'active' | 'draft';
-    views: number;
-    conversions: number;
     createdAt: string;
 }
 
 export function LandingsList({ onCreateNew }: { onCreateNew: () => void }) {
-    const [landings, setLandings] = useState<Landing[]>([]);
-    const [loading, setLoading] = useState(true);
-    const { addToast } = useToast();
+    const projects = useAppStore(state => state.projects);
+    const [landings, setLandings] = useState<LandingDisplay[]>([]);
 
     useEffect(() => {
         loadLandings();
-    }, []);
+    }, [projects]);
 
-    const loadLandings = async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/landings`);
-            const data = await response.json();
-            if (data.success && data.landings) {
-                setLandings(data.landings);
-            }
-        } catch (error) {
-            console.error('Error loading landings:', error);
-            addToast('Error cargando landings', 'error');
-        } finally {
-            setLoading(false);
-        }
+    const loadLandings = () => {
+        // Extract all landings from all projects
+        const allLandings: LandingDisplay[] = [];
+
+        projects.forEach(project => {
+            project.landings?.forEach((landing: LandingConfig) => {
+                const createdDate = landing.createdAt || project.createdAt;
+                allLandings.push({
+                    id: landing.id,
+                    title: landing.name || project.name,
+                    projectId: project.id,
+                    projectName: project.name,
+                    status: 'active', // Default to active
+                    createdAt: createdDate instanceof Date ? createdDate.toISOString() : createdDate
+                });
+            });
+        });
+
+        setLandings(allLandings);
     };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center py-20">
-                <Loader className="animate-spin text-primary" size={40} />
-            </div>
-        );
-    }
 
     if (landings.length === 0) {
         return (
@@ -91,21 +88,14 @@ export function LandingsList({ onCreateNew }: { onCreateNew: () => void }) {
                                         {landing.status === 'active' ? 'Publicada' : 'Borrador'}
                                     </span>
                                     <span>•</span>
+                                    <span>{landing.projectName}</span>
+                                    <span>•</span>
                                     <span>{new Date(landing.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-8 w-full md:w-auto justify-between md:justify-end">
-                            <div className="text-center">
-                                <div className="text-lg font-bold">{landing.views}</div>
-                                <div className="text-xs text-secondary">Visitas</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-lg font-bold text-primary">{landing.conversions}</div>
-                                <div className="text-xs text-secondary">Leads</div>
-                            </div>
-
+                        <div className="flex items-center gap-8 w-full md:w-auto justify-end">
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" size="sm" onClick={() => window.open(`/p/${landing.id}`, '_blank')}>
                                     <ExternalLink size={18} />
