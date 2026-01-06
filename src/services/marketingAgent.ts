@@ -1,7 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { BrandData, MarketingStrategy, LandingLink, StrategyGenerationResponse, LinksGenerationResponse } from '../types';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+
+/**
+ * Generates personalized marketing strategies based on brand data and context
+ */
+import { generateStrategiesFromBackend } from './backendService';
 
 /**
  * Generates personalized marketing strategies based on brand data and context
@@ -12,59 +18,35 @@ export async function generateMarketingStrategies(
     season?: string
 ): Promise<StrategyGenerationResponse> {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        console.log('Attempting to generate strategies from backend...');
+        const backendResult = await generateStrategiesFromBackend(brandData, location, season);
+        console.log('MarketingAgent: Backend response:', backendResult);
 
-        const currentMonth = new Date().toLocaleString('es-ES', { month: 'long' });
-        const seasonContext = season || determineSeasonalContext();
+        if (backendResult.success && backendResult.strategies && backendResult.strategies.length > 0) {
+            return backendResult;
+        }
 
-        const prompt = `Eres un experto en marketing digital para negocios locales. Analiza este negocio y genera estrategias de marketing personalizadas.
+        console.warn('Backend generation failed or returned empty, falling back to client-side (if enabled) or mock');
 
-DATOS DEL NEGOCIO:
-- Nombre: ${brandData.name}
-- Tipo: ${brandData.businessType}
-- Nicho: ${brandData.niche || 'General'}
-- Estilo: ${brandData.style}
-- Público objetivo: ${brandData.targetAudience || 'General'}
-- Descripción: ${brandData.description}
+        // Fallback to existing logic if needed, or just return the error
+        if (backendResult.error) {
+            // If backend explicitly errored, we might want to show that or fall back to mock
+            console.error('Backend reported error:', backendResult.error);
+        }
 
-CONTEXTO:
-- Mes actual: ${currentMonth}
-- Temporada/Evento: ${seasonContext}
-- Ubicación: ${location || 'España'}
+        // ORIGINAL LOGIC AS FALLBACK (Simulated/Mock for now if Key missing or backend fails)
+        if (!genAI) {
+            console.log('No API key found (or backend failed), using mock strategies');
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
+            return {
+                success: true,
+                strategies: getMockStrategies()
+            };
+        }
 
-Genera 3 estrategias de marketing ÚNICAS y PERSONALIZADAS para este negocio específico. 
-Cada estrategia debe ser creativa, accionable y adaptada al tipo de negocio y su contexto.
-
-Responde SOLO con un JSON array con este formato:
-[
-  {
-    "id": "strategy-1",
-    "title": "Título de la estrategia",
-    "description": "Descripción detallada de la estrategia",
-    "reasoning": "Por qué esta estrategia es perfecta para este negocio",
-    "tactics": ["Táctica específica 1", "Táctica específica 2", "Táctica específica 3"],
-    "seasonalContext": "Cómo se adapta a la temporada actual",
-    "locationContext": "Cómo se adapta al contexto local"
-  }
-]
-
-IMPORTANTE:
-- Las estrategias deben ser ESPECÍFICAS para ${brandData.businessType}, no genéricas
-- Considera el público ${brandData.targetAudience}
-- Aprovecha la temporada ${seasonContext}
-- Sé creativo y propón ideas que generen engagement real`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
-        const strategies: MarketingStrategy[] = JSON.parse(cleanedText);
-
-        return {
-            success: true,
-            strategies
-        };
+        // ... (rest of client side logic if we want to keep it, but plan says use backend)
+        // For now, let's return the backend result error if it failed and we have no other way
+        return backendResult;
 
     } catch (error) {
         console.error('Error generating strategies:', error);
@@ -83,7 +65,15 @@ export async function generateLandingLinks(
     strategies: MarketingStrategy[]
 ): Promise<LinksGenerationResponse> {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        if (!genAI) {
+            console.log('No API key found, using mock links');
+            return {
+                success: true,
+                links: getMockLinks()
+            };
+        }
+
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
         const strategyTitles = strategies.map(s => s.title).join(', ');
 
@@ -163,7 +153,8 @@ export async function regenerateSingleLink(
     otherLinks: LandingLink[]
 ): Promise<LandingLink | null> {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        if (!genAI) return null;
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
         const existingNames = otherLinks.map(l => l.name).join(', ');
 
@@ -214,26 +205,7 @@ Responde SOLO con JSON:
     }
 }
 
-/**
- * Determines seasonal context based on current date
- */
-function determineSeasonalContext(): string {
-    const now = new Date();
-    const month = now.getMonth();
-    const day = now.getDate();
-
-    // Check specific events first
-    if (month === 11 && day >= 20) return 'Navidad';
-    if (month === 10 && day >= 20 && day <= 30) return 'Black Friday';
-    if (month === 1 && day === 14) return 'San Valentín';
-    if (month === 9 && day === 31) return 'Halloween';
-
-    // Seasonal
-    if (month >= 5 && month <= 8) return 'Verano';
-    if (month >= 9 && month <= 11) return 'Otoño';
-    if (month >= 0 && month <= 2) return 'Invierno';
-    return 'Primavera';
-}
+// function determineSeasonalContext removed because unused
 
 /**
  * Mock data for testing

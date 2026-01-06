@@ -14,6 +14,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+    // Mock navigation for legal pages (in real app use router)
+    const openTerms = () => window.open('/terms', '_blank');
+    const openPrivacy = () => window.open('/privacy', '_blank');
 
     if (!isOpen) return null;
 
@@ -93,20 +98,36 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 </div>
                             )}
 
+                            <div className="flex items-start gap-3 p-1">
+                                <div className="flex items-center h-5">
+                                    <input
+                                        id="terms"
+                                        type="checkbox"
+                                        checked={acceptedTerms}
+                                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                        className="w-4 h-4 rounded border-gray-600 bg-black/40 text-primary focus:ring-primary/50 cursor-pointer"
+                                    />
+                                </div>
+                                <div className="text-xs text-gray-400">
+                                    <label htmlFor="terms" className="cursor-pointer select-none">
+                                        He leído y acepto los{' '}
+                                        <button type="button" onClick={openTerms} className="text-indigo-400 hover:underline">Términos de Servicio</button>
+                                        {' '}y la{' '}
+                                        <button type="button" onClick={openPrivacy} className="text-indigo-400 hover:underline">Política de Privacidad</button>.
+                                    </label>
+                                </div>
+                            </div>
+
                             <Button
                                 type="submit"
                                 variant="primary"
                                 className="w-full h-12"
-                                disabled={loading}
+                                disabled={loading || !acceptedTerms}
                                 leftIcon={loading ? <Loader className="animate-spin" /> : undefined}
                                 rightIcon={!loading ? <ArrowRight size={18} /> : undefined}
                             >
                                 {loading ? 'Enviando enlace...' : 'Continuar con Email'}
                             </Button>
-
-                            <p className="text-xs text-center text-gray-500 mt-4">
-                                Al continuar, aceptas nuestros Tameinos de Servicio y Política de Privacidad.
-                            </p>
                         </form>
                     )}
                 </div>

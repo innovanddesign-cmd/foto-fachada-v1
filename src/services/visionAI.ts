@@ -2,49 +2,61 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { BrandData, VisionAnalysisResponse } from '../types';
 
 // Initialize with API key from environment
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 /**
- * Analyzes a storefront image and extracts brand information
+ * Analyzes business images (storefront, interior, etc.) and extracts brand information
  */
-export async function analyzeStorefrontImage(imageBase64: string): Promise<VisionAnalysisResponse> {
+export async function analyzeBusinessMedia(imagesBase64: string[]): Promise<VisionAnalysisResponse> {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        if (!genAI) {
+            console.log('No API key found, using mock data for vision analysis');
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate delay
+            return {
+                success: true,
+                data: getMockBrandData()
+            };
+        }
 
-        const prompt = `Analiza esta imagen de la fachada de un negocio y extrae la siguiente información en formato JSON:
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+        const prompt = `Analiza estas imágenes del negocio (pueden ser fachada, interior, productos, etc.) y extrae la siguiente información en formato JSON. Si hay varias imágenes, combina la información para crear un perfil de marca coherente.
 
 {
-  "name": "Nombre del negocio visible en la fachada",
-  "businessType": "Tipo de negocio (ej: bar, peluquería, restaurante, tienda, gimnasio, etc.)",
-  "niche": "Nicho específico si lo hay (ej: peluquería urbana, bar de copas universitario, restaurante mexicano)",
-  "description": "Breve descripción del estilo y ambiente del negocio basándote en lo que ves",
+  "name": "Nombre del negocio (busca señales en fachada o interior)",
+  "businessType": "Tipo de negocio (ej: bar, peluquería, restaurante, tienda, gimnasio...)",
+  "niche": "Nicho específico (ej: peluquería urbana, bar de copas universitario, restaurante italiano elegante)",
+  "description": "Descripción DETALLADA del estilo, ambiente y 'vibe' del negocio. Menciona detalles de decoración, iluminación y atmósfera.",
   "colors": {
-    "primary": "Color principal en formato hexadecimal",
-    "secondary": "Color secundario en formato hexadecimal", 
-    "accent": "Color de acento en formato hexadecimal"
+    "primary": "Color principal dominante (hex)",
+    "secondary": "Color secundario (hex)", 
+    "accent": "Color de acento o contraste (hex)"
   },
-  "typography": "Descripción del estilo tipográfico (ej: moderna, clásica, manuscrita, bold, etc.)",
-  "style": "Estilo visual general (ej: urbano, elegante, rústico, minimalista, vibrante)",
-  "targetAudience": "Público objetivo estimado basándote en el estilo del negocio"
+  "typography": "Estilo tipográfico observado o sugerido (ej: moderna, clásica, manuscrita...)",
+  "style": "Estilo visual general (ej: industrial, minimalista, rústico, vibrante, lujoso...)",
+  "targetAudience": "Público objetivo estimado basándote en el diseño y ambiente"
 }
 
 IMPORTANTE: 
-- Responde SOLO con el JSON, sin markdown ni texto adicional
-- Si no puedes determinar algo, usa valores por defecto razonables
-- Los colores deben ser códigos hexadecimales válidos (#RRGGBB)
-- Sé específico y descriptivo`;
+- Responde SOLO con el JSON.
+- Sé creativo y descriptivo.
+- Si no ves el nombre, usa "Tu Negocio" o infiérelo.`;
 
-        // Remove data URL prefix if present
-        const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+        // Prepare image parts
+        const imageParts = imagesBase64.map(base64 => {
+            const data = base64.replace(/^data:image\/\w+;base64,/, '');
+            return {
+                inlineData: {
+                    mimeType: 'image/jpeg',
+                    data: data
+                }
+            };
+        });
 
         const result = await model.generateContent([
             prompt,
-            {
-                inlineData: {
-                    mimeType: 'image/jpeg',
-                    data: base64Data
-                }
-            }
+            ...imageParts
         ]);
 
         const response = await result.response;
@@ -60,10 +72,10 @@ IMPORTANTE:
         };
 
     } catch (error) {
-        console.error('Error analyzing image:', error);
+        console.error('Error analyzing images:', error);
         return {
             success: false,
-            error: error instanceof Error ? error.message : 'Error desconocido al analizar la imagen'
+            error: error instanceof Error ? error.message : 'Error desconocido al analizar las imágenes'
         };
     }
 }
@@ -73,17 +85,18 @@ IMPORTANTE:
  */
 export function getMockBrandData(): BrandData {
     return {
-        name: 'LA MOVIDA',
-        businessType: 'Bar de Copas',
-        niche: 'Zona Universitaria',
-        description: 'Bar de ambiente juvenil y vibrante, decoración urbana con toques neón y música moderna. Ideal para noches de copas con amigos.',
+        name: "Cafetería El Aroma",
+        businessType: "cafetería",
+        niche: "Café de especialidad",
+        tagline: "El mejor café de la ciudad",
+        description: "Un espacio acogedor para amantes del café.",
         colors: {
-            primary: '#FF6B35',
-            secondary: '#004E89',
-            accent: '#F7B801'
+            primary: "#d97706",
+            secondary: "#92400e",
+            accent: "#f59e0b"
         },
-        typography: 'Bold, Moderna, Energética',
-        style: 'Urbano, Juvenil, Vibrante',
-        targetAudience: 'Estudiantes universitarios 18-25 años'
+        typography: "Lato",
+        style: "Moderno y rústico",
+        targetAudience: "Jóvenes profesionales y estudiantes"
     };
 }

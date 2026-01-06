@@ -29,9 +29,11 @@ interface AppState {
     currentStep: FlowStep;
     setCurrentStep: (step: FlowStep) => void;
 
-    // Image upload
-    uploadedImage: string | null;
-    setUploadedImage: (image: string | null) => void;
+    // Media upload
+    uploadedMedia: { type: 'image' | 'video'; url: string; thumbnail?: string }[];
+    setUploadedMedia: (media: { type: 'image' | 'video'; url: string; thumbnail?: string }[]) => void;
+    addUploadedMedia: (item: { type: 'image' | 'video'; url: string; thumbnail?: string }) => void;
+    removeUploadedMedia: (index: number) => void;
 
     // Brand analysis
     brandData: BrandData | null;
@@ -68,8 +70,15 @@ interface AppState {
     isGeneratingPoster: boolean;
     setIsGeneratingPoster: (generating: boolean) => void;
 
+    // Widget Engine
+    selectedStrategy: MarketingStrategy | null;
+    setSelectedStrategy: (strategy: MarketingStrategy | null) => void;
+    widgetConfig: Record<string, any>;
+    setWidgetConfig: (config: Record<string, any>) => void;
+
     // Projects
     projects: Project[];
+    setProjects: (projects: Project[]) => void;
     currentProject: Project | null;
     addProject: (project: Project) => Promise<void>;
     deleteProject: (projectId: string) => Promise<void>;
@@ -109,9 +118,13 @@ export const useAppStore = create<AppState>()(
             currentStep: 'upload',
             setCurrentStep: (step) => set({ currentStep: step }),
 
-            // Image upload
-            uploadedImage: null,
-            setUploadedImage: (image) => set({ uploadedImage: image }),
+            // Media upload
+            uploadedMedia: [],
+            setUploadedMedia: (media) => set({ uploadedMedia: media }),
+            addUploadedMedia: (item) => set((state) => ({ uploadedMedia: [...state.uploadedMedia, item] })),
+            removeUploadedMedia: (index) => set((state) => ({
+                uploadedMedia: state.uploadedMedia.filter((_, i) => i !== index)
+            })),
 
             // Brand analysis  
             brandData: null,
@@ -152,8 +165,17 @@ export const useAppStore = create<AppState>()(
             isGeneratingPoster: false,
             setIsGeneratingPoster: (generating) => set({ isGeneratingPoster: generating }),
 
+
+
+            // Widget Engine (New)
+            selectedStrategy: null,
+            setSelectedStrategy: (strategy) => set({ selectedStrategy: strategy }),
+            widgetConfig: {},
+            setWidgetConfig: (config) => set({ widgetConfig: config }),
+
             // Projects
             projects: [],
+            setProjects: (projects) => set({ projects }),
             currentProject: null,
             fetchProjects: async () => {
                 const { user } = get();
@@ -272,9 +294,11 @@ export const useAppStore = create<AppState>()(
             // Reset flow
             resetFlow: () => set({
                 currentStep: 'upload',
-                uploadedImage: null,
+                uploadedMedia: [],
                 brandData: null,
                 strategies: [],
+                selectedStrategy: null,
+                widgetConfig: {},
                 links: [],
                 landingConfig: LANDING_THEMES['modern'],
                 generatedBackgroundImage: null,

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Plus, ChevronRight, Sparkles, ArrowLeft } from 'lucide-react';
+import { ChevronRight, Sparkles, ArrowLeft, Plus } from 'lucide-react';
 import { useAppStore } from './store/appStore';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { AuthModal } from './components/AuthModal';
@@ -21,18 +21,25 @@ import { LinkEditorV3 } from './components/LinkEditorV3';
 import { LandingPreviewV3 } from './components/LandingPreviewV3';
 import { PosterGeneratorV3 } from './components/PosterGeneratorV3';
 import { CreateProjectModal } from './components/CreateProjectModal';
-import { analyzeStorefrontImage, getMockBrandData } from './services/visionAI';
+import { SettingsModal } from './components/SettingsModal';
+import { AccountSettings } from './components/features/AccountSettings';
+import { HelpCenter } from './components/features/HelpCenter';
+import { LandingsList } from './components/features/LandingsList';
+import { PostersList } from './components/features/PostersList';
+import { SupportCenter } from './components/features/support/SupportCenter';
+import { CookieBanner } from './components/legal/CookieBanner';
+import { analyzeBusinessMedia, getMockBrandData } from './services/visionAI';
 import { generateMarketingStrategies, generateLandingLinks, getMockStrategies, getMockLinks } from './services/marketingAgent';
 import type { Project, LandingConfig, UserTier } from './types';
 import { PublicLandingPage } from './components/pages/PublicLandingPage';
 
-type AppView = 'home' | 'dashboard' | 'project' | 'create-landing' | 'pricing';
+type AppView = 'home' | 'dashboard' | 'project' | 'create-landing' | 'pricing' | 'campaigns' | 'landings' | 'strategies' | 'posters' | 'settings' | 'help';
 
 function AppContent() {
   const {
     currentStep,
     setCurrentStep,
-    uploadedImage,
+    uploadedMedia,
     brandData,
     setBrandData,
     isAnalyzing,
@@ -58,6 +65,7 @@ function AppContent() {
   const [appView, setAppView] = useState<AppView>('home');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const { setUser, fetchProjects } = useAppStore();
 
@@ -124,17 +132,27 @@ function AppContent() {
 
   // Step handlers
   const handleAnalyze = useCallback(async () => {
-    if (!uploadedImage) return;
+    if (uploadedMedia.length === 0) return;
 
     setCurrentStep('analysis');
     setIsAnalyzing(true);
 
     try {
       if (hasApiKey) {
-        const result = await analyzeStorefrontImage(uploadedImage);
+        // Collect URLs and convert to Base64
+        const mediaUrls = uploadedMedia.map(m => m.url);
+
+        // Convert blob URLs to actual Base64 strings for Gemini API
+        const { blobToBase64 } = await import('./services/imageUtils');
+        const base64Images = await Promise.all(
+          mediaUrls.map(url => blobToBase64(url))
+        );
+
+        // Analyze all media
+        const result = await analyzeBusinessMedia(base64Images);
         if (result.success && result.data) {
           setBrandData(result.data);
-          addToast('Análisis completado', 'success');
+          addToast('Análisis de negocio completado', 'success');
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -146,7 +164,7 @@ function AppContent() {
     }
 
     setIsAnalyzing(false);
-  }, [uploadedImage, hasApiKey, setCurrentStep, setIsAnalyzing, setBrandData, addToast]);
+  }, [uploadedMedia, hasApiKey, setCurrentStep, setIsAnalyzing, setBrandData, addToast]);
 
   const handleGenerateStrategies = useCallback(async () => {
     if (!brandData) return;
@@ -156,9 +174,16 @@ function AppContent() {
 
     try {
       if (hasApiKey) {
+        console.log('App: Calling generateMarketingStrategies...');
         const result = await generateMarketingStrategies(brandData);
+        console.log('App: Result from generateMarketingStrategies:', result);
+
         if (result.success && result.strategies) {
+          console.log('App: Setting strategies:', result.strategies);
           setStrategies(result.strategies);
+        } else {
+          console.error('App: Strategy generation failed or no strategies returned', result);
+          addToast(`Error: ${result.error || 'No strategies returned'}`, 'error');
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 2500));
@@ -166,6 +191,7 @@ function AppContent() {
       }
       addToast('Estrategias generadas', 'success');
     } catch (error) {
+      console.error('App: Critical error in handleGenerateStrategies:', error);
       addToast('Error generando estrategias', 'error');
     }
 
@@ -236,7 +262,7 @@ function AppContent() {
 
     switch (currentStep) {
       case 'upload':
-        return uploadedImage && (
+        return uploadedMedia.length > 0 && (
           <Button {...buttonProps} onClick={handleAnalyze} rightIcon={<ChevronRight size={18} />}>
             <Sparkles size={18} />
             Analizar negocio
@@ -299,6 +325,8 @@ function AppContent() {
           onNavigate={handleNavigate}
           currentView="dashboard"
           onLogin={() => setShowAuthModal(true)}
+          onShowPricing={handleShowPricing}
+          onOpenSettings={() => setShowSettingsModal(true)}
         />
         <PageContainer>
           <DashboardV3
@@ -320,9 +348,87 @@ function AppContent() {
             addToast('Proyecto creado', 'success');
           }}
         />
+        <SettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+        />
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
+        />
+      </>
+    );
+  }
+
+  // Render Landings Tab
+  if (appView === 'landings') {
+    return (
+      <>
+        <Header
+          onNavigate={handleNavigate}
+          currentView="landings"
+          onLogin={() => setShowAuthModal(true)}
+          onShowPricing={handleShowPricing}
+          onOpenSettings={() => setShowSettingsModal(true)}
+        />
+        <PageContainer>
+          <LandingsList onCreateNew={handleCreateLanding} />
+        </PageContainer>
+        <SettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+        />
+      </>
+    );
+  }
+
+  // Render Posters Tab
+  if (appView === 'posters') {
+    return (
+      <>
+        <Header
+          onNavigate={handleNavigate}
+          currentView="posters"
+          onLogin={() => setShowAuthModal(true)}
+          onShowPricing={handleShowPricing}
+          onOpenSettings={() => setShowSettingsModal(true)}
+        />
+        <PageContainer>
+          <PostersList onGenerate={handleCreateLanding} />
+        </PageContainer>
+        <SettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+        />
+      </>
+    );
+  }
+
+  // Placeholder for remaining tabs (Campaigns/Strategies)
+  if (['campaigns', 'strategies'].includes(appView)) {
+    return (
+      <>
+        <Header
+          onNavigate={handleNavigate}
+          currentView={appView}
+          onLogin={() => setShowAuthModal(true)}
+          onShowPricing={handleShowPricing}
+          onOpenSettings={() => setShowSettingsModal(true)}
+        />
+        <PageContainer>
+          <div className="text-center py-20">
+            <h2 className="text-2xl font-bold mb-4 capitalize">{appView}</h2>
+            <p className="text-secondary text-lg">Esta sección estará disponible próximamente.</p>
+            <div className="mt-8">
+              <Button variant="primary" onClick={() => handleNavigate('dashboard')}>
+                Volver al Dashboard
+              </Button>
+            </div>
+          </div>
+        </PageContainer>
+        <SettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
         />
       </>
     );
@@ -349,13 +455,16 @@ function AppContent() {
           title={currentStepInfo.title}
           description={currentStepInfo.description}
           actions={
-            <Button
-              variant="ghost"
-              onClick={() => handleNavigate('dashboard')}
-              leftIcon={<ArrowLeft size={16} />}
-            >
-              Cancelar
-            </Button>
+            <div className="flex gap-3 items-center">
+              <Button
+                variant="ghost"
+                onClick={() => handleNavigate('dashboard')}
+                leftIcon={<ArrowLeft size={16} />}
+              >
+                Cancelar
+              </Button>
+              {renderActionButton()}
+            </div>
           }
         >
           {/* Main Content */}
@@ -370,11 +479,6 @@ function AppContent() {
               </div>
             )}
             {currentStep === 'poster' && <PosterGeneratorV3 />}
-          </div>
-
-          {/* Action Button */}
-          <div className="flex justify-center">
-            {renderActionButton()}
           </div>
 
           {/* Demo Warning */}
@@ -413,10 +517,43 @@ function AppContent() {
 
   // Render Pricing
   if (appView === 'pricing') {
-    const handleSelectPlan = (tier: UserTier) => {
-      // Por ahora solo mostrar toast - en producción abriría modal de pago
-      if (tier !== 'free') {
-        addToast(`Plan ${tier.toUpperCase()} seleccionado - Próximamente podrás completar el pago`, 'info');
+    const handleSelectPlan = async (tier: UserTier) => {
+      if (tier === 'free') return;
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          // Trigger login if not authenticated
+          const event = new CustomEvent('open-auth-modal');
+          window.dispatchEvent(event);
+          return;
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/billing/create-checkout-session`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            planId: tier,
+            userId: session.user.id,
+            email: session.user.email,
+            successUrl: `${window.location.origin}/dashboard?payment=success`,
+            cancelUrl: `${window.location.origin}/pricing?payment=cancelled`
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.url) {
+          window.location.href = data.url;
+        } else {
+          addToast('Error al iniciar el pago: ' + (data.error || 'Desconocido'), 'error');
+        }
+      } catch (error) {
+        console.error('Payment Error:', error);
+        addToast('Error de conexión con el servidor de pagos', 'error');
       }
     };
 
@@ -433,6 +570,39 @@ function AppContent() {
       </>
     );
   }
+  // Render Settings
+  if (appView === 'settings') {
+    return (
+      <>
+        <Header
+          onNavigate={handleNavigate}
+          currentView="settings"
+          onLogin={() => setShowAuthModal(true)}
+        />
+        <PageContainer>
+          <AccountSettings />
+        </PageContainer>
+        <SupportCenter />
+      </>
+    );
+  }
+
+  // Render Help Center
+  if (appView === 'help') {
+    return (
+      <>
+        <Header
+          onNavigate={handleNavigate}
+          currentView="help"
+          onLogin={() => setShowAuthModal(true)}
+        />
+        <PageContainer>
+          <HelpCenter />
+        </PageContainer>
+        <SupportCenter />
+      </>
+    );
+  }
 
   return null;
 }
@@ -444,6 +614,7 @@ export default function App() {
         <Route path="/p/:id" element={<PublicLandingPage />} />
         <Route path="/*" element={<AppContent />} />
       </Routes>
+      <CookieBanner />
     </ToastProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Plus,
     FolderOpen,
@@ -10,26 +10,54 @@ import {
     LayoutGrid,
     List,
     ArrowUpRight,
-    Sparkles,
-    Zap,
-    TrendingUp
+    Eye,
+    QrCode,
+    MousePointerClick,
+    Rocket
 } from 'lucide-react';
+
 import { useAppStore } from '../../store/appStore';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { ConfirmModal } from '../ui/ConfirmModal';
+import { Tooltip } from '../ui/Tooltip';
+import { EmptyState } from '../ui/EmptyState';
+import { deleteCampaign, getDashboardMetrics } from '../../services/campaignService';
 import type { Project } from '../../types';
 import './DashboardV3.css';
 
 interface DashboardV3Props {
     onCreateNew: () => void;
     onOpenProject: (project: Project) => void;
+    onViewLanding?: (project: Project) => void;
+    onDownloadPoster?: (project: Project) => void;
 }
 
-export function DashboardV3({ onCreateNew, onOpenProject }: DashboardV3Props) {
-    const { projects, userTier } = useAppStore();
+interface DashboardMetrics {
+    totalVisits: number;
+    totalScans: number;
+    totalClicks: number;
+    activeCampaigns: number;
+}
+
+export function DashboardV3({ onCreateNew, onOpenProject, onViewLanding, onDownloadPoster }: DashboardV3Props) {
+    const { projects, userTier, setProjects } = useAppStore();
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
+    // Delete confirmation
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    // Metrics
+    const [metrics, setMetrics] = useState<DashboardMetrics>({
+        totalVisits: 0,
+        totalScans: 0,
+        totalClicks: 0,
+        activeCampaigns: 0
+    });
 
     const maxProjects = userTier === 'free' ? 1 : userTier === 'plus' ? 5 : userTier === 'pro' ? 20 : -1;
     const canCreateMore = maxProjects === -1 || projects.length < maxProjects;
@@ -39,6 +67,11 @@ export function DashboardV3({ onCreateNew, onOpenProject }: DashboardV3Props) {
         project.campaign?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Load metrics on mount
+    useEffect(() => {
+        getDashboardMetrics().then(setMetrics);
+    }, [projects]);
+
     const formatDate = (date: Date) => {
         return new Date(date).toLocaleDateString('es-ES', {
             day: 'numeric',
@@ -47,16 +80,61 @@ export function DashboardV3({ onCreateNew, onOpenProject }: DashboardV3Props) {
         });
     };
 
+    // Handle delete
+    const handleDeleteClick = (e: React.MouseEvent, project: Project) => {
+        e.stopPropagation();
+        setProjectToDelete(project);
+        setDeleteModalOpen(true);
+        setActiveMenu(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!projectToDelete) return;
+
+        setIsDeleting(true);
+
+        // Optimistic UI update
+        const updatedProjects = projects.filter(p => p.id !== projectToDelete.id);
+        setProjects(updatedProjects);
+
+        try {
+            await deleteCampaign(projectToDelete.id);
+        } catch (error) {
+            // Revert on error
+            setProjects(projects);
+            console.error('Delete failed:', error);
+        } finally {
+            setIsDeleting(false);
+            setDeleteModalOpen(false);
+            setProjectToDelete(null);
+        }
+    };
+
     // Stats
-    const totalLandings = projects.reduce((acc, p) => acc + p.landings.length, 0);
+    const hasData = metrics.totalVisits > 0 || metrics.totalScans > 0;
+
+    // Empty state for no projects at all
+    if (projects.length === 0 && !searchQuery) {
+        return (
+            <div className="dashboard-v3">
+                <EmptyState
+                    icon={<Rocket size={48} />}
+                    title="¡Bienvenido a Foto Fachada!"
+                    description="Crea tu primera campaña de marketing y empieza a atraer clientes con landings y carteles profesionales."
+                    actionLabel="Crear mi primera campaña"
+                    onAction={onCreateNew}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="dashboard-v3">
             {/* V3 Header Section */}
             <div className="dashboard-v3-header">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Panel de Control</h1>
-                    <p className="text-gray-400">Gestiona tus proyectos y campañas de marketing</p>
+                    <h1 className="text-3xl font-bold mb-2">Panel de Control</h1>
+                    <p className="description-v3">Gestiona tus proyectos y campañas de marketing</p>
                 </div>
                 <div className="flex gap-3">
                     <Button
@@ -71,61 +149,74 @@ export function DashboardV3({ onCreateNew, onOpenProject }: DashboardV3Props) {
                 </div>
             </div>
 
-            {/* Stats Cards - Glass Effect */}
+            {/* Stats Cards - Glass Effect with Tooltips */}
             <div className="stats-grid-v3">
-                <div className="glass-stat-card">
-                    <div className="stat-icon-wrapper blue">
-                        <FolderOpen size={24} />
+                <Tooltip content="Número de proyectos activos en tu cuenta">
+                    <div className="glass-stat-card">
+                        <div className="stat-icon-wrapper blue">
+                            <FolderOpen size={24} />
+                        </div>
+                        <div className="stat-info">
+                            <span className="stat-value-v3">{projects.length}</span>
+                            <span className="stat-label-v3">Proyectos Activos</span>
+                        </div>
+                        <div className="stat-chart-mini">
+                            <div className="bar" style={{ height: '30%' }}></div>
+                            <div className="bar" style={{ height: '50%' }}></div>
+                            <div className="bar" style={{ height: '80%' }}></div>
+                        </div>
                     </div>
-                    <div className="stat-info">
-                        <span className="stat-value-v3">{projects.length}</span>
-                        <span className="stat-label-v3">Proyectos Activos</span>
-                    </div>
-                    <div className="stat-chart-mini">
-                        {/* CSS-only mini chart */}
-                        <div className="bar" style={{ height: '30%' }}></div>
-                        <div className="bar" style={{ height: '50%' }}></div>
-                        <div className="bar" style={{ height: '80%' }}></div>
-                    </div>
-                </div>
+                </Tooltip>
 
-                <div className="glass-stat-card">
-                    <div className="stat-icon-wrapper purple">
-                        <Zap size={24} />
+                <Tooltip content="Escaneos de QR en carteles físicos">
+                    <div className="glass-stat-card">
+                        <div className="stat-icon-wrapper purple">
+                            <QrCode size={24} />
+                        </div>
+                        <div className="stat-info">
+                            {hasData ? (
+                                <span className="stat-value-v3">{metrics.totalScans}</span>
+                            ) : (
+                                <span className="stat-value-v3 text-gray-500">—</span>
+                            )}
+                            <span className="stat-label-v3">Escaneos QR</span>
+                        </div>
+                        {!hasData && (
+                            <span className="stat-waiting">Esperando primer escaneo</span>
+                        )}
                     </div>
-                    <div className="stat-info">
-                        <span className="stat-value-v3">{totalLandings}</span>
-                        <span className="stat-label-v3">Landings Generadas</span>
-                    </div>
-                    <div className="stat-chart-mini">
-                        <div className="bar" style={{ height: '40%' }}></div>
-                        <div className="bar" style={{ height: '90%' }}></div>
-                        <div className="bar" style={{ height: '60%' }}></div>
-                    </div>
-                </div>
+                </Tooltip>
 
-                <div className="glass-stat-card">
-                    <div className="stat-icon-wrapper green">
-                        <TrendingUp size={24} />
+                <Tooltip content="Visitas totales a tus landings">
+                    <div className="glass-stat-card">
+                        <div className="stat-icon-wrapper green">
+                            <Eye size={24} />
+                        </div>
+                        <div className="stat-info">
+                            {hasData ? (
+                                <>
+                                    <span className="stat-value-v3">{metrics.totalVisits}</span>
+                                    <Badge variant="success" size="sm" className="ml-2">+12%</Badge>
+                                </>
+                            ) : (
+                                <span className="stat-value-v3 text-gray-500">0</span>
+                            )}
+                            <span className="stat-label-v3">Visitas Totales</span>
+                        </div>
                     </div>
-                    <div className="stat-info">
-                        <span className="stat-value-v3">1.2k</span>
-                        <span className="stat-label-v3">Visitas Totales</span>
-                    </div>
-                    <Badge variant="success" size="sm" className="ml-auto">+12%</Badge>
-                </div>
+                </Tooltip>
 
-                <div className="glass-stat-card plan-card">
-                    <div className="stat-info">
-                        <span className="stat-label-v3">Plan Actual</span>
-                        <span className="stat-value-v3 text-gradient">{userTier.toUpperCase()}</span>
+                <Tooltip content="Clicks en botones de tus landings">
+                    <div className="glass-stat-card">
+                        <div className="stat-icon-wrapper amber">
+                            <MousePointerClick size={24} />
+                        </div>
+                        <div className="stat-info">
+                            <span className="stat-value-v3">{hasData ? metrics.totalClicks : 0}</span>
+                            <span className="stat-label-v3">Clicks Totales</span>
+                        </div>
                     </div>
-                    {userTier === 'free' && (
-                        <Button variant="ghost" size="sm" className="upgrade-btn-v3">
-                            <Sparkles size={14} className="mr-2" /> Upgrade
-                        </Button>
-                    )}
-                </div>
+                </Tooltip>
             </div>
 
             {/* Toolbar V3 */}
@@ -175,10 +266,29 @@ export function DashboardV3({ onCreateNew, onOpenProject }: DashboardV3Props) {
 
                                 {activeMenu === project.id && (
                                     <div className="menu-dropdown-v3">
-                                        <button className="menu-item-v3">
+                                        <button className="menu-item-v3" onClick={(e) => {
+                                            e.stopPropagation();
+                                            onOpenProject(project);
+                                        }}>
                                             <Edit3 size={14} /> Editar
                                         </button>
-                                        <button className="menu-item-v3 text-red-500">
+                                        {onViewLanding && (
+                                            <button className="menu-item-v3" onClick={(e) => {
+                                                e.stopPropagation();
+                                                onViewLanding(project);
+                                            }}>
+                                                <Eye size={14} /> Ver Landing
+                                            </button>
+                                        )}
+                                        {onDownloadPoster && (
+                                            <button className="menu-item-v3" onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDownloadPoster(project);
+                                            }}>
+                                                <QrCode size={14} /> Descargar Cartel
+                                            </button>
+                                        )}
+                                        <button className="menu-item-v3 text-red-500" onClick={(e) => handleDeleteClick(e, project)}>
                                             <Trash2 size={14} /> Eliminar
                                         </button>
                                     </div>
@@ -225,8 +335,8 @@ export function DashboardV3({ onCreateNew, onOpenProject }: DashboardV3Props) {
                     <div className="empty-icon-glow">
                         <FolderOpen size={64} />
                     </div>
-                    <h2 className="text-xl font-bold text-white mb-2">No se encontraron proyectos</h2>
-                    <p className="text-gray-400 mb-6">Prueba con otra búsqueda o crea un nuevo proyecto</p>
+                    <h2 className="text-xl font-bold mb-2">No se encontraron proyectos</h2>
+                    <p className="description-v3 mb-6">Prueba con otra búsqueda o crea un nuevo proyecto</p>
                     {canCreateMore && (
                         <Button variant="primary" onClick={onCreateNew} leftIcon={<Plus size={18} />}>
                             Crear Proyecto
@@ -234,6 +344,33 @@ export function DashboardV3({ onCreateNew, onOpenProject }: DashboardV3Props) {
                     )}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="¿Eliminar proyecto?"
+                message={`Esta acción eliminará permanentemente "${projectToDelete?.name}" y todos sus datos asociados. Esta acción no se puede deshacer.`}
+                confirmText="Eliminar"
+                cancelText="Cancelar"
+                variant="danger"
+                isLoading={isDeleting}
+            />
+
+            <style>{`
+                .stat-waiting {
+                    font-size: 0.65rem;
+                    color: var(--text-secondary);
+                    opacity: 0.6;
+                    text-align: center;
+                }
+                .stat-icon-wrapper.amber {
+                    background: rgba(245, 158, 11, 0.15);
+                    color: #f59e0b;
+                }
+            `}</style>
         </div>
     );
 }
+

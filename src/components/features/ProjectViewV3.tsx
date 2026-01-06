@@ -26,10 +26,16 @@ interface ProjectViewV3Props {
     onCreateLanding: () => void;
 }
 
+// Imports updated above
+import { StrategiesTab } from './strategies/StrategiesTab';
+import { downloadPrintPoster } from '../../services/pdfPosterGenerator';
+
 export function ProjectViewV3({ project, onBack, onCreateLanding }: ProjectViewV3Props) {
     const { userTier } = useAppStore();
     const { addToast } = useToast();
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'landings' | 'strategies' | 'posters'>('landings');
+    const [generatingPosterId, setGeneratingPosterId] = useState<string | null>(null);
 
     const maxLandings = userTier === 'free' ? 1 : userTier === 'plus' ? 3 : userTier === 'pro' ? 10 : -1;
     const canCreateMore = maxLandings === -1 || project.landings.length < maxLandings;
@@ -49,9 +55,26 @@ export function ProjectViewV3({ project, onBack, onCreateLanding }: ProjectViewV
         setActiveMenu(null);
     };
 
-    const handleDownloadQR = (landing: LandingConfig) => {
-        addToast(`Descargando QR de ${landing.name}...`, 'info');
+    const handleDownloadQR = async (landing: LandingConfig) => {
+        setGeneratingPosterId(landing.id);
         setActiveMenu(null);
+        try {
+            await downloadPrintPoster({
+                businessName: landing.name,
+                businessType: landing.brand.businessType,
+                tagline: 'Escanea para ver más', // TODO: Get from strategy
+                landingUrl: `${window.location.origin}/p/${landing.id}`,
+                primaryColor: landing.brand.colors.primary,
+                phone: landing.brand.whatsapp || '',
+                address: landing.brand.address || ''
+            });
+            addToast('Cartel descargado correctamente', 'success');
+        } catch (error) {
+            console.error('Error downloading poster:', error);
+            addToast('Error generando cartel', 'error');
+        } finally {
+            setGeneratingPosterId(null);
+        }
     };
 
     // Calculate dynamic stats
@@ -107,165 +130,241 @@ export function ProjectViewV3({ project, onBack, onCreateLanding }: ProjectViewV
                     </div>
 
                     <div className="project-actions-v3">
+                        <div className="project-tabs-v3">
+                            <button
+                                className={`tab-btn-v3 ${activeTab === 'landings' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('landings')}
+                            >
+                                Landings
+                            </button>
+                            <button
+                                className={`tab-btn-v3 ${activeTab === 'strategies' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('strategies')}
+                            >
+                                Estrategias
+                            </button>
+                            <button
+                                className={`tab-btn-v3 ${activeTab === 'posters' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('posters')}
+                            >
+                                Carteles
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* TABS CONTENT */}
+
+            {/* LANDINGS TAB */}
+            {activeTab === 'landings' && (
+                <div className="landings-section-v3 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="section-title-v3">
+                        <h2>Landing Pages</h2>
                         <Button
                             variant="primary"
-                            className="create-btn-v3"
+                            size="sm"
                             onClick={onCreateLanding}
                             disabled={!canCreateMore}
-                            leftIcon={<Plus size={18} />}
+                            leftIcon={<Plus size={16} />}
                         >
                             Nueva Landing
                         </Button>
                     </div>
-                </div>
 
-                {/* Quick Stats */}
-                <div className="project-stats-grid-v3">
-                    <div className="stat-card-v3">
-                        <div className="stat-label-v3">Total Landings</div>
-                        <div className="stat-value-v3">{project.landings.length}</div>
-                        <div className="stat-trend-v3 positive">Activo</div>
-                    </div>
-                    <div className="stat-card-v3">
-                        <div className="stat-label-v3">Enlaces Totales</div>
-                        <div className="stat-value-v3">{totalLinks}</div>
-                        <div className="stat-trend-v3 neutral">Configurados</div>
-                    </div>
-                    <div className="stat-card-v3">
-                        <div className="stat-label-v3">Conversiones</div>
-                        <div className="stat-value-v3">0%</div>
-                        <div className="stat-trend-v3 text-muted">Sin datos</div>
-                    </div>
-                </div>
-            </div>
+                    {project.landings.length > 0 ? (
+                        <div className="landings-grid-v3">
+                            {project.landings.map((landing) => (
+                                <div key={landing.id} className="landing-card-v3 glass-panel">
+                                    {/* Preview Top */}
+                                    <div
+                                        className="landing-card-preview"
+                                        style={{
+                                            background: `linear-gradient(135deg, ${landing.brand.colors.primary}20, ${landing.brand.colors.secondary}20)`
+                                        }}
+                                    >
+                                        <div className="mini-phone-mockup">
+                                            <div
+                                                className="mini-screen"
+                                                style={{
+                                                    background: `linear-gradient(to bottom, ${landing.brand.colors.primary}, ${landing.brand.colors.secondary})`
+                                                }}
+                                            />
+                                        </div>
 
-            {/* Landings Grid */}
-            <div className="landings-section-v3">
-                <div className="section-title-v3">
-                    <h2>Landing Pages</h2>
-                    <div className="flex items-center gap-2">
-                        {maxLandings !== -1 && (
-                            <span className="limit-badge-v3">
-                                {project.landings.length} / {maxLandings}
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                {project.landings.length > 0 ? (
-                    <div className="landings-grid-v3">
-                        {project.landings.map((landing) => (
-                            <div key={landing.id} className="landing-card-v3 glass-panel">
-                                {/* Preview Top */}
-                                <div
-                                    className="landing-card-preview"
-                                    style={{
-                                        background: `linear-gradient(135deg, ${landing.brand.colors.primary}20, ${landing.brand.colors.secondary}20)`
-                                    }}
-                                >
-                                    <div className="mini-phone-mockup">
-                                        <div
-                                            className="mini-screen"
-                                            style={{
-                                                background: `linear-gradient(to bottom, ${landing.brand.colors.primary}, ${landing.brand.colors.secondary})`
-                                            }}
-                                        />
+                                        <div className="card-actions-overlay">
+                                            <Button
+                                                size="sm"
+                                                variant="secondary"
+                                                className="glass-btn-sm"
+                                                onClick={() => window.open(`/p/${landing.id}`, '_blank')}
+                                            >
+                                                <ExternalLink size={14} className="mr-2" />
+                                                Ver
+                                            </Button>
+                                        </div>
                                     </div>
 
-                                    <div className="card-actions-overlay">
+                                    {/* Content */}
+                                    <div className="landing-card-content">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h3 className="landing-name-v3">{landing.name}</h3>
+                                                <span className="landing-type-v3">{landing.brand.businessType}</span>
+                                            </div>
+                                            <button
+                                                className="menu-trigger-v3"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setActiveMenu(activeMenu === landing.id ? null : landing.id);
+                                                }}
+                                            >
+                                                <MoreHorizontal size={18} />
+                                            </button>
+                                        </div>
+
+                                        {/* Context Menu */}
+                                        {activeMenu === landing.id && (
+                                            <div className="context-menu-v3 animate-in fade-in zoom-in-95">
+                                                <button onClick={() => handleCopyLink(landing)}>
+                                                    <Copy size={14} /> Copiar enlace
+                                                </button>
+                                                <button onClick={() => handleDownloadQR(landing)}>
+                                                    {generatingPosterId === landing.id ? (
+                                                        <span className="animate-pulse">Generando...</span>
+                                                    ) : (
+                                                        <>
+                                                            <QrCode size={14} /> Descargar QR
+                                                        </>
+                                                    )}
+                                                </button>
+                                                <div className="menu-divider" />
+                                                <button className="danger">
+                                                    <Trash2 size={14} /> Eliminar
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        <div className="landing-card-footer">
+                                            <div className="footer-stat">
+                                                <Eye size={14} /> 0
+                                            </div>
+                                            <div className="footer-stat">
+                                                <BarChart3 size={14} /> 0%
+                                            </div>
+                                            <div className="footer-date">
+                                                {formatDate(landing.createdAt)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="empty-state-v3 glass-panel">
+                            <div className="empty-icon-v3">
+                                <LayoutGrid size={48} />
+                            </div>
+                            <h3>No hay landings creadas</h3>
+                            <p>Comienza creando tu primera landing page para este proyecto</p>
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={onCreateLanding}
+                                leftIcon={<Plus size={20} />}
+                            >
+                                Crear Landing
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* STRATEGIES TAB */}
+            {activeTab === 'strategies' && (
+                <div className="strategies-section-v3 animate-in fade-in slide-in-from-bottom-4">
+                    {project.landings.length > 0 ? (
+                        <div className="max-w-6xl mx-auto">
+                            <StrategiesTab brandData={project.landings[0].brand} />
+                        </div>
+                    ) : (
+                        <div className="empty-state-v3 glass-panel">
+                            <div className="empty-icon-v3">
+                                <Sparkles size={48} />
+                            </div>
+                            <h3>No hay datos de marca suficientes</h3>
+                            <p>Crea tu primera landing para generar estrategias de marketing personalizadas</p>
+                            <Button
+                                variant="primary"
+                                onClick={onCreateLanding}
+                            >
+                                Configurar Marca
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* POSTERS TAB */}
+            {activeTab === 'posters' && (
+                <div className="posters-section-v3 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="section-title-v3">
+                        <h2>Carteles Promocionales</h2>
+                        <p className="text-gray-400 text-sm">Carteles A4 listos para imprimir con QR integrado</p>
+                    </div>
+
+                    {project.landings.length > 0 ? (
+                        <div className="landings-grid-v3">
+                            {project.landings.map((landing) => (
+                                <div key={landing.id} className="landing-card-v3 glass-panel">
+                                    <div className="h-48 bg-gradient-to-br from-gray-900 to-gray-800 relative flex items-center justify-center p-6 overflow-hidden">
+                                        <div className="absolute inset-0 opacity-20 bg-[url('https://source.unsplash.com/random/800x600/?texture')]" />
+                                        <div className="bg-white p-3 rounded shadow-xl transform rotate-[-2deg] scale-90">
+                                            <QrCode size={48} color={landing.brand.colors.primary} />
+                                        </div>
+                                        <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/60 backdrop-blur rounded text-xs font-mono text-white/80 border border-white/10">
+                                            A4 • 300 DPI
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4">
+                                        <h3 className="font-bold text-white mb-1">{landing.name}</h3>
+                                        <p className="text-xs text-gray-400 mb-4">{landing.brand.businessType}</p>
                                         <Button
-                                            size="sm"
                                             variant="secondary"
+                                            fullWidth
                                             className="glass-btn-sm"
-                                            onClick={() => window.open(`/p/${landing.id}`, '_blank')}
+                                            onClick={() => handleDownloadQR(landing)}
+                                            disabled={generatingPosterId === landing.id}
                                         >
-                                            <ExternalLink size={14} className="mr-2" />
-                                            Ver
+                                            {generatingPosterId === landing.id ? (
+                                                <span className="flex items-center gap-2"><div className="w-3 h-3 border-2 border-primary-500 rounded-full animate-spin border-t-transparent" /> Generando...</span>
+                                            ) : (
+                                                <>
+                                                    <QrCode size={16} className="mr-2" />
+                                                    Descargar Cartel PDF
+                                                </>
+                                            )}
                                         </Button>
                                     </div>
                                 </div>
-
-                                {/* Content */}
-                                <div className="landing-card-content">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div>
-                                            <h3 className="landing-name-v3">{landing.name}</h3>
-                                            <span className="landing-type-v3">{landing.brand.businessType}</span>
-                                        </div>
-                                        <button
-                                            className="menu-trigger-v3"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setActiveMenu(activeMenu === landing.id ? null : landing.id);
-                                            }}
-                                        >
-                                            <MoreHorizontal size={18} />
-                                        </button>
-                                    </div>
-
-                                    {/* Context Menu */}
-                                    {activeMenu === landing.id && (
-                                        <div className="context-menu-v3 animate-in fade-in zoom-in-95">
-                                            <button onClick={() => handleCopyLink(landing)}>
-                                                <Copy size={14} /> Copiar enlace
-                                            </button>
-                                            <button onClick={() => handleDownloadQR(landing)}>
-                                                <QrCode size={14} /> Descargar QR
-                                            </button>
-                                            <div className="menu-divider" />
-                                            <button className="danger">
-                                                <Trash2 size={14} /> Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    <div className="landing-card-footer">
-                                        <div className="footer-stat">
-                                            <Eye size={14} /> 0
-                                        </div>
-                                        <div className="footer-stat">
-                                            <BarChart3 size={14} /> 0%
-                                        </div>
-                                        <div className="footer-date">
-                                            {formatDate(landing.createdAt)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-
-                        {/* Create Skeleton Card */}
-                        {canCreateMore && (
-                            <button className="create-card-v3" onClick={onCreateLanding}>
-                                <div className="create-icon-circle">
-                                    <Plus size={32} />
-                                </div>
-                                <span>Crear Nueva Landing</span>
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <div className="empty-state-v3 glass-panel">
-                        <div className="empty-icon-v3">
-                            <LayoutGrid size={48} />
+                            ))}
                         </div>
-                        <h3>No hay landings creadas</h3>
-                        <p>Comienza creando tu primera landing page para este proyecto</p>
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            onClick={onCreateLanding}
-                            leftIcon={<Plus size={20} />}
-                        >
-                            Crear Landing
-                        </Button>
-                    </div>
-                )}
-            </div>
+                    ) : (
+                        <div className="empty-state-v3 glass-panel">
+                            <div className="empty-icon-v3">
+                                <QrCode size={48} />
+                            </div>
+                            <h3>No hay carteles disponibles</h3>
+                            <p>Los carteles se generan automáticamente a partir de tus landings</p>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Pro Analytics Banner */}
-            {(userTier === 'free' || userTier === 'plus') && (
-                <div className="pro-banner-v3 glass-panel">
+            {(userTier === 'free' || userTier === 'plus') && activeTab === 'landings' && (
+                <div className="pro-banner-v3 glass-panel mt-6">
                     <div className="glow-effect" />
                     <div className="banner-content relative z-10 flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -283,6 +382,33 @@ export function ProjectViewV3({ project, onBack, onCreateLanding }: ProjectViewV
                     </div>
                 </div>
             )}
+
+            <style>{`
+                .project-tabs-v3 {
+                    display: flex;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 999px;
+                    padding: 4px;
+                    gap: 4px;
+                }
+                .tab-btn-v3 {
+                    padding: 8px 16px;
+                    border-radius: 999px;
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                    transition: all 0.2s;
+                }
+                .tab-btn-v3.active {
+                    background: var(--primary-500);
+                    color: white;
+                    font-weight: 500;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                }
+                .tab-btn-v3:hover:not(.active) {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: white;
+                }
+            `}</style>
         </div>
     );
 }

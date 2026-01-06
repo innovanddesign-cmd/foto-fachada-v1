@@ -46,6 +46,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
             : CAMPAIGN_SUGGESTIONS.find(c => c.id === campaign)?.name || undefined;
 
         const newProject: Project = {
+            status: 'active',
             id: `project-${Date.now()}`,
             name: name.trim(),
             description: description.trim() || undefined,
