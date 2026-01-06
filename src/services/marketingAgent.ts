@@ -27,7 +27,7 @@ export async function generateMarketingStrategies(
             }
             console.warn('Backend generation failed:', backendResult.error);
         } catch (backendError) {
-            console.warn('Backend unavailable:', backendError);
+            console.warn('Backend unavailable or failed. Trying client-side fallback...', backendError);
         }
 
         // 2. Fallback to Client-Side Gemini (if API Key exists)
