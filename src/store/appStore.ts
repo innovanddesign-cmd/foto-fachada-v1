@@ -90,6 +90,10 @@ interface AppState {
     userTier: SubscriptionTier;
     setUserTier: (tier: SubscriptionTier) => void;
 
+    // Widget auto-generation
+    autoGenerateWidgets: (campaignId: string) => Promise<any>;
+    saveLanding: () => LandingConfig | null;
+
     // Reset flow
     resetFlow: () => void;
 }
@@ -172,6 +176,61 @@ export const useAppStore = create<AppState>()(
             setSelectedStrategy: (strategy) => set({ selectedStrategy: strategy }),
             widgetConfig: {},
             setWidgetConfig: (config) => set({ widgetConfig: config }),
+
+            // Save current landing configuration
+            saveLanding: (): LandingConfig | null => {
+                const state = get();
+                if (!state.brandData) return null;
+
+                const landing: LandingConfig = {
+                    id: Date.now().toString(),
+                    name: `${state.brandData.name} Landing`,
+                    brand: state.brandData,
+                    links: state.links,
+                    presetId: state.selectedTemplate, // Corrected from currentTemplate
+                    config: state.landingConfig,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                };
+
+                return landing;
+            },
+
+            // Auto-generate widgets for current campaign
+            autoGenerateWidgets: async (campaignId: string) => {
+                console.log('[AppStore] Starting auto-generation for campaign:', campaignId);
+
+                try {
+                    // Import service dynamically
+                    const { autoGenerateWidgets } = await import('../services/widgetGenerationService');
+
+                    // Call backend to generate widgets
+                    const result = await autoGenerateWidgets(campaignId);
+
+                    console.log('[AppStore] ✅ Widgets generated:', result.widgets);
+
+                    // Update links with generated URLs
+                    const currentLinks = get().links;
+                    const updatedLinks = currentLinks.map((link, index) => {
+                        const widget = result.widgets[index];
+                        if (widget) {
+                            return {
+                                ...link,
+                                url: widget.url,
+                                id: widget.id
+                            };
+                        }
+                        return link;
+                    });
+
+                    set({ links: updatedLinks });
+
+                    return result;
+                } catch (error) {
+                    console.error('[AppStore] Error auto-generating widgets:', error);
+                    throw error;
+                }
+            },
 
             // Projects
             projects: [],
