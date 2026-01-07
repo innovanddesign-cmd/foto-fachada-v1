@@ -393,3 +393,200 @@ ${brandData.primaryColor ? `Brand Color: ${brandData.primaryColor}` : ''}`;
 
     throw new Error(`[CreativeEngine] Failed after ${MAX_RETRIES + 1} attempts: ${lastError?.message}`);
 }
+
+/**
+ * New method: Generate 1 optimized strategy with 3 widgets
+ * This is the recommended method for FASE 1
+ */
+export async function generateOptimizedStrategy(
+    brandData: BrandData,
+    dateStr?: string,
+    location?: string
+): Promise<{ strategy: any; widgets: any[] }> {
+    console.log('[CreativeEngine] 🎯 Generating 1 optimized strategy with 3 widgets...');
+
+    // Parse date and location
+    const date = dateStr ? new Date(dateStr) : new Date();
+    const loc = location || brandData.location || 'España';
+    const seasonalContext = detectSeasonalContext(date, loc);
+
+    console.log(`[CreativeEngine] 📅 Context: ${seasonalContext.season}, Events: ${seasonalContext.events.join(', ')}`);
+
+    // Build system prompt for 1 strategy + 3 widgets
+    const systemPrompt = `
+# ROLE: Creative Tech Lead at a Digital Marketing Agency
+
+You are creating ONE cohesive marketing strategy with EXACTLY 3 interactive widgets.
+
+## YOUR MISSION
+Generate 1 optimized marketing strategy that includes 3 unique, interactive widgets for:
+- **Business**: ${brandData.name} (${brandData.businessType})
+- **Style**: ${brandData.style || 'Modern'}
+- **Target Audience**: ${brandData.targetAudience || 'General public'}
+
+## CURRENT CONTEXT
+- **Date**: ${seasonalContext.date}
+- **Season**: ${seasonalContext.season}
+- **Active Events**: ${seasonalContext.events.join(', ')}
+- **Weather Context**: ${seasonalContext.weatherHint}
+- **Location**: ${seasonalContext.location}
+
+## STRATEGY REQUIREMENTS
+
+### 1. The strategy must be COHESIVE
+All 3 widgets should work together as part of a unified campaign, not 3 separate unrelated ideas.
+
+### 2. Optimize for CURRENT CONTEXT
+Use the season, events, and location to make the strategy TIMELY and RELEVANT.
+
+Example: If it's near Christmas in Spain, create a "Festive Campaign" with:
+- Widget 1: Christmas Prize Wheel
+- Widget 2: Holiday Flash Offers
+- Widget 3: Festive Photo Wall
+
+### 3. Each widget must be DIFFERENT
+Use varied mechanics (not 3 roulettes):
+- Gamification (wheel, scratch card, quiz,game)
+- Urgency (countdown, flash offers, limited stock)
+- Social Proof (photo wall, testimonials, reviews)
+- Engagement (polls, quizzes, forms)
+
+## TECHNICAL RULES (STRICT)
+
+### Code Requirements
+1. Generate COMPLETE, WORKING code in HTML5 + TailwindCSS (via CDN) + Vanilla JavaScript
+2. Each widget must be SELF-CONTAINED (single HTML block)
+3. Use localStorage for persistence
+4. Mobile-first design
+5. Include smooth animations
+6. NEVER hardcode business-specific text - use {{variables}}
+7. INCLUDE Google Fonts link
+8. INCLUDE Smart Footer
+
+### Variable System
+- Use \`{{variable_name}}\` syntax for all configurable text
+- Each variable MUST appear in the ui_config_schema
+
+### JSON Escaping (CRITICAL)
+- The code_template field is a JSON string
+- You MUST escape: double quotes (\\"), backslashes (\\\\), newlines (\\n)
+
+## OUTPUT FORMAT (EXACT)
+
+\`\`\`json
+{
+  "strategy": {
+    "title": "Campaign Name (e.g., 'Festive Interactive Campaign 2024')",
+    "description": "Brief description of the overall strategy",
+    "seasonal_context": "Why this strategy is optimized for current date/season"
+  },
+  "widgets": [
+    {
+      "id": "unique_snake_case_id",
+      "emoji": "🎰",
+      "title": "Widget Name (max 5 words)",
+      "description": "One sentence explaining the widget benefit",
+      "vibe_analysis": "Emotional vibe",
+      "typography": "Google Font name",
+      "visual_mechanic": "Mechanic name",
+      "ui_config_schema": [
+        {
+          "key": "variable_name",
+          "label": "Question for owner",
+          "type": "text|number|color|tel|email|textarea",
+          "default": "Default value"
+        }
+      ],
+      "code_template": "<div>Complete HTML with {{variables}}</div><script>...</script>"
+    }
+  ]
+}
+\`\`\`
+
+Now generate 1 strategy with 3 widgets.
+`;
+
+    const userMessage = `Generate 1 cohesive marketing strategy with 3 interactive widgets for:
+    
+Business: ${brandData.name}
+Type: ${brandData.businessType}
+Style: ${brandData.style || 'Modern'}
+Target: ${brandData.targetAudience || 'Locals'}
+${brandData.description ? `Description: ${brandData.description}` : ''}
+${brandData.niche ? `Niche: ${brandData.niche}` : ''}
+${brandData.primaryColor ? `Brand Color: ${brandData.primaryColor}` : ''}
+
+Remember: Create 1 unified strategy optimized for ${seasonalContext.season} and ${seasonalContext.events.join(', ')}.`;
+
+    // Get AI client
+    const genAI = getAIClient();
+    const model = genAI.getGenerativeModel({
+        model: MODEL_NAME,
+        generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.9,
+            topP: 0.95
+        }
+    });
+
+    // Call AI
+    let lastError: Error | null = null;
+    for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
+        try {
+            console.log(`[CreativeEngine] 🤖 Calling Gemini (attempt ${attempt})...`);
+
+            const result = await model.generateContent([systemPrompt, userMessage]);
+            const response = await result.response;
+            const text = response.text();
+
+            console.log(`[CreativeEngine] 📦 Response received (${text.length} chars)`);
+
+            const json = JSON.parse(text);
+
+            // Validate
+            if (!json.strategy || !json.widgets || !Array.isArray(json.widgets)) {
+                throw new Error('Invalid response structure');
+            }
+
+            if (json.widgets.length !== 3) {
+                console.warn(`[CreativeEngine] Expected 3 widgets, got ${json.widgets.length}. Using first 3.`);
+                json.widgets = json.widgets.slice(0, 3);
+            }
+
+            // Add metadata
+            const enrichedWidgets = json.widgets.map((w: any, idx: number) => ({
+                ...w,
+                _meta: {
+                    generatedAt: new Date().toISOString(),
+                    seasonalContext: seasonalContext.events,
+                    index: idx
+                }
+            }));
+
+            console.log(`[CreativeEngine] ✅ Generated 1 strategy with ${enrichedWidgets.length} widgets`);
+
+            return {
+                strategy: {
+                    ...json.strategy,
+                    _meta: {
+                        generatedAt: new Date().toISOString(),
+                        seasonalContext: seasonalContext.events,
+                        location: loc
+                    }
+                },
+                widgets: enrichedWidgets
+            };
+
+        } catch (error: any) {
+            lastError = error;
+            console.error(`[CreativeEngine] ❌ Attempt ${attempt} failed:`, error.message);
+
+            if (attempt <= MAX_RETRIES) {
+                console.log(`[CreativeEngine] 🔄 Retrying...`);
+                await new Promise(r => setTimeout(r, 1000 * attempt));
+            }
+        }
+    }
+
+    throw new Error(`[CreativeEngine] Failed after ${MAX_RETRIES + 1} attempts: ${lastError?.message}`);
+}

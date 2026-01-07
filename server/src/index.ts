@@ -99,6 +99,11 @@ app.use('/api', generalLimiter);
 app.use('/health', healthRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/l', landingsRoutes); // Public landing pages by slug
+
+// Import widgets routes
+import widgetsRoutes from './routes/widgets.routes.js';
+app.use('/', widgetsRoutes); // Public widget pages at /w/:brand/:widget
+
 app.use('/api/auth', authLimiter, authRoutes);
 
 // Protected Routes (Strategies made optional for dev compatibility)
