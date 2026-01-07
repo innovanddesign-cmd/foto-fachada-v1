@@ -323,9 +323,242 @@ router.post('/:id/duplicate', async (req: AuthRequest, res: Response, next: Next
 });
 
 // ─────────────────────────────────────────────────────────────
-// POST /api/campaigns/:id/auto-generate - Automatic Full Flow
+// POST /api/campaigns/:id/auto-generate - FASE 1 Complete Flow
 // ─────────────────────────────────────────────────────────────
-// Generates strategies and creates 3 published landings automatically
+// Generates 1 optimized strategy with 3 widgets, creates 3 individual widget pages
+// Flow: Analysis (done) → Generate 1 Strategy + 3 Widgets → Create 3 Widget Pages
+router.post('/:id/auto-generate', async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const client = await pool.connect();
+
+    try {
+        const userId = req.user?.id;
+        const { id: campaignId } = req.params;
+
+        if (!userId) {
+            res.status(401).json({ success: false, error: 'No autorizado' });
+            return;
+        }
+
+        await client.query('BEGIN');
+
+        appLogger.info({ campaignId, userId }, '[AutoGenerate] Starting FASE 1: 1 strategy + 3 widgets');
+
+        // 1. Get campaign and brand analysis
+        const campaignResult = await client.query(`
+            SELECT c.*, 
+                   ba.business_name,
+                   ba.business_type,
+                   ba.primary_color,
+                   ba.secondary_color,
+                   ba.description,
+                   ba.location,
+                   ba.analysis_data
+            FROM campaigns c
+            LEFT JOIN brand_analysis ba ON c.brand_analysis_id = ba.id
+            WHERE c.id = $1 AND c.client_id = $2
+        `, [campaignId, userId]);
+
+        if (campaignResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            res.status(404).json({ success: false, error: 'Campaña no encontrada' });
+            return;
+        }
+
+        const campaign = campaignResult.rows[0];
+
+        if (!campaign.brand_analysis_id) {
+            await client.query('ROLLBACK');
+            res.status(400).json({
+                success: false,
+                error: 'La campaña no tiene análisis de marca asociado'
+            });
+            return;
+        }
+
+        // 2. Generate 1 optimized strategy with 3 widgets using NEW method
+        appLogger.info({ campaignId }, '[AutoGenerate] Generating 1 optimized strategy with 3 widgets...');
+
+        const { generateOptimizedStrategy } = await import('../services/CreativeEngineService.js');
+
+        const { strategy, widgets } = await generateOptimizedStrategy({
+            name: campaign.business_name,
+            businessType: campaign.business_type,
+            style: 'Modern',
+            targetAudience: 'Local customers',
+            description: campaign.description,
+            primaryColor: campaign.primary_color,
+            location: campaign.location
+        });
+
+        appLogger.info({
+            campaignId,
+            strategyTitle: strategy.title,
+            widgetsCount: widgets.length
+        }, '[AutoGenerate] Strategy generated successfully');
+
+        // 3. Save the strategy as a marketing proposal
+        const proposalResult = await client.query(`
+            INSERT INTO marketing_proposals (
+                campaign_id,
+                strategy_id,
+                title,
+                description,
+                status
+            )
+            VALUES ($1, $2, $3, $4, 'approved')
+            RETURNING id
+        `, [
+            campaignId,
+            `optimized-strategy-${Date.now()}`,
+            strategy.title,
+            strategy.description
+        ]);
+
+        const proposalId = proposalResult.rows[0].id;
+
+        appLogger.info({
+            campaignId,
+            proposalId
+        }, '[AutoGenerate] Marketing proposal created');
+
+        // 4. For each widget, create an individual functional page
+        const { LandingGeneratorService } = await import('../services/LandingGeneratorService.js');
+        const { slugify } = await import('../services/LinkContentGenerator.js');
+
+        const brandSlug = slugify(campaign.business_name);
+        const generatedWidgets: any[] = [];
+
+        for (let i = 0; i < widgets.length; i++) {
+            const widget = widgets[i];
+
+            //Build default config from UI schema
+            const defaultConfig: Record<string, any> = {
+                business_name: campaign.business_name,
+                business_type: campaign.business_type,
+                primary_color: campaign.primary_color || '#6366f1'
+            };
+
+            widget.ui_config_schema?.forEach((field: any) => {
+                if (field.default) {
+                    defaultConfig[field.key] = field.default;
+                }
+            });
+
+            // Replace variables in widget code
+            const widgetHtml = LandingGeneratorService.replaceVariables(
+                widget.code_template,
+                defaultConfig
+            );
+
+            // Get external libraries for this widget type
+            const externalLibraries = LandingGeneratorService.getLibrariesForStrategy(widget.id);
+
+            // Generate complete HTML page for this widget
+            const html = LandingGeneratorService.generateHtml({
+                title: `${campaign.business_name} - ${widget.title}`,
+                description: widget.description,
+                widgetCode: widgetHtml,
+                brandColors: {
+                    primary: campaign.primary_color || '#6366f1',
+                    secondary: campaign.secondary_color || '#8b5cf6'
+                },
+                contactInfo: {
+                    address: campaign.location
+                },
+                externalLibraries
+            });
+
+            // Generate widget slug
+            const widgetSlug = slugify(widget.title);
+            const fullSlug = `/w/${brandSlug}/${widgetSlug}`;
+
+            // Ensure unique slug
+            let uniqueSlug = fullSlug;
+            let counter = 1;
+            while (true) {
+                const existingResult = await client.query(
+                    'SELECT id FROM widget_pages WHERE slug = $1',
+                    [uniqueSlug]
+                );
+                if (existingResult.rows.length === 0) break;
+                uniqueSlug = `${fullSlug}-${counter}`;
+                counter++;
+            }
+
+            // Insert widget page
+            const widgetPageResult = await client.query(`
+                INSERT INTO widget_pages (
+                    proposal_id,
+                    campaign_id,
+                    title,
+                    slug,
+                    widget_id,
+                    widget_type,
+                    html_content,
+                    status
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, $7, 'published')
+                RETURNING *
+            `, [
+                proposalId,
+                campaignId,
+                `${campaign.business_name} - ${widget.title}`,
+                uniqueSlug,
+                widget.id,
+                widget.visual_mechanic || 'interactive',
+                html
+            ]);
+
+            const isDev = process.env.NODE_ENV !== 'production';
+            const protocol = isDev ? 'http' : 'https';
+            const domain = isDev ? 'localhost:3000' : process.env.PUBLIC_DOMAIN || 'foto-fachada-v1.vercel.app';
+
+            generatedWidgets.push({
+                ...widgetPageResult.rows[0],
+                widget_title: widget.title,
+                widget_emoji: widget.emoji,
+                publicUrl: `${protocol}://${domain}${uniqueSlug}`
+            });
+        }
+
+        await client.query('COMMIT');
+
+        appLogger.info({
+            campaignId,
+            proposalId,
+            widgetPagesCount: generatedWidgets.length
+        }, '[AutoGenerate] FASE 1 completed: 3 widget pages created and published');
+
+        res.status(201).json({
+            success: true,
+            message: `FASE 1 completada: ${generatedWidgets.length} páginas de widgets generadas automáticamente`,
+            strategy: {
+                title: strategy.title,
+                description: strategy.description
+            },
+            widgets: generatedWidgets.map(w => ({
+                id: w.id,
+                title: w.widget_title,
+                emoji: w.widget_emoji,
+                url: w.publicUrl,
+                slug: w.slug
+            })),
+            campaignId,
+            proposalId
+        });
+
+    } catch (error) {
+        await client.query('ROLLBACK');
+        appLogger.error({ error, context: 'auto-generate' }, 'Error in automatic widget generation');
+        next(error);
+    } finally {
+        client.release();
+    }
+});
+
+
+export default router;
+
 // Flow: Analysis (already done) → Generate 3 Strategies → Create 3 Landings
 router.post('/:id/auto-generate', async (req: AuthRequest, res: Response, next: NextFunction) => {
     const client = await pool.connect();
