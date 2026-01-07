@@ -295,7 +295,112 @@ export const PosterGeneratorV3 = () => {
                 </div>
 
                 <div className="poster-controls glass-panel">
-                    <h3 className="controls-title">Opciones de Descarga</h3>
+                    <h3 className="controls-title">Enlaces Públicos</h3>
+
+                    {/* Landing Principal */}
+                    <div className="control-group" style={{ marginBottom: '20px' }}>
+                        <div className="info-block" style={{
+                            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
+                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                            padding: '16px',
+                            borderRadius: '12px'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                <QrCode size={20} className="text-indigo-500" />
+                                <h4 style={{ margin: 0, fontWeight: '600', fontSize: '15px' }}>Landing Principal</h4>
+                            </div>
+                            <a
+                                href={(() => {
+                                    const isDev = import.meta.env.DEV;
+                                    const protocol = isDev ? 'http' : 'https';
+                                    const domain = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
+                                    const slug = brandData?.name?.toLowerCase().replace(/\s+/g, '-') || 'landing';
+                                    return `${protocol}://${domain}/l/${slug}`;
+                                })()}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: 'block',
+                                    padding: '10px 12px',
+                                    background: 'rgba(255, 255, 255, 0.1)',
+                                    borderRadius: '8px',
+                                    fontSize: '13px',
+                                    color: '#10b981',
+                                    textDecoration: 'none',
+                                    wordBreak: 'break-all',
+                                    fontFamily: 'monospace',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                            >
+                                {(() => {
+                                    const isDev = import.meta.env.DEV;
+                                    const protocol = isDev ? 'http' : 'https';
+                                    const domain = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
+                                    const slug = brandData?.name?.toLowerCase().replace(/\s+/g, '-') || 'landing';
+                                    return `${protocol}://${domain}/l/${slug}`;
+                                })()}
+                            </a>
+                            <p style={{ fontSize: '12px', opacity: 0.7, margin: '8px 0 0 0' }}>
+                                Página con los 3 botones interactivos
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Widgets Individuales */}
+                    {useAppStore.getState().links.length > 0 && (
+                        <div className="control-group" style={{ marginBottom: '20px' }}>
+                            <h4 style={{ fontSize: '14px', marginBottom: '12px', opacity: 0.9 }}>
+                                Widgets Funcionales ({useAppStore.getState().links.slice(0, 3).length})
+                            </h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {useAppStore.getState().links.slice(0, 3).map((link, index) => {
+                                    const isDev = import.meta.env.DEV;
+                                    const protocol = isDev ? 'http' : 'https';
+                                    const domain = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
+                                    const brandSlug = brandData?.name?.toLowerCase().replace(/\s+/g, '-') || 'negocio';
+                                    const widgetSlug = link.name?.toLowerCase().replace(/\s+/g, '-') || `widget-${index + 1}`;
+                                    const widgetUrl = link.url || `${protocol}://${domain}/w/${brandSlug}/${widgetSlug}`;
+
+                                    return (
+                                        <div key={link.id} style={{
+                                            background: 'rgba(255, 255, 255, 0.05)',
+                                            padding: '12px',
+                                            borderRadius: '8px',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)'
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                                <span style={{ fontSize: '16px' }}>{link.emoji}</span>
+                                                <span style={{ fontSize: '13px', fontWeight: '500' }}>{link.name}</span>
+                                            </div>
+                                            <a
+                                                href={widgetUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{
+                                                    display: 'block',
+                                                    fontSize: '11px',
+                                                    color: '#60a5fa',
+                                                    textDecoration: 'none',
+                                                    fontFamily: 'monospace',
+                                                    wordBreak: 'break-all',
+                                                    opacity: 0.8
+                                                }}
+                                            >
+                                                {widgetUrl}
+                                            </a>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <p style={{ fontSize: '11px', opacity: 0.6, margin: '10px 0 0 0', fontStyle: 'italic' }}>
+                                * Si las URLs aún no funcionan, espera a que la generación automática termine
+                            </p>
+                        </div>
+                    )}
+
+                    <h3 className="controls-title" style={{ marginTop: '24px' }}>Opciones de Descarga</h3>
 
                     <div className="control-group">
                         <div className="info-block">
