@@ -322,4 +322,223 @@ router.post('/:id/duplicate', async (req: AuthRequest, res: Response, next: Next
     }
 });
 
+// ─────────────────────────────────────────────────────────────
+// POST /api/campaigns/:id/auto-generate - Automatic Full Flow
+// ─────────────────────────────────────────────────────────────
+// Generates strategies and creates 3 published landings automatically
+// Flow: Analysis (already done) → Generate 3 Strategies → Create 3 Landings
+router.post('/:id/auto-generate', async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const client = await pool.connect();
+
+    try {
+        const userId = req.user?.id;
+        const { id: campaignId } = req.params;
+
+        if (!userId) {
+            res.status(401).json({ success: false, error: 'No autorizado' });
+            return;
+        }
+
+        await client.query('BEGIN');
+
+        appLogger.info({ campaignId, userId }, '[AutoGenerate] Starting automatic landing generation');
+
+        // 1. Get campaign and brand analysis
+        const campaignResult = await client.query(`
+            SELECT c.*, 
+                   ba.business_name,
+                   ba.business_type,
+                   ba.primary_color,
+                   ba.secondary_color,
+                   ba.description,
+                   ba.location,
+                   ba.analysis_data
+            FROM campaigns c
+            LEFT JOIN brand_analysis ba ON c.brand_analysis_id = ba.id
+            WHERE c.id = $1 AND c.client_id = $2
+        `, [campaignId, userId]);
+
+        if (campaignResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            res.status(404).json({ success: false, error: 'Campaña no encontrada' });
+            return;
+        }
+
+        const campaign = campaignResult.rows[0];
+
+        if (!campaign.brand_analysis_id) {
+            await client.query('ROLLBACK');
+            res.status(400).json({
+                success: false,
+                error: 'La campaña no tiene análisis de marca asociado'
+            });
+            return;
+        }
+
+        // 2. Generate 3 strategies using CreativeEngine
+        appLogger.info({ campaignId }, '[AutoGenerate] Generating strategies with AI...');
+
+        const { generateStrategies } = await import('../services/CreativeEngineService.js');
+
+        const strategies = await generateStrategies({
+            name: campaign.business_name,
+            businessType: campaign.business_type,
+            style: 'Modern',
+            targetAudience: 'Local customers',
+            description: campaign.description,
+            primaryColor: campaign.primary_color,
+            location: campaign.location
+        });
+
+        appLogger.info({
+            campaignId,
+            strategiesCount: strategies.length
+        }, '[AutoGenerate] Strategies generated successfully');
+
+        // 3. Create marketing proposals for each strategy
+        const proposalIds: string[] = [];
+
+        for (let i = 0; i < Math.min(3, strategies.length); i++) {
+            const strategy = strategies[i];
+
+            const proposalResult = await client.query(`
+                INSERT INTO marketing_proposals (
+                    campaign_id,
+                    strategy_id,
+                    title,
+                    description,
+                    code_template,
+                    ui_config_schema,
+                    status
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, 'approved')
+                RETURNING id
+            `, [
+                campaignId,
+                strategy.id,
+                strategy.title,
+                strategy.description,
+                strategy.code_template,
+                JSON.stringify(strategy.ui_config_schema),
+            ]);
+
+            proposalIds.push(proposalResult.rows[0].id);
+        }
+
+        appLogger.info({
+            campaignId,
+            proposalsCount: proposalIds.length
+        }, '[AutoGenerate] Marketing proposals created');
+
+        // 4. Generate landings for each proposal
+        const { LandingGeneratorService } = await import('../services/LandingGeneratorService.js');
+        const generatedLandings: any[] = [];
+
+        for (let i = 0; i < proposalIds.length; i++) {
+            const proposalId = proposalIds[i];
+            const strategy = strategies[i];
+
+            // Build default UI config from schema
+            const defaultConfig: Record<string, any> = {
+                business_name: campaign.business_name,
+                business_type: campaign.business_type
+            };
+
+            strategy.ui_config_schema.forEach((field: any) => {
+                if (field.default) {
+                    defaultConfig[field.key] = field.default;
+                }
+            });
+
+            // Replace variables in widget code
+            const widgetHtml = LandingGeneratorService.replaceVariables(
+                strategy.code_template,
+                defaultConfig
+            );
+
+            // Get external libraries
+            const externalLibraries = LandingGeneratorService.getLibrariesForStrategy(strategy.id);
+
+            // Generate complete HTML
+            const html = LandingGeneratorService.generateHtml({
+                title: `${campaign.business_name} - ${strategy.title}`,
+                description: strategy.description,
+                widgetCode: widgetHtml,
+                brandColors: {
+                    primary: campaign.primary_color || '#6366f1',
+                    secondary: campaign.secondary_color || '#8b5cf6'
+                },
+                contactInfo: {
+                    address: campaign.location
+                },
+                externalLibraries
+            });
+
+            // Generate slug
+            const { slugify } = await import('../services/LinkContentGenerator.js');
+            const baseSlug = slugify(`${campaign.business_name}-${strategy.title}`);
+
+            // Ensure unique slug
+            let slug = baseSlug;
+            let counter = 1;
+            while (true) {
+                const existingResult = await client.query(
+                    'SELECT id FROM landings WHERE slug = $1',
+                    [slug]
+                );
+                if (existingResult.rows.length === 0) break;
+                slug = `${baseSlug}-${counter}`;
+                counter++;
+            }
+
+            // Insert landing
+            const landingResult = await client.query(`
+                INSERT INTO landings (
+                    campaign_id,
+                    proposal_id,
+                    title,
+                    slug,
+                    html_content,
+                    status
+                )
+                VALUES ($1, $2, $3, $4, $5, 'published')
+                RETURNING *
+            `, [
+                campaignId,
+                proposalId,
+                `${campaign.business_name} - ${strategy.title}`,
+                slug,
+                html
+            ]);
+
+            generatedLandings.push({
+                ...landingResult.rows[0],
+                strategy: strategy.title,
+                publicUrl: strategy.url || `/l/${slug}`
+            });
+        }
+
+        await client.query('COMMIT');
+
+        appLogger.info({
+            campaignId,
+            landingsCount: generatedLandings.length
+        }, '[AutoGenerate] Landings created and published successfully');
+
+        res.status(201).json({
+            success: true,
+            message: `${generatedLandings.length} landings generadas y publicadas automáticamente`,
+            landings: generatedLandings,
+            campaignId
+        });
+
+    } catch (error) {
+        await client.query('ROLLBACK');
+        appLogger.error({ error, context: 'auto-generate' }, 'Error in automatic generation');
+        next(error);
+    } finally {
+        client.release();
+    }
+});
+
 export default router;
