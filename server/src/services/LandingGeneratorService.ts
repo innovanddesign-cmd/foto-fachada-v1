@@ -26,6 +26,30 @@ interface LandingGenerationOptions {
 export class LandingGeneratorService {
 
     /**
+     * Replace {{variable}} placeholders with actual values
+     * Used to customize widget templates with user-provided configuration
+     */
+    static replaceVariables(template: string, variables: Record<string, any>): string {
+        let result = template;
+
+        for (const [key, value] of Object.entries(variables)) {
+            const placeholder = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+            // Basic XSS prevention
+            const safeValue = String(value || '')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;');
+            result = result.replace(placeholder, safeValue);
+        }
+
+        // Replace any remaining unmatched variables with empty string
+        result = result.replace(/\{\{[^}]+\}\}/g, '');
+
+        return result;
+    }
+
+    /**
      * Generate the complete HTML for the landing page
      */
     static generateHtml(options: LandingGenerationOptions): string {

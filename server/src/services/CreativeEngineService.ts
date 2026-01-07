@@ -7,6 +7,7 @@
  * Security: All AI API calls happen here. Keys never exposed to frontend.
  */
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import * as LinkContentGenerator from './LinkContentGenerator.js';
 
 // Types
 export interface BrandData {
@@ -46,6 +47,15 @@ export interface Strategy {
     visual_mechanic: string;
     ui_config_schema: UIConfigField[];
     code_template: string;
+    // Optional enrichment fields
+    url?: string;
+    slug?: string;
+    type?: 'gamification' | 'promo' | 'social' | 'menu' | 'reservation' | 'info';
+    _enrichment?: {
+        brandSlug: string;
+        index: number;
+        enrichedAt: string;
+    };
     _meta?: {
         generatedAt: string;
         seasonalContext: string[];
@@ -349,13 +359,26 @@ ${brandData.primaryColor ? `Brand Color: ${brandData.primaryColor}` : ''}`;
                 }
             }));
 
-            // Store in Cache
+            // Enrich strategies with URLs using LinkContentGenerator
+            console.log('[CreativeEngine] 🔗 Enriching strategies with URLs...');
+            const enrichedStrategies = LinkContentGenerator.enrichStrategiesWithUrls(
+                strategies,
+                {
+                    name: brandData.name,
+                    businessType: brandData.businessType,
+                    location: brandData.location
+                }
+            );
+
+            console.log(`[CreativeEngine] ✅ Enriched ${enrichedStrategies.length} strategies with URLs`);
+
+            // Store enriched strategies in Cache
             strategyCache.set(cacheKey, {
-                data: strategies,
+                data: enrichedStrategies,
                 expires: Date.now() + CACHE_TTL
             });
 
-            return strategies;
+            return enrichedStrategies;
 
         } catch (error: any) {
             lastError = error;
