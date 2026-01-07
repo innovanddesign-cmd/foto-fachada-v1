@@ -140,10 +140,25 @@ export function LandingPreviewV3() {
                                             cursor: 'pointer'
                                         }}
                                         onClick={(e) => {
-                                            // If no URL, prevent default
+                                            // Generate temporary URL if not exists
                                             if (!link.url || link.url === '#') {
                                                 e.preventDefault();
-                                                alert('Este enlace aún no tiene una URL asignada');
+
+                                                // Generate slug like backend does
+                                                const slugify = (text: string) => text
+                                                    .toLowerCase()
+                                                    .normalize('NFD')
+                                                    .replace(/[\u0300-\u036f]/g, '')
+                                                    .replace(/[^\w\s-]/g, '')
+                                                    .replace(/\s+/g, '-')
+                                                    .replace(/-+/g, '-')
+                                                    .replace(/^-|-$/g, '');
+
+                                                const brandSlug = slugify(brandData?.name || 'negocio');
+                                                const widgetSlug = slugify(link.name);
+                                                const tempUrl = `/w/${brandSlug}/${widgetSlug}`;
+
+                                                alert(`⚠️ Widget aún no generado\n\nEsta página se creará automáticamente cuando generes la estrategia.\n\nURL futura: ${window.location.origin}${tempUrl}\n\n💡 Tip: Haz click en "Generar Cartel QR" para crear todos los widgets.`);
                                             }
                                         }}
                                     >
