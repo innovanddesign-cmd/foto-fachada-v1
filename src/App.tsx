@@ -209,6 +209,27 @@ function AppContent() {
         const result = await generateLandingLinks(brandData, strategies);
         if (result.success && result.links) {
           setLinks(result.links);
+
+          // AUTO-GENERATE WIDGETS IN BACKGROUND
+          // This creates 3 functional widget pages after links are generated
+          if (currentProject?.id) {
+            console.log('[App] Auto-generating widgets in background for campaign:', currentProject.id);
+
+            // Call in background without blocking UI
+            setTimeout(async () => {
+              try {
+                const { autoGenerateWidgets } = useAppStore.getState();
+                const widgetResult = await autoGenerateWidgets(currentProject.id);
+
+                console.log('[App] ✅ Widgets auto-generated:', widgetResult.widgets.length);
+                addToast(`✨ ${widgetResult.widgets.length} widgets funcionales creados`, 'success');
+              } catch (error) {
+                console.error('[App] Error auto-generating widgets:', error);
+                // Don't show error to user, it's a background process
+                // addToast('Los widgets se generarán más tarde', 'info');
+              }
+            }, 500); // Small delay to not block link generation UI
+          }
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -219,7 +240,7 @@ function AppContent() {
     }
 
     setIsGeneratingLinks(false);
-  }, [brandData, strategies, hasApiKey, setCurrentStep, setIsGeneratingLinks, setLinks, addToast]);
+  }, [brandData, strategies, hasApiKey, currentProject, setCurrentStep, setIsGeneratingLinks, setLinks, addToast]);
 
   const handleGenerateLandingDesign = useCallback(async () => {
     if (!brandData || links.length === 0) return;
