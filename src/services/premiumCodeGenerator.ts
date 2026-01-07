@@ -701,6 +701,11 @@ export function quickGenerateLanding(
             typography: 'Inter'
         } as BrandData,
         links,
-        landingUrl: `https://land.fotofachada.com/${name.toLowerCase().replace(/\s+/g, '-')}`
+        landingUrl: (() => {
+            const isDev = import.meta.env.DEV;
+            const protocol = isDev ? 'http' : 'https';
+            const domain = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
+            return `${protocol}://${domain}/l/${name.toLowerCase().replace(/\s+/g, '-')}`;
+        })()
     });
 }

@@ -113,6 +113,9 @@ export async function requestChanges(request: ChangeRequest): Promise<boolean> {
 // ─────────────────────────────────────────────────────────────
 
 export function getLandingPreviewUrl(campaignId: string, landingId?: string): string {
-    const baseUrl = import.meta.env.VITE_LANDING_BASE_URL || 'https://land.fotofachada.com';
+    const isDev = import.meta.env.DEV;
+    const protocol = isDev ? 'http' : 'https';
+    const domain = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
+    const baseUrl = import.meta.env.VITE_LANDING_BASE_URL || `${protocol}://${domain}`;
     return `${baseUrl}/${campaignId}${landingId ? `/${landingId}` : ''}`;
 }

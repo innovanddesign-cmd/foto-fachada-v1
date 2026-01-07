@@ -15,8 +15,12 @@ export const PosterGeneratorV3 = () => {
     const hasWatermark = false; // userTier === 'free'; // Disable watermark for now as requested "sin limite"
 
     useEffect(() => {
-        // Generate QR code
-        const landingUrl = `https://land.fotofachada.com/${brandData?.name?.toLowerCase().replace(/\s+/g, '-') || 'landing'}`;
+        // Generate QR code with correct domain
+        const isDev = import.meta.env.DEV;
+        const protocol = isDev ? 'http' : 'https';
+        const domain = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
+        const slug = brandData?.name?.toLowerCase().replace(/\s+/g, '-') || 'landing';
+        const landingUrl = `${protocol}://${domain}/l/${slug}`;
 
         if (brandData) {
             QRCode.toDataURL(landingUrl, {

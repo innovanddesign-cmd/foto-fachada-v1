@@ -109,8 +109,11 @@ export function LandingPreview() {
                     {/* Links */}
                     <div className="landing-links" style={{ position: 'relative', zIndex: 2 }}>
                         {links.map((link, index) => (
-                            <div
+                            <a
                                 key={link.id}
+                                href={link.url || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className={`landing-link-card btn-${config.buttons.style}`}
                                 style={{
                                     background: config.buttons.background,
@@ -118,7 +121,17 @@ export function LandingPreview() {
                                     border: config.buttons.border || 'none',
                                     boxShadow: config.buttons.shadow || 'none',
                                     animationDelay: `${index * 0.1}s`,
-                                    backdropFilter: config.buttons.style === 'glass' ? 'blur(10px)' : 'none'
+                                    backdropFilter: config.buttons.style === 'glass' ? 'blur(10px)' : 'none',
+                                    textDecoration: 'none',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                                onClick={(e) => {
+                                    if (!link.url || link.url === '#') {
+                                        e.preventDefault();
+                                        alert('Este enlace aún no tiene una URL asignada');
+                                    }
                                 }}
                             >
                                 <span className="link-emoji">{link.emoji}</span>
@@ -134,7 +147,7 @@ export function LandingPreview() {
                                     )}
                                 </div>
                                 <ExternalLink size={16} style={{ color: config.buttons.textColor }} />
-                            </div>
+                            </a>
                         ))}
                     </div>
 

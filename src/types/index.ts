@@ -64,6 +64,7 @@ export interface LandingLink {
     conversion: 'low' | 'medium' | 'high' | 'very-high';
     isPremium: boolean;
     regenerateCount: number;
+    url?: string; // Generated URL for this specific link's content page
 }
 
 // Landing page configuration

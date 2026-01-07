@@ -102,8 +102,11 @@ export function Enlaces() {
     };
 
     const getPublicUrl = (slug: string) => {
-        const protocol = window.location.protocol;
-        const host = window.location.host.replace(':5173', ':3000'); // Dev adjustment
+        // Use Vercel URL in production, localhost in development
+        const isDev = import.meta.env.DEV;
+        const protocol = isDev ? 'http:' : 'https:';
+        const host = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
+
         return `${protocol}//${host}/l/${slug}`;
     };
 

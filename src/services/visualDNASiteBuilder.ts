@@ -604,7 +604,7 @@ function generateTagline(businessType: string): string {
 export function buildVisualDNALanding(
     brandData: BrandData,
     links: any[] = [],
-    landingUrl: string = 'https://land.fotofachada.com'
+    landingUrl: string = import.meta.env.DEV ? 'http://localhost:3000' : 'https://foto-fachada-v1.vercel.app'
 ): GeneratedLanding {
     // Extract primary color from brand colors
     const primaryColor = brandData.colors?.primary || '#6366f1';

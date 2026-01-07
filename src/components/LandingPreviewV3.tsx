@@ -124,15 +124,27 @@ export function LandingPreviewV3() {
                             {/* Links Section */}
                             <div className="landing-links-v3">
                                 {links.map((link, index) => (
-                                    <div
+                                    <a
                                         key={link.id}
+                                        href={link.url || '#'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className={`landing-link-btn btn-${config.buttons.style}`}
                                         style={{
                                             background: config.buttons.background,
                                             color: config.buttons.textColor,
                                             border: config.buttons.border || 'none',
                                             boxShadow: config.buttons.shadow || 'none',
-                                            animationDelay: `${index * 0.1}s`
+                                            animationDelay: `${index * 0.1}s`,
+                                            textDecoration: 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={(e) => {
+                                            // If no URL, prevent default
+                                            if (!link.url || link.url === '#') {
+                                                e.preventDefault();
+                                                alert('Este enlace aún no tiene una URL asignada');
+                                            }
                                         }}
                                     >
                                         <div className="link-icon-circle">{link.emoji}</div>
@@ -145,7 +157,7 @@ export function LandingPreviewV3() {
                                             )}
                                         </div>
                                         <ExternalLink size={16} className="link-arrow" />
-                                    </div>
+                                    </a>
                                 ))}
                             </div>
 
