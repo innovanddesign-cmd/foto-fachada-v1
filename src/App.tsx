@@ -32,6 +32,7 @@ import { analyzeBusinessMedia, getMockBrandData } from './services/visionAI';
 import { generateMarketingStrategies, generateLandingLinks, getMockStrategies, getMockLinks } from './services/marketingAgent';
 import type { Project, LandingConfig, UserTier } from './types';
 import { PublicLandingPage } from './components/pages/PublicLandingPage';
+import { WidgetPageViewer } from './components/pages/WidgetPageViewer';
 
 type AppView = 'home' | 'dashboard' | 'project' | 'create-landing' | 'pricing' | 'campaigns' | 'landings' | 'strategies' | 'posters' | 'settings' | 'help';
 
@@ -205,42 +206,72 @@ function AppContent() {
     setIsGeneratingLinks(true);
 
     try {
+      let generatedLinks: typeof links = [];
+
       if (hasApiKey) {
         const result = await generateLandingLinks(brandData, strategies);
         if (result.success && result.links) {
-          setLinks(result.links);
-
-          // AUTO-GENERATE WIDGETS IN BACKGROUND
-          // This creates 3 functional widget pages after links are generated
-          if (currentProject?.id) {
-            console.log('[App] Auto-generating widgets in background for campaign:', currentProject.id);
-
-            // Call in background without blocking UI
-            setTimeout(async () => {
-              try {
-                const { autoGenerateWidgets } = useAppStore.getState();
-                const widgetResult = await autoGenerateWidgets(currentProject.id);
-
-                console.log('[App] ✅ Widgets auto-generated:', widgetResult.widgets.length);
-                addToast(`✨ ${widgetResult.widgets.length} widgets funcionales creados`, 'success');
-              } catch (error) {
-                console.error('[App] Error auto-generating widgets:', error);
-                // Don't show error to user, it's a background process
-                // addToast('Los widgets se generarán más tarde', 'info');
-              }
-            }, 500); // Small delay to not block link generation UI
-          }
+          generatedLinks = result.links;
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 2000));
-        setLinks(getMockLinks());
+        generatedLinks = getMockLinks();
       }
+
+      // AUTO-GENERATE WIDGET PAGES (100% FRONTEND - NO BACKEND REQUIRED)
+      // This creates full HTML pages for each link using Gemini API
+      console.log('[App] 🚀 Auto-generating widget pages for', generatedLinks.length, 'links...');
+
+      try {
+        const { generateWidgetPages } = await import('./services/widgetPageGenerator');
+
+        addToast('⏳ Generando páginas de widgets...', 'info');
+
+        const widgetPages = await generateWidgetPages(
+          generatedLinks.slice(0, 3), // First 3 links
+          brandData,
+          (progress) => {
+            // Update toast with progress
+            if (progress.status === 'generating') {
+              console.log(`[App] Generating ${progress.current}/${progress.total}: ${progress.currentWidget}`);
+            } else if (progress.status === 'complete') {
+              addToast('✨ ¡Widgets generados exitosamente!', 'success');
+            }
+          }
+        );
+
+        console.log('[App] ✅ Generated', widgetPages.length, 'widget pages');
+
+        // Update links with widget URLs
+        const isDev = import.meta.env.DEV;
+        const protocol = isDev ? 'http' : 'https';
+        const domain = isDev ? 'localhost:5173' : window.location.host;
+
+        const updatedLinks = generatedLinks.map((link, index) => {
+          const widgetPage = widgetPages[index];
+          if (widgetPage) {
+            return {
+              ...link,
+              url: `${protocol}://${domain}/widget/${widgetPage.slug}`
+            };
+          }
+          return link;
+        });
+
+        setLinks(updatedLinks);
+
+      } catch (widgetError) {
+        console.error('[App] Widget generation failed, using links without URLs:', widgetError);
+        setLinks(generatedLinks);
+        // Don't show error to user, links still work just without widget pages
+      }
+
     } catch (error) {
       addToast('Error generando enlaces', 'error');
     }
 
     setIsGeneratingLinks(false);
-  }, [brandData, strategies, hasApiKey, currentProject, setCurrentStep, setIsGeneratingLinks, setLinks, addToast]);
+  }, [brandData, strategies, hasApiKey, setCurrentStep, setIsGeneratingLinks, setLinks, addToast]);
 
   const handleGenerateLandingDesign = useCallback(async () => {
     if (!brandData || links.length === 0) return;
@@ -633,6 +664,7 @@ export default function App() {
     <ToastProvider>
       <Routes>
         <Route path="/p/:id" element={<PublicLandingPage />} />
+        <Route path="/widget/:slug" element={<WidgetPageViewer />} />
         <Route path="/*" element={<AppContent />} />
       </Routes>
       <CookieBanner />
