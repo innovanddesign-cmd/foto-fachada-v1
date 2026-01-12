@@ -1,4 +1,11 @@
-import { useState, useEffect } from 'react';
+/**
+ * Enlaces Component
+ * =================
+ * Displays and manages landing page links from Zustand store.
+ * Uses local storage data instead of backend API calls.
+ */
+
+import { useState } from 'react';
 import {
     Link as LinkIcon,
     Copy,
@@ -6,188 +13,86 @@ import {
     Edit2,
     ExternalLink,
     MoreVertical,
-    Sparkles
+    Sparkles,
+    Check
 } from 'lucide-react';
 import { QRCodeGenerator } from './QRCodeGenerator';
 import { StrategySelector } from './StrategySelector';
+import { useAppStore } from '../store/appStore';
 import './Enlaces.css';
 
-interface Landing {
+interface EnlaceItem {
     id: string;
     title: string;
     slug: string;
     status: 'draft' | 'published' | 'archived';
     views: number;
     conversions: number;
-    created_at: string;
-    updated_at: string;
+    projectName?: string;
 }
 
 export function Enlaces() {
-    const [landings, setLandings] = useState<Landing[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedLanding, setSelectedLanding] = useState<Landing | null>(null);
+    const { projects, brandData } = useAppStore();
     const [strategyModalOpen, setStrategyModalOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [selectedEnlace, setSelectedEnlace] = useState<EnlaceItem | null>(null);
 
-    useEffect(() => {
-        fetchLandings();
-    }, []);
+    // Extract all landings from all projects
+    const enlaces: EnlaceItem[] = projects.flatMap(project =>
+        project.landings.map(landing => ({
+            id: landing.id,
+            title: landing.name || project.name || 'Landing sin título',
+            slug: landing.id.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+            status: project.status === 'active' ? 'published' : 'draft',
+            views: Math.floor(Math.random() * 100), // Mock data - would come from analytics
+            conversions: Math.floor(Math.random() * 20), // Mock data
+            projectName: project.name
+        }))
+    );
 
-    const fetchLandings = async () => {
+    // Also add current brandData if exists and not in projects
+    if (brandData && !enlaces.some(e => e.title === brandData.name)) {
+        enlaces.unshift({
+            id: 'current-' + Date.now(),
+            title: brandData.name || 'Negocio actual',
+            slug: (brandData.name || 'landing').toLowerCase().replace(/[^a-z0-9]/g, '-'),
+            status: 'draft',
+            views: 0,
+            conversions: 0,
+            projectName: 'Proyecto actual'
+        });
+    }
+
+    const copyToClipboard = async (url: string, id: string) => {
         try {
-            setLoading(true);
-            const token = localStorage.getItem('auth_token'); // Adjust based on your auth implementation
-
-            const response = await fetch('http://localhost:3000/api/campaigns', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch campaigns');
-            }
-
-            const data = await response.json();
-
-            // Extract landings from campaigns
-            const allLandings: Landing[] = [];
-            if (data.campaigns) {
-                for (const campaign of data.campaigns) {
-                    // Fetch landings for each campaign
-                    const landingsResponse = await fetch(`http://localhost:3000/api/landings/campaign/${campaign.id}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include'
-                    });
-
-                    if (landingsResponse.ok) {
-                        const landingsData = await landingsResponse.json();
-                        if (landingsData.landings) {
-                            allLandings.push(...landingsData.landings);
-                        }
-                    }
-                }
-            }
-
-            setLandings(allLandings);
-        } catch (error) {
-            console.error('Error fetching landings:', error);
-            // Fallback to empty for now
-            setLandings([]);
-        } finally {
-            setLoading(false);
+            await navigator.clipboard.writeText(url);
+            setCopiedId(id);
+            setTimeout(() => setCopiedId(null), 2000);
+        } catch (err) {
+            console.error('Error copying to clipboard:', err);
         }
     };
 
-    const copyToClipboard = (url: string) => {
-        navigator.clipboard.writeText(url).then(() => {
-            // Show success feedback
-            const button = event?.target as HTMLElement;
-            if (button) {
-                const originalText = button.innerHTML;
-                button.innerHTML = '✓';
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                }, 1500);
-            }
-        }).catch(err => {
-            console.error('Error copying to clipboard:', err);
-        });
-    };
-
     const getPublicUrl = (slug: string) => {
-        // Use Vercel URL in production, localhost in development
         const isDev = import.meta.env.DEV;
-        const protocol = isDev ? 'http:' : 'https:';
-        const host = isDev ? 'localhost:3000' : 'foto-fachada-v1.vercel.app';
-
-        return `${protocol}//${host}/l/${slug}`;
+        const host = isDev ? 'localhost:5173' : 'foto-fachada-v1.vercel.app';
+        return `https://${host}/p/${slug}`;
     };
 
-    const handleChangeStrategy = (landing: Landing) => {
-        setSelectedLanding(landing);
+    const handleChangeStrategy = (enlace: EnlaceItem) => {
+        setSelectedEnlace(enlace);
         setStrategyModalOpen(true);
     };
 
     const handleStrategySelect = async (strategyId: string) => {
-        if (!selectedLanding) return;
-
-        try {
-            const token = localStorage.getItem('auth_token');
-
-            // First, get the proposal ID for this strategy
-            // This would need to be stored or fetched from campaigns
-            const response = await fetch(`http://localhost:3000/api/landings/${selectedLanding.id}/strategy`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    proposalId: strategyId // This needs to be mapped to actual proposal ID
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to change strategy');
-            }
-
-            // Show success message
-            console.log('Strategy changed successfully');
-            fetchLandings(); // Refresh
-        } catch (error) {
-            console.error('Error changing strategy:', error);
-            alert('Error al cambiar la estrategia. Por favor intenta de nuevo.');
-        }
+        console.log('Strategy selected:', strategyId, 'for landing:', selectedEnlace?.id);
+        setStrategyModalOpen(false);
+        setSelectedEnlace(null);
+        // TODO: Update landing with new strategy
     };
 
-    const handlePublish = async (landingId: string) => {
-        try {
-            const token = localStorage.getItem('auth_token');
-
-            const response = await fetch(`http://localhost:3000/api/landings/${landingId}/publish`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    status: 'published'
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to publish landing');
-            }
-
-            console.log('Landing published successfully');
-            fetchLandings(); // Refresh
-        } catch (error) {
-            console.error('Error publishing landing:', error);
-            alert('Error al publicar el enlace. Por favor intenta de nuevo.');
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="enlaces-container">
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>Cargando enlaces...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (landings.length === 0) {
+    if (enlaces.length === 0) {
         return (
             <div className="enlaces-container">
                 <div className="empty-state">
@@ -196,7 +101,7 @@ export function Enlaces() {
                     </div>
                     <h2>No hay enlaces creados</h2>
                     <p className="text-muted">
-                        Crea tu primer proyecto para generar un enlace público con acción interactiva
+                        Sube una foto de fachada y genera tu primer enlace con acción interactiva
                     </p>
                 </div>
             </div>
@@ -213,35 +118,46 @@ export function Enlaces() {
                         <p className="text-muted">Gestiona tus landing pages con QR y estrategias interactivas</p>
                     </div>
                 </div>
+                <div className="enlaces-count">
+                    <span className="count-badge">{enlaces.length}</span>
+                    <span className="count-label">enlaces</span>
+                </div>
             </div>
 
             <div className="enlaces-grid">
-                {landings.map(landing => {
-                    const publicUrl = getPublicUrl(landing.slug);
+                {enlaces.map(enlace => {
+                    const publicUrl = getPublicUrl(enlace.slug);
+                    const isCopied = copiedId === enlace.id;
 
                     return (
-                        <div key={landing.id} className="enlace-card glass-card">
+                        <div key={enlace.id} className="enlace-card glass-card">
                             <div className="enlace-header">
                                 <div className="enlace-status">
-                                    <span className={`status-badge ${landing.status}`}>
-                                        {landing.status === 'published' ? 'Publicado' :
-                                            landing.status === 'draft' ? 'Borrador' : 'Archivado'}
+                                    <span className={`status-badge ${enlace.status}`}>
+                                        {enlace.status === 'published' ? '✓ Publicado' :
+                                            enlace.status === 'draft' ? '📝 Borrador' : '📦 Archivado'}
                                     </span>
                                 </div>
                                 <button
                                     className="btn-icon"
-                                    onClick={() => setActiveMenu(activeMenu === landing.id ? null : landing.id)}
+                                    onClick={() => setActiveMenu(activeMenu === enlace.id ? null : enlace.id)}
                                 >
                                     <MoreVertical size={18} />
                                 </button>
 
-                                {activeMenu === landing.id && (
+                                {activeMenu === enlace.id && (
                                     <div className="enlace-menu">
-                                        <button onClick={() => window.open(publicUrl, '_blank')}>
+                                        <button onClick={() => {
+                                            window.open(publicUrl, '_blank');
+                                            setActiveMenu(null);
+                                        }}>
                                             <ExternalLink size={14} />
-                                            Abrir
+                                            Abrir enlace
                                         </button>
-                                        <button onClick={() => handleChangeStrategy(landing)}>
+                                        <button onClick={() => {
+                                            handleChangeStrategy(enlace);
+                                            setActiveMenu(null);
+                                        }}>
                                             <Sparkles size={14} />
                                             Cambiar Acción
                                         </button>
@@ -249,7 +165,10 @@ export function Enlaces() {
                                 )}
                             </div>
 
-                            <h3 className="enlace-title">{landing.title}</h3>
+                            <h3 className="enlace-title">{enlace.title}</h3>
+                            {enlace.projectName && (
+                                <p className="enlace-project">{enlace.projectName}</p>
+                            )}
 
                             {/* QR Code */}
                             <div className="qr-section">
@@ -270,11 +189,11 @@ export function Enlaces() {
                                         className="url-input"
                                     />
                                     <button
-                                        className="btn-icon"
-                                        onClick={() => copyToClipboard(publicUrl)}
+                                        className={`btn-icon ${isCopied ? 'copied' : ''}`}
+                                        onClick={() => copyToClipboard(publicUrl, enlace.id)}
                                         title="Copiar enlace"
                                     >
-                                        <Copy size={16} />
+                                        {isCopied ? <Check size={16} /> : <Copy size={16} />}
                                     </button>
                                 </div>
                             </div>
@@ -283,23 +202,31 @@ export function Enlaces() {
                             <div className="enlace-stats">
                                 <div className="stat">
                                     <Eye size={16} />
-                                    <span>{landing.views} vistas</span>
+                                    <span>{enlace.views} vistas</span>
                                 </div>
                                 <div className="stat">
                                     <Edit2 size={16} />
-                                    <span>{landing.conversions} conversiones</span>
+                                    <span>{enlace.conversions} conversiones</span>
                                 </div>
                             </div>
 
                             {/* Actions */}
-                            {landing.status === 'draft' && (
+                            <div className="enlace-actions">
                                 <button
-                                    className="btn btn-primary w-full"
-                                    onClick={() => handlePublish(landing.id)}
+                                    className="btn btn-secondary"
+                                    onClick={() => handleChangeStrategy(enlace)}
                                 >
-                                    Publicar
+                                    <Sparkles size={16} />
+                                    Cambiar Acción
                                 </button>
-                            )}
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => window.open(publicUrl, '_blank')}
+                                >
+                                    <ExternalLink size={16} />
+                                    Ver
+                                </button>
+                            </div>
                         </div>
                     );
                 })}
@@ -310,10 +237,10 @@ export function Enlaces() {
                 isOpen={strategyModalOpen}
                 onClose={() => {
                     setStrategyModalOpen(false);
-                    setSelectedLanding(null);
+                    setSelectedEnlace(null);
                 }}
                 onSelect={handleStrategySelect}
-                currentStrategy={undefined} // TODO: Get from landing
+                currentStrategy={undefined}
             />
         </div>
     );
