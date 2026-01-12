@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, RefreshCw, Check, Zap, Crown, Loader, AlertCircle } from 'lucide-react';
+import { Link, RefreshCw, Check, Zap, Crown, Loader, AlertCircle, ExternalLink, QrCode } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
 import { regenerateSingleLink } from '../services/marketingAgent';
 import type { LandingLink } from '../types';
@@ -22,10 +22,33 @@ const TYPE_LABELS: Record<string, string> = {
     info: 'ℹ️ Información'
 };
 
+// Get generated Simple Page from localStorage
+function getGeneratedSimplePage(): { url: string; slug: string; actionId: number } | null {
+    try {
+        const pages = localStorage.getItem('fotofachada_pages');
+        if (pages) {
+            const parsed = JSON.parse(pages);
+            if (parsed.length > 0) {
+                const latest = parsed[parsed.length - 1];
+                return {
+                    url: latest.url,
+                    slug: latest.id,
+                    actionId: latest.action_id
+                };
+            }
+        }
+    } catch {
+        // Ignore
+    }
+    return null;
+}
+
 export function LinkEditorV3() {
-    const { links, isGeneratingLinks, brandData, regenerateLink, userTier } = useAppStore();
+    const { links, isGeneratingLinks, brandData, regenerateLink, userTier, selectedStrategy } = useAppStore();
     const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
     const [approvedLinks, setApprovedLinks] = useState<Set<string>>(new Set());
+
+    const generatedPage = getGeneratedSimplePage();
 
     const maxRegenerations = userTier === 'free' ? 3 : userTier === 'plus' ? 10 : -1;
 
@@ -91,7 +114,75 @@ export function LinkEditorV3() {
         );
     }
 
-    if (links.length === 0) return null;
+    // Show generated Simple Page if available
+    if (links.length === 0 && generatedPage) {
+        return (
+            <div className="link-editor-v3 animate-fadeIn">
+                <div className="section-header-v3">
+                    <div className="icon-badge success">
+                        <Check size={24} className="text-white" />
+                    </div>
+                    <div>
+                        <h2 className="section-title">¡Simple Page Generada!</h2>
+                        <p className="section-subtitle">Tu página interactiva está lista para compartir</p>
+                    </div>
+                </div>
+
+                <div className="simple-page-card glass-panel">
+                    <div className="simple-page-preview">
+                        <div className="preview-icon">🎯</div>
+                        <div className="preview-info">
+                            <h3>{selectedStrategy?.title || 'Acción de Marketing'}</h3>
+                            <p className="preview-url">{generatedPage.url}</p>
+                        </div>
+                    </div>
+
+                    <div className="simple-page-actions">
+                        <a
+                            href={generatedPage.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="action-btn primary-btn"
+                        >
+                            <ExternalLink size={18} />
+                            <span>Ver página</span>
+                        </a>
+                        <button
+                            className="action-btn secondary-btn"
+                            onClick={() => {
+                                navigator.clipboard.writeText(generatedPage.url);
+                            }}
+                        >
+                            <QrCode size={18} />
+                            <span>Copiar enlace</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="links-summary-bar glass-panel">
+                    <div className="completion-badge">
+                        <Check size={14} />
+                        <span>¡Listo para continuar al diseño!</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Empty state when no links and no generated page
+    if (links.length === 0) {
+        return (
+            <div className="link-editor-v3 empty-state glass-panel">
+                <div className="empty-icon">
+                    <Link size={48} />
+                </div>
+                <h3>Generando tu enlace...</h3>
+                <p className="empty-subtitle">
+                    Selecciona una acción estratégica para generar tu Simple Page interactiva
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="link-editor-v3 animate-fadeIn">
