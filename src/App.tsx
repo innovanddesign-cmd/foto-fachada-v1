@@ -16,8 +16,8 @@ import { HomePageV3 } from './components/features/HomePageV3';
 import { StepIndicator } from './components/StepIndicator';
 import { ImageUploader } from './components/ImageUploader';
 import { BrandAnalysis } from './components/BrandAnalysis';
-import { StrategicSelectionView } from './components/features/StrategicSelectionView';
-import { LinkEditorV3 } from './components/LinkEditorV3';
+import { StrategyOverview } from './components/StrategyOverview';
+import { AutoLinksView } from './components/AutoLinksView';
 import { LandingPreviewV3 } from './components/LandingPreviewV3';
 import { PosterGeneratorV3 } from './components/PosterGeneratorV3';
 import { CreateProjectModal } from './components/CreateProjectModal';
@@ -523,8 +523,8 @@ function AppContent() {
           <div className="card p-6 mb-6">
             {currentStep === 'upload' && <ImageUploader />}
             {currentStep === 'analysis' && <BrandAnalysis />}
-            {currentStep === 'strategy' && <StrategicSelectionView />}
-            {currentStep === 'links' && <LinkEditorV3 />}
+            {currentStep === 'strategy' && <StrategyOverview />}
+            {currentStep === 'links' && <AutoLinksView />}
             {currentStep === 'design' && (
               <div className="flex justify-center">
                 <LandingPreviewV3 />
