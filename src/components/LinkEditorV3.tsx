@@ -23,28 +23,38 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 // Get generated Simple Page from localStorage
-function getGeneratedSimplePage(): { url: string; slug: string; actionId: number } | null {
+function getGeneratedSimplePage(): { url: string; slug: string; actionId: number; title: string } | null {
     try {
-        const pages = localStorage.getItem('fotofachada_pages');
-        if (pages) {
-            const parsed = JSON.parse(pages);
+        // Read from simple_pages_index (where strategicActionsService stores pages)
+        const index = localStorage.getItem('simple_pages_index');
+        if (index) {
+            const parsed = JSON.parse(index);
             if (parsed.length > 0) {
                 const latest = parsed[parsed.length - 1];
-                return {
-                    url: latest.url,
-                    slug: latest.id,
-                    actionId: latest.action_id
-                };
+                // Get the full page data
+                const pageData = localStorage.getItem(`simple_page_${latest.slug}`);
+                if (pageData) {
+                    const page = JSON.parse(pageData);
+                    const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                    const baseUrl = isDev ? 'http://localhost:5173' : `https://${window.location.host}`;
+
+                    return {
+                        url: `${baseUrl}/p/${latest.slug}`,
+                        slug: latest.slug,
+                        actionId: page.actionId || 0,
+                        title: page.title || latest.title || 'Simple Page'
+                    };
+                }
             }
         }
-    } catch {
-        // Ignore
+    } catch (e) {
+        console.error('[LinkEditorV3] Error reading Simple Page:', e);
     }
     return null;
 }
 
 export function LinkEditorV3() {
-    const { links, isGeneratingLinks, brandData, regenerateLink, userTier, selectedStrategy } = useAppStore();
+    const { links, isGeneratingLinks, brandData, regenerateLink, userTier } = useAppStore();
     const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
     const [approvedLinks, setApprovedLinks] = useState<Set<string>>(new Set());
 
@@ -132,7 +142,7 @@ export function LinkEditorV3() {
                     <div className="simple-page-preview">
                         <div className="preview-icon">🎯</div>
                         <div className="preview-info">
-                            <h3>{selectedStrategy?.title || 'Acción de Marketing'}</h3>
+                            <h3>{generatedPage.title}</h3>
                             <p className="preview-url">{generatedPage.url}</p>
                         </div>
                     </div>
