@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { PublicHeader } from './PublicHeader';
-import { Footer } from './Footer';
+import { PublicNavbar } from './PublicNavbar';
+import { PublicFooter } from './PublicFooter';
 import './PublicLayout.css';
 
 interface PublicLayoutProps {
@@ -12,11 +12,11 @@ interface PublicLayoutProps {
 export function PublicLayout({ children, onLogin, onGetStarted }: PublicLayoutProps) {
     return (
         <div className="public-layout">
-            <PublicHeader onLogin={onLogin} onGetStarted={onGetStarted} />
+            <PublicNavbar onLogin={onLogin} onGetStarted={onGetStarted} />
             <main className="public-main">
                 {children}
             </main>
-            <Footer />
+            <PublicFooter />
         </div>
     );
 }

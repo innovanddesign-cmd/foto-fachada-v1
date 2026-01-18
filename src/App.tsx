@@ -1,6 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { ChevronRight, Sparkles, ArrowLeft, Plus } from 'lucide-react';
 import { useAppStore } from './store/appStore';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { AuthModal } from './components/AuthModal';
@@ -8,70 +7,90 @@ import { supabase } from './lib/supabase';
 import { Button } from './components/ui/Button';
 import { Header } from './components/layout/Header';
 import { PageContainer } from './components/layout/PageContainer';
-import { DashboardV3 } from './components/features/DashboardV3';
-import { PricingPageV3 } from './components/features/PricingPageV3';
-import { ProjectViewV3 } from './components/features/ProjectViewV3';
 import { PublicLayout } from './components/layout/PublicLayout';
-import { HomePageV3 } from './components/features/HomePageV3';
-import { StepIndicator } from './components/StepIndicator';
-import { ImageUploader } from './components/ImageUploader';
-import { BrandAnalysis } from './components/BrandAnalysis';
-import { StrategyOverview } from './components/StrategyOverview';
-import { AutoLinksView } from './components/AutoLinksView';
-import { LandingPreviewV3 } from './components/LandingPreviewV3';
-import { PosterGeneratorV3 } from './components/PosterGeneratorV3';
+// Removed HomePageV3 import as it's replaced by PublicHome
 import { CreateProjectModal } from './components/CreateProjectModal';
 import { SettingsModal } from './components/SettingsModal';
-import { AccountSettings } from './components/features/AccountSettings';
-import { HelpCenter } from './components/features/HelpCenter';
-import { LandingsList } from './components/features/LandingsList';
-import { PostersList } from './components/features/PostersList';
 import { SupportCenter } from './components/features/support/SupportCenter';
 import { CookieBanner } from './components/legal/CookieBanner';
-import { analyzeBusinessMedia, getMockBrandData } from './services/visionAI';
-import { generateMarketingStrategies, generateLandingLinks, getMockStrategies, getMockLinks } from './services/marketingAgent';
-import type { Project, LandingConfig, UserTier } from './types';
+import type { Project, UserTier } from './types';
 import { PublicLandingPage } from './components/pages/PublicLandingPage';
 import { WidgetPageViewer } from './components/pages/WidgetPageViewer';
+import { MobileTabBar } from './components/layout/MobileTabBar';
+import { NotFoundPage } from './components/pages/NotFoundPage';
+import { OnboardingCarousel } from './components/features/OnboardingCarousel';
+import { Loader2 } from 'lucide-react';
 
-type AppView = 'home' | 'dashboard' | 'project' | 'create-landing' | 'pricing' | 'campaigns' | 'landings' | 'strategies' | 'posters' | 'settings' | 'help';
+// Public Pages
+import { PublicHome } from './components/public/PublicHome';
+import { PublicExamples } from './components/public/PublicExamples';
+import { PublicSolutions } from './components/public/PublicSolutions';
+import { PublicPricing } from './components/public/PublicPricing';
+import { PublicHelp } from './components/public/PublicHelp';
+
+// Lazy Imports for heavy components
+const DashboardV3 = lazy(() => import('./components/features/DashboardV3').then(module => ({ default: module.DashboardV3 })));
+const PricingPageV3 = lazy(() => import('./components/features/PricingPageV3').then(module => ({ default: module.PricingPageV3 })));
+const ProjectViewV3 = lazy(() => import('./components/features/ProjectViewV3').then(module => ({ default: module.ProjectViewV3 })));
+const AccountSettings = lazy(() => import('./components/features/AccountSettings').then(module => ({ default: module.AccountSettings })));
+const HelpCenter = lazy(() => import('./components/features/HelpCenter').then(module => ({ default: module.HelpCenter })));
+const LandingsList = lazy(() => import('./components/features/LandingsList').then(module => ({ default: module.LandingsList })));
+const PostersList = lazy(() => import('./components/features/PostersList').then(module => ({ default: module.PostersList })));
+const EscaparateEngine = lazy(() => import('./components/EscaparateEngine').then(module => ({ default: module.EscaparateEngine })));
+
+type AppView = 'home' | 'dashboard' | 'project' | 'create-landing' | 'escaparate' | 'pricing' | 'campaigns' | 'landings' | 'strategies' | 'posters' | 'settings' | 'help';
+
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+        <p className="text-gray-500 font-medium">Cargando...</p>
+      </div>
+    </div>
+  );
+}
 
 function AppContent() {
   const {
-    currentStep,
-    setCurrentStep,
-    uploadedMedia,
-    brandData,
-    setBrandData,
-    isAnalyzing,
-    setIsAnalyzing,
-    strategies,
-    setStrategies,
-    isGeneratingStrategies,
-    setIsGeneratingStrategies,
-    links,
-    setLinks,
-    isGeneratingLinks,
-    setIsGeneratingLinks,
+    currentView,
+    setCurrentView,
     resetFlow,
     currentProject,
     setCurrentProject,
-    landingConfig,
-    setLandingConfig,
-    setIsGeneratingDesign,
-    addLandingToProject,
+    setUser,
+    fetchProjects
   } = useAppStore();
 
   const { addToast } = useToast();
-  const [appView, setAppView] = useState<AppView>('home');
+  // Sincronizar estado local con global para la vista, aunque idealmente usaríamos solo el global
+  const [appView, setAppView] = useState<AppView>(currentView as AppView);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  const { setUser, fetchProjects } = useAppStore();
+  // Sincronizar cambios del store a local (temporal hasta refactor total)
+  useEffect(() => {
+    setAppView(currentView as AppView);
+  }, [currentView]);
+
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check Onboarding Status
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('foto_fachada_onboarding_completed');
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('foto_fachada_onboarding_completed', 'true');
+    setShowOnboarding(false);
+  };
 
   // Auth Listener
-  useState(() => {
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ? { id: session.user.id, email: session.user.email } : null);
       if (session?.user) fetchProjects();
@@ -85,294 +104,61 @@ function AppContent() {
     });
 
     return () => subscription.unsubscribe();
-  });
+  }, [setUser, fetchProjects]);
 
-  const hasApiKey = Boolean(import.meta.env.VITE_GEMINI_API_KEY);
+  // Recuperar sesión de escaparate si existe
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('escaparate-session');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const step = parsed?.state?.currentState?.step;
+        // Si hay una sesión activa (no está en UPLOAD inicial)
+        if (step && step !== 'UPLOAD') {
+          console.log('[App] Recuperando sesión de escaparate:', step);
+          setCurrentView('escaparate');
+        }
+      }
+    } catch (e) {
+      // Ignorar errores de parsing
+    }
+  }, [setCurrentView]);
 
   // Navigation handlers
   const handleNavigate = useCallback((view: string) => {
-    setAppView(view as AppView);
+    setCurrentView(view);
     if (view === 'dashboard') {
       setCurrentProject(null);
       resetFlow();
     }
-  }, [setCurrentProject, resetFlow]);
+  }, [setCurrentView, setCurrentProject, resetFlow]);
 
   const handleOpenProject = useCallback((project: Project) => {
     setCurrentProject(project);
-    setAppView('project');
-  }, [setCurrentProject]);
+    setCurrentView('project');
+  }, [setCurrentProject, setCurrentView]);
 
   const handleCreateLanding = useCallback(() => {
     resetFlow();
-    setAppView('create-landing');
-  }, [resetFlow]);
+    // Usar el nuevo motor de escaparates
+    setCurrentView('escaparate');
+  }, [resetFlow, setCurrentView]);
 
   const handleShowPricing = useCallback(() => {
-    setAppView('pricing');
+    setCurrentView('pricing');
+  }, [setCurrentView]);
+
+  // Handle Auth Modal from outside
+  useEffect(() => {
+    const handleOpenAuth = () => setShowAuthModal(true);
+    window.addEventListener('open-auth-modal', handleOpenAuth);
+    return () => window.removeEventListener('open-auth-modal', handleOpenAuth);
   }, []);
-
-  const handleSaveLanding = useCallback(() => {
-    if (!brandData || !currentProject) return;
-
-    const newLanding: LandingConfig = {
-      id: `landing-${Date.now()}`,
-      name: brandData.name,
-      brand: brandData,
-      links: links,
-      config: landingConfig, // AI-generated configuration
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    addLandingToProject(currentProject.id, newLanding);
-    addToast('Landing guardada correctamente', 'success');
-    setAppView('project');
-    resetFlow();
-  }, [brandData, currentProject, links, landingConfig, addLandingToProject, resetFlow, addToast]);
-
-  // Step handlers
-  const handleAnalyze = useCallback(async () => {
-    if (uploadedMedia.length === 0) return;
-
-    setCurrentStep('analysis');
-    setIsAnalyzing(true);
-
-    try {
-      if (hasApiKey) {
-        // Collect URLs and convert to Base64
-        const mediaUrls = uploadedMedia.map(m => m.url);
-
-        // Convert blob URLs to actual Base64 strings for Gemini API
-        const { blobToBase64 } = await import('./services/imageUtils');
-        const base64Images = await Promise.all(
-          mediaUrls.map(url => blobToBase64(url))
-        );
-
-        // Analyze all media
-        const result = await analyzeBusinessMedia(base64Images);
-        if (result.success && result.data) {
-          setBrandData(result.data);
-          addToast('Análisis de negocio completado', 'success');
-        }
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setBrandData(getMockBrandData());
-        addToast('Análisis completado (demo)', 'info');
-      }
-    } catch (error) {
-      addToast('Error en el análisis', 'error');
-    }
-
-    setIsAnalyzing(false);
-  }, [uploadedMedia, hasApiKey, setCurrentStep, setIsAnalyzing, setBrandData, addToast]);
-
-  const handleGenerateStrategies = useCallback(async () => {
-    if (!brandData) return;
-
-    setCurrentStep('strategy');
-    setIsGeneratingStrategies(true);
-
-    try {
-      if (hasApiKey) {
-        console.log('App: Calling generateMarketingStrategies...');
-        const result = await generateMarketingStrategies(brandData);
-        console.log('App: Result from generateMarketingStrategies:', result);
-
-        if (result.success && result.strategies) {
-          console.log('App: Setting strategies:', result.strategies);
-          setStrategies(result.strategies);
-        } else {
-          console.error('App: Strategy generation failed or no strategies returned', result);
-          addToast(`Error: ${result.error || 'No strategies returned'}`, 'error');
-        }
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 2500));
-        setStrategies(getMockStrategies());
-      }
-      addToast('Estrategias generadas', 'success');
-    } catch (error) {
-      console.error('App: Critical error in handleGenerateStrategies:', error);
-      addToast('Error generando estrategias', 'error');
-    }
-
-    setIsGeneratingStrategies(false);
-  }, [brandData, hasApiKey, setCurrentStep, setIsGeneratingStrategies, setStrategies, addToast]);
-
-  const handleGenerateLinks = useCallback(async () => {
-    if (!brandData || strategies.length === 0) return;
-
-    setCurrentStep('links');
-    setIsGeneratingLinks(true);
-
-    try {
-      let generatedLinks: typeof links = [];
-
-      if (hasApiKey) {
-        const result = await generateLandingLinks(brandData, strategies);
-        if (result.success && result.links) {
-          generatedLinks = result.links;
-        }
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        generatedLinks = getMockLinks();
-      }
-
-      // AUTO-GENERATE WIDGET PAGES (100% FRONTEND - NO BACKEND REQUIRED)
-      // This creates full HTML pages for each link using Gemini API
-      console.log('[App] 🚀 Auto-generating widget pages for', generatedLinks.length, 'links...');
-
-      try {
-        const { generateWidgetPages } = await import('./services/widgetPageGenerator');
-
-        addToast('⏳ Generando páginas de widgets...', 'info');
-
-        const widgetPages = await generateWidgetPages(
-          generatedLinks.slice(0, 3), // First 3 links
-          brandData,
-          (progress) => {
-            // Update toast with progress
-            if (progress.status === 'generating') {
-              console.log(`[App] Generating ${progress.current}/${progress.total}: ${progress.currentWidget}`);
-            } else if (progress.status === 'complete') {
-              addToast('✨ ¡Widgets generados exitosamente!', 'success');
-            }
-          }
-        );
-
-        console.log('[App] ✅ Generated', widgetPages.length, 'widget pages');
-
-        // Update links with widget URLs
-        const isDev = import.meta.env.DEV;
-        const protocol = isDev ? 'http' : 'https';
-        const domain = isDev ? 'localhost:5173' : window.location.host;
-
-        const updatedLinks = generatedLinks.map((link, index) => {
-          const widgetPage = widgetPages[index];
-          if (widgetPage) {
-            return {
-              ...link,
-              url: `${protocol}://${domain}/widget/${widgetPage.slug}`
-            };
-          }
-          return link;
-        });
-
-        setLinks(updatedLinks);
-
-      } catch (widgetError) {
-        console.error('[App] Widget generation failed, using links without URLs:', widgetError);
-        setLinks(generatedLinks);
-        // Don't show error to user, links still work just without widget pages
-      }
-
-    } catch (error) {
-      addToast('Error generando enlaces', 'error');
-    }
-
-    setIsGeneratingLinks(false);
-  }, [brandData, strategies, hasApiKey, setCurrentStep, setIsGeneratingLinks, setLinks, addToast]);
-
-  const handleGenerateLandingDesign = useCallback(async () => {
-    if (!brandData || links.length === 0) return;
-
-    setCurrentStep('design');
-    setIsGeneratingDesign(true);
-
-    try {
-      const { generateLandingPageDesign } = await import('./services/landingPageGenerator');
-      const result = await generateLandingPageDesign(brandData, links);
-
-      setLandingConfig(result.config);
-
-      addToast('Diseño personalizado generado', 'success');
-    } catch (error) {
-      console.error('Error generating design:', error);
-      addToast('Error generando diseño', 'error');
-    }
-
-    setIsGeneratingDesign(false);
-  }, [brandData, links, setCurrentStep, setIsGeneratingDesign, setLandingConfig, addToast]);
-
-  const handleGeneratePoster = useCallback(() => {
-    setCurrentStep('poster');
-  }, [setCurrentStep]);
-
-  // Step titles
-  const stepTitles: Record<string, { title: string; description: string }> = {
-    upload: { title: 'Sube una foto', description: 'Captura la esencia del negocio con una foto de la fachada' },
-    analysis: { title: 'Análisis de marca', description: 'Extrayendo identidad visual y datos del negocio' },
-    strategy: { title: 'Estrategias de marketing', description: 'Propuestas personalizadas basadas en el análisis' },
-    links: { title: 'Enlaces de la landing', description: 'Configura los enlaces que aparecerán en tu landing' },
-    design: { title: 'Tu landing personalizada', description: 'Generada automáticamente por IA basada en tu marca' },
-    poster: { title: 'Cartel con QR', description: 'Genera un cartel imprimible con código QR' },
-  };
-
-  // Render action button based on current step
-  const renderActionButton = () => {
-    const buttonProps = { variant: 'primary' as const, size: 'lg' as const };
-
-    switch (currentStep) {
-      case 'upload':
-        return uploadedMedia.length > 0 && (
-          <Button {...buttonProps} onClick={handleAnalyze} rightIcon={<ChevronRight size={18} />}>
-            <Sparkles size={18} />
-            Analizar negocio
-          </Button>
-        );
-      case 'analysis':
-        return brandData && !isAnalyzing && (
-          <Button {...buttonProps} onClick={handleGenerateStrategies} rightIcon={<ChevronRight size={18} />}>
-            Generar estrategias
-          </Button>
-        );
-      case 'strategy':
-        return strategies.length > 0 && !isGeneratingStrategies && (
-          <Button {...buttonProps} onClick={handleGenerateLinks} rightIcon={<ChevronRight size={18} />}>
-            Generar enlaces
-          </Button>
-        );
-      case 'links':
-        return links.length > 0 && !isGeneratingLinks && (
-          <Button {...buttonProps} onClick={handleGenerateLandingDesign} rightIcon={<Sparkles size={18} />}>
-            <Sparkles size={18} />
-            Generar diseño personalizado
-          </Button>
-        );
-      case 'design':
-        return (
-          <Button {...buttonProps} onClick={handleGeneratePoster} rightIcon={<ChevronRight size={18} />}>
-            Generar cartel QR
-          </Button>
-        );
-      case 'poster':
-        return currentProject && (
-          <Button {...buttonProps} onClick={handleSaveLanding}>
-            <Plus size={18} />
-            Guardar en proyecto
-          </Button>
-        );
-      default:
-        return null;
-    }
-  };
-
-  // Render Public Home
-  if (appView === 'home') {
-    return (
-      <PublicLayout
-        onLogin={() => handleNavigate('dashboard')}
-        onGetStarted={() => handleNavigate('dashboard')}
-      >
-        <HomePageV3 onGetStarted={() => handleNavigate('dashboard')} />
-      </PublicLayout>
-    );
-  }
 
   // Render Dashboard
   if (appView === 'dashboard') {
     return (
-      <>
+      <Suspense fallback={<LoadingScreen />}>
         <Header
           onNavigate={handleNavigate}
           currentView="dashboard"
@@ -386,8 +172,7 @@ function AppContent() {
               setShowCreateModal(true);
             }}
             onOpenProject={(project) => {
-              setCurrentProject(project);
-              handleNavigate('project');
+              handleOpenProject(project);
             }}
           />
         </PageContainer>
@@ -408,14 +193,19 @@ function AppContent() {
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
         />
-      </>
+        <MobileTabBar
+          currentView={appView}
+          onNavigate={handleNavigate}
+        />
+        {showOnboarding && <OnboardingCarousel onComplete={handleOnboardingComplete} />}
+      </Suspense>
     );
   }
 
   // Render Landings Tab
   if (appView === 'landings') {
     return (
-      <>
+      <Suspense fallback={<LoadingScreen />}>
         <Header
           onNavigate={handleNavigate}
           currentView="landings"
@@ -430,14 +220,14 @@ function AppContent() {
           isOpen={showSettingsModal}
           onClose={() => setShowSettingsModal(false)}
         />
-      </>
+      </Suspense>
     );
   }
 
   // Render Posters Tab
   if (appView === 'posters') {
     return (
-      <>
+      <Suspense fallback={<LoadingScreen />}>
         <Header
           onNavigate={handleNavigate}
           currentView="posters"
@@ -452,7 +242,7 @@ function AppContent() {
           isOpen={showSettingsModal}
           onClose={() => setShowSettingsModal(false)}
         />
-      </>
+      </Suspense>
     );
   }
 
@@ -486,63 +276,27 @@ function AppContent() {
     );
   }
 
-  // Render Create Landing Flow
-  if (appView === 'create-landing') {
-    const currentStepInfo = stepTitles[currentStep] || { title: '', description: '' };
-
+  // Render Create Landing Flow (MOTOR DE ESCAPARATES - NUEVO)
+  if (appView === 'escaparate' || appView === 'create-landing') {
     return (
-      <div className="min-h-screen">
-        <Header
-          onNavigate={handleNavigate}
-          onShowPricing={handleShowPricing}
-          currentView="create-landing"
-          onLogin={() => setShowAuthModal(true)}
-        />
-
-        <div className="container py-6">
-          <StepIndicator />
-        </div>
-
-        <PageContainer
-          title={currentStepInfo.title}
-          description={currentStepInfo.description}
-          actions={
-            <div className="flex gap-3 items-center">
-              <Button
-                variant="ghost"
-                onClick={() => handleNavigate('dashboard')}
-                leftIcon={<ArrowLeft size={16} />}
-              >
-                Cancelar
-              </Button>
-              {renderActionButton()}
-            </div>
-          }
-        >
-          {/* Main Content */}
-          <div className="card p-6 mb-6">
-            {currentStep === 'upload' && <ImageUploader />}
-            {currentStep === 'analysis' && <BrandAnalysis />}
-            {currentStep === 'strategy' && <StrategyOverview />}
-            {currentStep === 'links' && <AutoLinksView />}
-            {currentStep === 'design' && (
-              <div className="flex justify-center">
-                <LandingPreviewV3 />
-              </div>
-            )}
-            {currentStep === 'poster' && <PosterGeneratorV3 />}
-          </div>
-
-          {/* Demo Warning */}
-          {!hasApiKey && (
-            <div className="mt-6 p-4 bg-warning-50 border border-warning-200 rounded-xl text-center">
-              <p className="text-sm text-warning-600">
-                <strong>Modo Demo:</strong> Usando datos de ejemplo.
-                Añade <code className="bg-warning-100 px-1 rounded">VITE_GEMINI_API_KEY</code> para usar IA real.
-              </p>
-            </div>
-          )}
-        </PageContainer>
+      <div className="min-h-screen has-tab-bar">
+        <Suspense fallback={<LoadingScreen />}>
+          <Header
+            onNavigate={handleNavigate}
+            onShowPricing={handleShowPricing}
+            currentView="escaparate"
+            onLogin={() => setShowAuthModal(true)}
+          />
+          <EscaparateEngine />
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+          />
+          <MobileTabBar
+            currentView={appView}
+            onNavigate={handleNavigate}
+          />
+        </Suspense>
       </div>
     );
   }
@@ -550,7 +304,7 @@ function AppContent() {
   // Render Project View
   if (appView === 'project' && currentProject) {
     return (
-      <>
+      <Suspense fallback={<LoadingScreen />}>
         <Header
           onNavigate={handleNavigate}
           currentView="project"
@@ -563,7 +317,7 @@ function AppContent() {
             onCreateLanding={handleCreateLanding}
           />
         </PageContainer>
-      </>
+      </Suspense>
     );
   }
 
@@ -610,7 +364,7 @@ function AppContent() {
     };
 
     return (
-      <>
+      <Suspense fallback={<LoadingScreen />}>
         <Header
           onNavigate={handleNavigate}
           currentView="pricing"
@@ -619,13 +373,13 @@ function AppContent() {
         <PageContainer>
           <PricingPageV3 onSelectPlan={handleSelectPlan} />
         </PageContainer>
-      </>
+      </Suspense>
     );
   }
   // Render Settings
   if (appView === 'settings') {
     return (
-      <>
+      <Suspense fallback={<LoadingScreen />}>
         <Header
           onNavigate={handleNavigate}
           currentView="settings"
@@ -635,14 +389,14 @@ function AppContent() {
           <AccountSettings />
         </PageContainer>
         <SupportCenter />
-      </>
+      </Suspense>
     );
   }
 
   // Render Help Center
   if (appView === 'help') {
     return (
-      <>
+      <Suspense fallback={<LoadingScreen />}>
         <Header
           onNavigate={handleNavigate}
           currentView="help"
@@ -652,7 +406,7 @@ function AppContent() {
           <HelpCenter />
         </PageContainer>
         <SupportCenter />
-      </>
+      </Suspense>
     );
   }
 
@@ -660,12 +414,29 @@ function AppContent() {
 }
 
 export default function App() {
+  const handleLogin = () => {
+    // Navigate to dashboard which triggers auth modal if not logged in
+    window.location.href = '/dashboard';
+  };
+
+  const handleGetStarted = () => {
+    window.location.href = '/dashboard';
+  };
+
   return (
     <ToastProvider>
       <Routes>
+        <Route path="/" element={<PublicLayout onLogin={handleLogin} onGetStarted={handleGetStarted}><PublicHome onGetStarted={handleGetStarted} onViewDemo={() => window.location.href = '/p/demo'} /></PublicLayout>} />
+        <Route path="/ejemplos" element={<PublicLayout onLogin={handleLogin} onGetStarted={handleGetStarted}><PublicExamples /></PublicLayout>} />
+        <Route path="/como-funciona" element={<PublicLayout onLogin={handleLogin} onGetStarted={handleGetStarted}><PublicSolutions /></PublicLayout>} />
+        <Route path="/precios" element={<PublicLayout onLogin={handleLogin} onGetStarted={handleGetStarted}><PublicPricing /></PublicLayout>} />
+        <Route path="/ayuda" element={<PublicLayout onLogin={handleLogin} onGetStarted={handleGetStarted}><PublicHelp /></PublicLayout>} />
+
+        <Route path="/dashboard" element={<AppContent />} />
         <Route path="/p/:id" element={<PublicLandingPage />} />
         <Route path="/widget/:slug" element={<WidgetPageViewer />} />
         <Route path="/*" element={<AppContent />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <CookieBanner />
     </ToastProvider>

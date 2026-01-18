@@ -1,0 +1,205 @@
+/**
+ * AI Scan Animation Styles
+ * =========================
+ * Estilos para la animación de escaneo IA
+ */
+
+.ai-scan {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.ai-scan__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Imagen con efecto de escaneo */
+.ai-scan__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: var(--radius-xl, 24px);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.25));
+}
+
+.ai-scan__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(30%);
+    transition: filter 0.5s ease;
+}
+
+/* Línea de escaneo animada */
+.ai-scan__scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(99, 102, 241, 0.3) 10%,
+            rgba(99, 102, 241, 0.8) 50%,
+            rgba(99, 102, 241, 0.3) 90%,
+            transparent 100%);
+    box-shadow:
+        0 0 20px rgba(99, 102, 241, 0.6),
+        0 0 40px rgba(99, 102, 241, 0.4),
+        0 0 60px rgba(99, 102, 241, 0.2);
+    animation: scan-vertical 2s ease-in-out infinite;
+}
+
+@keyframes scan-vertical {
+
+    0%,
+    100% {
+        top: 0;
+        opacity: 1;
+    }
+
+    50% {
+        top: calc(100% - 4px);
+        opacity: 0.8;
+    }
+}
+
+.ai-scan__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+            rgba(99, 102, 241, 0.1) 0%,
+            transparent 30%,
+            transparent 70%,
+            rgba(99, 102, 241, 0.1) 100%);
+    pointer-events: none;
+}
+
+/* Placeholder sin imagen */
+.ai-scan__placeholder {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-scan__orb {
+    width: 60px;
+    height: 60px;
+    background: var(--accent-gradient, linear-gradient(135deg, #6366f1, #8b5cf6));
+    border-radius: 50%;
+    animation: orb-pulse 2s ease-in-out infinite;
+    box-shadow:
+        0 0 30px rgba(99, 102, 241, 0.4),
+        0 0 60px rgba(99, 102, 241, 0.2);
+}
+
+@keyframes orb-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.ai-scan__rings {
+    position: absolute;
+    inset: 0;
+}
+
+.ai-scan__rings span {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 50%;
+    animation: ring-expand 2s ease-out infinite;
+}
+
+.ai-scan__rings span:nth-child(2) {
+    animation-delay: 0.4s;
+}
+
+.ai-scan__rings span:nth-child(3) {
+    animation-delay: 0.8s;
+}
+
+@keyframes ring-expand {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Mensaje dinámico */
+.ai-scan__message-container {
+    height: 24px;
+    overflow: hidden;
+}
+
+.ai-scan__message {
+    font-size: var(--text-base, 1rem);
+    color: var(--text-secondary, #a0a0b0);
+    text-align: center;
+    margin: 0;
+    animation: message-fade 2s ease-in-out;
+}
+
+@keyframes message-fade {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    90% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Barra de progreso */
+.ai-scan__progress {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-elevated, #1a1a24);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.ai-scan__progress-bar {
+    height: 100%;
+    background: var(--accent-gradient, linear-gradient(135deg, #6366f1, #8b5cf6));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+}

@@ -27,6 +27,9 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+@import './elite-design-system.css';
+@tailwind base;
+
 body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;

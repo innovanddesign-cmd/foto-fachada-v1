@@ -26,6 +26,8 @@ interface AppState {
     signOut: () => Promise<void>;
 
     // Current flow state
+    currentView: string;
+    setCurrentView: (view: string) => void;
     currentStep: FlowStep;
     setCurrentStep: (step: FlowStep) => void;
 
@@ -119,6 +121,8 @@ export const useAppStore = create<AppState>()(
             },
 
             // Current flow state
+            currentView: 'home',
+            setCurrentView: (view) => set({ currentView: view }),
             currentStep: 'upload',
             setCurrentStep: (step) => set({ currentStep: step }),
 

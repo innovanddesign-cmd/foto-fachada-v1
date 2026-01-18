@@ -1,0 +1,279 @@
+/**
+ * Elite Design System
+ * ====================
+ * Variables CSS globales para estética "Plataforma Elite" 2026
+ * Glassmorphism + Tipografía Geométrica + Paleta Neutra
+ */
+
+:root {
+    /* ═══════════════════════════════════════════════════════════
+       TIPOGRAFÍA
+       ═══════════════════════════════════════════════════════════ */
+    --font-display: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Pesos */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* Tamaños */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 2rem;
+    --text-4xl: 2.5rem;
+    --text-5xl: 3rem;
+
+    /* ═══════════════════════════════════════════════════════════
+       COLORES PLATAFORMA (Neutros para resaltar escaparates)
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Fondos */
+    --bg-app: #0a0a0f;
+    --bg-surface: #12121a;
+    --bg-elevated: #1a1a24;
+    --bg-hover: rgba(255, 255, 255, 0.04);
+    --bg-active: rgba(255, 255, 255, 0.08);
+
+    /* Textos */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0b0;
+    --text-tertiary: #6b7280;
+    --text-muted: #4b5563;
+
+    /* Bordes */
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.15);
+
+    /* Acentos de marca */
+    --accent-primary: #6366f1;
+    --accent-primary-rgb: 99, 102, 241;
+    --accent-secondary: #8b5cf6;
+    --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+
+    /* Estados */
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+
+    /* ═══════════════════════════════════════════════════════════
+       GLASSMORPHISM
+       ═══════════════════════════════════════════════════════════ */
+    --glass-bg: rgba(26, 26, 36, 0.7);
+    --glass-blur: blur(25px);
+    --glass-border: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.08) 0%,
+            rgba(255, 255, 255, 0.02) 50%,
+            rgba(255, 255, 255, 0.05) 100%);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    /* ═══════════════════════════════════════════════════════════
+       BORDES Y RADIOS
+       ═══════════════════════════════════════════════════════════ */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-full: 9999px;
+
+    /* ═══════════════════════════════════════════════════════════
+       ESPACIADO
+       ═══════════════════════════════════════════════════════════ */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+
+    /* ═══════════════════════════════════════════════════════════
+       SOMBRAS
+       ═══════════════════════════════════════════════════════════ */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 0 40px rgba(var(--accent-primary-rgb), 0.3);
+
+    /* ═══════════════════════════════════════════════════════════
+       TRANSICIONES
+       ═══════════════════════════════════════════════════════════ */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+    --transition-smooth: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Slide transitions */
+    --slide-duration: 300ms;
+    --slide-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    /* ═══════════════════════════════════════════════════════════
+       LAYOUT
+       ═══════════════════════════════════════════════════════════ */
+    --header-height: 64px;
+    --tab-bar-height: 72px;
+    --sidebar-width: 280px;
+    --content-max-width: 1400px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMA CLARO (override)
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+    --bg-app: #f8f9fc;
+    --bg-surface: #ffffff;
+    --bg-elevated: #ffffff;
+    --bg-hover: rgba(0, 0, 0, 0.03);
+    --bg-active: rgba(0, 0, 0, 0.06);
+
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #9ca3af;
+
+    --border-subtle: rgba(0, 0, 0, 0.04);
+    --border-default: rgba(0, 0, 0, 0.08);
+    --border-strong: rgba(0, 0, 0, 0.12);
+
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: linear-gradient(135deg,
+            rgba(0, 0, 0, 0.04) 0%,
+            rgba(0, 0, 0, 0.01) 50%,
+            rgba(0, 0, 0, 0.03) 100%);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILIDADES GLASSMORPHISM
+   ═══════════════════════════════════════════════════════════════ */
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--glass-border);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.glass-card--compact {
+    border-radius: var(--radius-xl);
+}
+
+.glass-card--interactive {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    cursor: pointer;
+}
+
+.glass-card--interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TIPOGRAFÍA GLOBAL
+   ═══════════════════════════════════════════════════════════════ */
+
+.text-display {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-extrabold);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.text-heading {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+
+.text-body {
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.text-label {
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TRANSICIONES DE PÁGINA (Smooth Slide)
+   ═══════════════════════════════════════════════════════════════ */
+
+.page-transition-enter {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.page-transition-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity var(--slide-duration) var(--slide-easing),
+        transform var(--slide-duration) var(--slide-easing);
+}
+
+.page-transition-exit {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.page-transition-exit-active {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity var(--slide-duration) var(--slide-easing),
+        transform var(--slide-duration) var(--slide-easing);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BODY BASE
+   ═══════════════════════════════════════════════════════════════ */
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-app);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Safe area para móviles */
+.has-tab-bar {
+    padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom));
+}

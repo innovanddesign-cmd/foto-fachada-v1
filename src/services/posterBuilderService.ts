@@ -4,15 +4,14 @@
  * Generates print-ready A4 posters at 300 DPI with:
  * - 3-Level Visual Hierarchy (Hook, QR Magnet, Trust Footer)
  * - Styled QR with logo integration
- * - Contextual background textures
+ * - Contextual background textures based on Vibe 2026
  * - CMYK-ready output
  */
 
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 import { generateVisualDNAPalette, hexToRgb, isLightColor, type ColorPalette } from './colorScience';
-// import { detectVibe } from './vibeAnalysis'; // Unused
-import type { BrandData } from '../types';
+import type { BrandData, BrandIdentity2026, BrandVibe2026 } from '../types';
 
 // ─────────────────────────────────────────────────────────────
 // CONSTANTS: A4 at 300 DPI
@@ -20,7 +19,6 @@ import type { BrandData } from '../types';
 
 const A4_WIDTH_MM = 210;
 const A4_HEIGHT_MM = 297;
-const MARGIN = 15;
 // const DPI = 300;
 
 // ─────────────────────────────────────────────────────────────
@@ -29,6 +27,7 @@ const MARGIN = 15;
 
 export interface PosterConfig {
     brandData: BrandData;
+    brandIdentity?: BrandIdentity2026;  // Nuevo: herencia de marca 2026
     landingUrl: string;
     hookText: string;
     hookEmoji?: string;
@@ -54,7 +53,12 @@ interface TextureConfig {
     overlay: string;
 }
 
-function getContextualTexture(businessType: string, palette: ColorPalette): TextureConfig {
+function getContextualTexture(businessType: string, palette: ColorPalette, vibe?: BrandVibe2026): TextureConfig {
+    // Si hay vibe 2026, usar texturas específicas
+    if (vibe) {
+        return getTextureByVibe(vibe, palette);
+    }
+
     const type = businessType.toLowerCase();
 
     // Match textures to business vibes
@@ -79,6 +83,26 @@ function getContextualTexture(businessType: string, palette: ColorPalette): Text
 
     // Default: gradient with brand colors
     return { baseColor: palette.background, pattern: 'gradient', overlay: palette.overlay };
+}
+
+/**
+ * Texturas por Vibe 2026 - Coherencia con Escaparate Digital
+ */
+function getTextureByVibe(vibe: BrandVibe2026, palette: ColorPalette): TextureConfig {
+    const vibeTextures: Record<BrandVibe2026, TextureConfig> = {
+        'Urban-Tech': { baseColor: '#0f0f0f', pattern: 'metal', overlay: 'rgba(0,0,0,0.3)' },
+        'Mediterranean-Gourmet': { baseColor: '#3d2914', pattern: 'wood', overlay: 'rgba(0,0,0,0.35)' },
+        'Vintage-Cálido': { baseColor: '#2a2420', pattern: 'fabric', overlay: 'rgba(0,0,0,0.25)' },
+        'Neon-Nightlife': { baseColor: '#080812', pattern: 'neon', overlay: 'rgba(0,0,0,0.2)' },
+        'Chiringuito-Moderno': { baseColor: palette.primary, pattern: 'gradient', overlay: 'rgba(0,0,0,0.1)' },
+        'Industrial-Chic': { baseColor: '#1c1c1c', pattern: 'concrete', overlay: 'rgba(0,0,0,0.4)' },
+        'Wellness-Zen': { baseColor: '#f8f5f2', pattern: 'marble', overlay: 'rgba(0,0,0,0.05)' },
+        'Street-Food': { baseColor: '#1a1a1a', pattern: 'concrete', overlay: 'rgba(0,0,0,0.3)' },
+        'Luxury-Boutique': { baseColor: '#0a0a0a', pattern: 'fabric', overlay: 'rgba(0,0,0,0.15)' },
+        'Family-Friendly': { baseColor: palette.background || '#f0f0f0', pattern: 'gradient', overlay: 'rgba(0,0,0,0.05)' }
+    };
+
+    return vibeTextures[vibe] || { baseColor: palette.background, pattern: 'gradient', overlay: palette.overlay };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -219,9 +243,94 @@ function drawSocialIcon(doc: jsPDF, type: 'instagram' | 'facebook' | 'whatsapp',
 // MAIN POSTER GENERATOR
 // ─────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────
+// ART DIRECTOR ENGINE: LAYOUTS & COMPOSITION
+// ─────────────────────────────────────────────────────────────
+
+interface LayoutConfig {
+    name: 'MINIMAL_MODERN' | 'IMPACT_BOLD' | 'ELEGANT_SERIF';
+    margins: { top: number; bottom: number; side: number };
+    fonts: { title: string; body: string };
+    alignment: 'center' | 'left';
+}
+
+function getLayoutByVibe(vibe: BrandVibe2026): LayoutConfig {
+    switch (vibe) {
+        case 'Urban-Tech':
+        case 'Industrial-Chic':
+        case 'Neon-Nightlife':
+            return {
+                name: 'IMPACT_BOLD',
+                margins: { top: 20, bottom: 20, side: 15 },
+                fonts: { title: 'helvetica', body: 'helvetica' },
+                alignment: 'center'
+            };
+        case 'Mediterranean-Gourmet':
+        case 'Vintage-Cálido':
+        case 'Luxury-Boutique':
+        case 'Wellness-Zen':
+            return {
+                name: 'ELEGANT_SERIF',
+                margins: { top: 30, bottom: 30, side: 20 },
+                fonts: { title: 'times', body: 'helvetica' }, // Times simulated as Serif
+                alignment: 'center'
+            };
+        default:
+            return {
+                name: 'MINIMAL_MODERN',
+                margins: { top: 25, bottom: 25, side: 20 },
+                fonts: { title: 'helvetica', body: 'helvetica' },
+                alignment: 'center'
+            };
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// VECTOR GRAPHICS GENERATION
+// ─────────────────────────────────────────────────────────────
+
+function drawVectorAccents(doc: jsPDF, vibe: BrandVibe2026, palette: ColorPalette, width: number, height: number): void {
+    const accentRgb = hexToRgb(palette.primary);
+    doc.setDrawColor(accentRgb.r, accentRgb.g, accentRgb.b);
+    doc.setFillColor(accentRgb.r, accentRgb.g, accentRgb.b);
+
+    switch (vibe) {
+        case 'Urban-Tech':
+        case 'Neon-Nightlife':
+            // Tech lines
+            doc.setLineWidth(0.5);
+            doc.line(20, 20, 60, 20);
+            doc.line(20, 20, 20, 60);
+            doc.line(width - 20, height - 20, width - 60, height - 20);
+            doc.line(width - 20, height - 20, width - 20, height - 60);
+            break;
+
+        case 'Mediterranean-Gourmet':
+        case 'Wellness-Zen':
+            // Organic circles/blobs (simulated)
+            doc.setGState(new (doc as any).GState({ opacity: 0.1 }));
+            doc.circle(0, 0, 80, 'F');
+            doc.circle(width, height * 0.5, 60, 'F');
+            doc.setGState(new (doc as any).GState({ opacity: 1.0 }));
+            break;
+
+        case 'Industrial-Chic':
+            // Frame borders
+            doc.setLineWidth(2);
+            doc.rect(10, 10, width - 20, height - 20, 'S');
+            break;
+    }
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// MAIN POSTER GENERATOR
+// ─────────────────────────────────────────────────────────────
+
 export async function generatePremiumPoster(config: PosterConfig): Promise<PosterResult> {
     const {
         brandData,
+        brandIdentity,
         landingUrl,
         hookText,
         hookEmoji = '✨',
@@ -231,7 +340,6 @@ export async function generatePremiumPoster(config: PosterConfig): Promise<Poste
         whatsapp
     } = config;
 
-    // Initialize PDF
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -242,192 +350,138 @@ export async function generatePremiumPoster(config: PosterConfig): Promise<Poste
     const pageWidth = A4_WIDTH_MM;
     const pageHeight = A4_HEIGHT_MM;
     const centerX = pageWidth / 2;
-    const contentWidth = pageWidth - (MARGIN * 2);
 
-    // Generate palette and vibe
-    const primaryColor = brandData.colors?.primary || '#6366f1';
+    // 1. Setup Palette & Vibe
+    const primaryColor = brandIdentity?.palette?.color_principal || brandData.colors?.primary || '#6366f1';
+    const accentColor = brandIdentity?.palette?.color_acento || brandData.colors?.accent || primaryColor;
     const palette = generateVisualDNAPalette(primaryColor, 'modern');
-    const texture = getContextualTexture(brandData.businessType, palette);
+    const vibe = brandIdentity?.vibe || 'Family-Friendly';
 
-    // Determine text colors based on background
-    const isLightBg = isLightColor(texture.baseColor);
-    const textPrimary = isLightBg ? [26, 26, 26] : [255, 255, 255];
-    const textSecondary = isLightBg ? [80, 80, 80] : [200, 200, 200];
-    const accentRgb = hexToRgb(palette.primary);
+    // 2. Determine Layout Strategy
+    const layout = getLayoutByVibe(vibe);
+    const contentWidth = pageWidth - (layout.margins.side * 2);
 
-    // ═══════════════════════════════════════════════════════════
-    // RENDER BACKGROUND TEXTURE
-    // ═══════════════════════════════════════════════════════════
+    // 3. Render Background Texture
+    const texture = getContextualTexture(brandData.businessType, palette, vibe);
     renderTexture(doc, texture, palette);
 
-    // ═══════════════════════════════════════════════════════════
-    // NIVEL 1: EL GANCHO (Hook)
-    // ═══════════════════════════════════════════════════════════
-    let currentY = MARGIN + 30;
+    // 4. Render Vector Accents
+    drawVectorAccents(doc, vibe, palette, pageWidth, pageHeight);
 
-    // Business Type (small)
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
+    // Color Logic
+    const isLightBg = isLightColor(texture.baseColor);
+    const textPrimary = isLightBg ? [20, 20, 20] : [255, 255, 255];
+    const textSecondary = isLightBg ? [80, 80, 80] : [220, 220, 220];
+    const accentRgb = hexToRgb(accentColor);
+
+
+    // ═══════════════════════════════════════════════════════════
+    // LEVEL 1: GRID LAYOUT & HEADER
+    // ═══════════════════════════════════════════════════════════
+    let currentY = layout.margins.top + 10;
+
+    // Business Type Tag
+    doc.setFont(layout.fonts.body, 'normal');
+    doc.setFontSize(10);
     doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
-    doc.text(brandData.businessType.toUpperCase(), centerX, currentY, { align: 'center' });
-
-    currentY += 12;
-
-    // Business Name (large)
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(38);
-    doc.setTextColor(textPrimary[0], textPrimary[1], textPrimary[2]);
-    doc.text(brandData.name, centerX, currentY, { align: 'center', maxWidth: contentWidth });
-
-    currentY += 25;
-
-    // Hook Text with Emoji (HIGH IMPACT)
-    doc.setFillColor(accentRgb.r, accentRgb.g, accentRgb.b);
-    const hookBgHeight = 22;
-    doc.roundedRect(MARGIN, currentY - 8, contentWidth, hookBgHeight, 4, 4, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(20);
-    doc.setTextColor(255, 255, 255);
-    doc.text(`${hookEmoji} ${hookText.toUpperCase()} ${hookEmoji}`, centerX, currentY + 6, { align: 'center' });
-
-    currentY += hookBgHeight + 20;
-
-    // ═══════════════════════════════════════════════════════════
-    // NIVEL 2: EL IMÁN (QR Code)
-    // ═══════════════════════════════════════════════════════════
-
-    // Styled QR Container
-    const qrContainerSize = 110;
-    const qrPadding = 12;
-    const qrFrameRadius = 15;
-    const qrContainerX = centerX - (qrContainerSize / 2) - qrPadding;
-    const qrContainerY = currentY;
-
-    // Outer frame with brand accent
-    doc.setFillColor(accentRgb.r, accentRgb.g, accentRgb.b);
-    doc.roundedRect(
-        qrContainerX - 4,
-        qrContainerY - 4,
-        qrContainerSize + qrPadding * 2 + 8,
-        qrContainerSize + qrPadding * 2 + 8,
-        qrFrameRadius + 2,
-        qrFrameRadius + 2,
-        'F'
-    );
-
-    // Inner white background for QR
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(
-        qrContainerX,
-        qrContainerY,
-        qrContainerSize + qrPadding * 2,
-        qrContainerSize + qrPadding * 2,
-        qrFrameRadius,
-        qrFrameRadius,
-        'F'
-    );
-
-    // Generate and add QR code
-    try {
-        const qrDataUrl = await generateStyledQR(landingUrl, primaryColor, 400);
-        doc.addImage(
-            qrDataUrl,
-            'PNG',
-            centerX - qrContainerSize / 2,
-            qrContainerY + qrPadding,
-            qrContainerSize,
-            qrContainerSize
-        );
-    } catch (error) {
-        console.error('Error generating QR:', error);
-        // Fallback placeholder
-        doc.setFillColor(220, 220, 220);
-        doc.rect(centerX - qrContainerSize / 2, qrContainerY + qrPadding, qrContainerSize, qrContainerSize, 'F');
-    }
-
-    // Logo placeholder in QR center (white circle for brand logo)
-    const logoSize = 22;
-    doc.setFillColor(255, 255, 255);
-    doc.circle(centerX, qrContainerY + qrPadding + qrContainerSize / 2, logoSize / 2, 'F');
-
-    // Brand initial in logo position
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(accentRgb.r, accentRgb.g, accentRgb.b);
-    doc.text(brandData.name.charAt(0).toUpperCase(), centerX, qrContainerY + qrPadding + qrContainerSize / 2 + 4, { align: 'center' });
-
-    currentY += qrContainerSize + qrPadding * 2 + 25;
-
-    // "Escanea" instruction
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(14);
-    doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
-    doc.text('📱 Escanea con tu móvil', centerX, currentY, { align: 'center' });
-
+    doc.text(brandData.businessType.toUpperCase(), centerX, currentY, { align: 'center', charSpace: 2 });
     currentY += 15;
 
-    // Landing URL display
-    const shortUrl = landingUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
-    doc.setFillColor(255, 255, 255);
-    const urlBgWidth = contentWidth - 40;
-    doc.roundedRect(centerX - urlBgWidth / 2, currentY - 6, urlBgWidth, 16, 3, 3, 'F');
+    // Business Name (Hero)
+    doc.setFont(layout.fonts.title, 'bold');
+    doc.setFontSize(layout.name === 'IMPACT_BOLD' ? 42 : 36);
+    doc.setTextColor(textPrimary[0], textPrimary[1], textPrimary[2]);
 
+    // Split long names
+    const nameLines = doc.splitTextToSize(brandData.name, contentWidth);
+    doc.text(nameLines, centerX, currentY, { align: 'center' });
+    currentY += (nameLines.length * 14) + 10;
+
+    // Hook Box
+    doc.setFillColor(accentRgb.r, accentRgb.g, accentRgb.b);
+    const hookPadding = 8;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(accentRgb.r, accentRgb.g, accentRgb.b);
-    doc.text(shortUrl, centerX, currentY + 3, { align: 'center' });
+    doc.setFontSize(18);
+    const hookWidth = doc.getTextWidth(`${hookEmoji} ${hookText.toUpperCase()} ${hookEmoji}`) + (hookPadding * 4);
+
+    // Rounded Pill for Hook
+    doc.roundedRect(centerX - (hookWidth / 2), currentY - 6, hookWidth, 14, 7, 7, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.text(`${hookEmoji} ${hookText.toUpperCase()} ${hookEmoji}`, centerX, currentY + 3.5, { align: 'center' });
+
+    currentY += 35;
 
     // ═══════════════════════════════════════════════════════════
-    // NIVEL 3: CONFIANZA (Trust Footer)
+    // LEVEL 2: THE MAGNET (QR)
     // ═══════════════════════════════════════════════════════════
-    const footerY = pageHeight - MARGIN - 35;
 
-    // Separator line
+    const qrSize = 100;
+    const qrY = currentY;
+
+    // White Card for QR (Contrast Area)
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(230, 230, 230);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(centerX - (qrSize / 2) - 10, qrY - 10, qrSize + 20, qrSize + 35, 6, 6, 'FD');
+
+    // QR Code
+    try {
+        const qrDataUrl = await generateStyledQR(landingUrl, '#000000', 400); // Black QR for max contrast
+        doc.addImage(qrDataUrl, 'PNG', centerX - (qrSize / 2), qrY, qrSize, qrSize);
+    } catch (e) {
+        doc.rect(centerX - (qrSize / 2), qrY, qrSize, qrSize);
+    }
+
+    // "Scan Me" Label below QR
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(textPrimary[0], textPrimary[1], textPrimary[2]); // Dark text on white card
+    doc.setTextColor(0, 0, 0);
+    doc.text('ABRIR ESCAPARATE', centerX, qrY + qrSize + 15, { align: 'center' });
+
+    // ═══════════════════════════════════════════════════════════
+    // LEVEL 3: FOOTER
+    // ═══════════════════════════════════════════════════════════
+    const footerY = pageHeight - layout.margins.bottom;
+
+    // Divider Line
     doc.setDrawColor(textSecondary[0], textSecondary[1], textSecondary[2]);
-    doc.setLineWidth(0.3);
-    doc.line(MARGIN + 20, footerY - 10, pageWidth - MARGIN - 20, footerY - 10);
+    doc.setLineWidth(0.2);
+    doc.line(centerX - 40, footerY - 25, centerX + 40, footerY - 25);
 
-    // Social Icons (minimalistas)
-    const iconSize = 8;
-    const iconGap = 25;
-    const socialStartX = centerX - (iconGap * 1.5);
+    // Social Media Icons
+    // (Reusable social icon logic here...)
+    const iconStartY = footerY - 15;
+    let iconX = centerX - 12;
 
-    if (instagram || facebook || whatsapp) {
-        let iconX = socialStartX;
-
-        if (instagram) {
-            drawSocialIcon(doc, 'instagram', iconX, footerY - 5, iconSize, textPrimary);
-            iconX += iconGap;
-        }
-        if (facebook) {
-            drawSocialIcon(doc, 'facebook', iconX, footerY - 5, iconSize, textPrimary);
-            iconX += iconGap;
-        }
-        if (whatsapp) {
-            drawSocialIcon(doc, 'whatsapp', iconX, footerY - 5, iconSize, textPrimary);
-        }
+    if (whatsapp) {
+        drawSocialIcon(doc, 'whatsapp', iconX, iconStartY, 6, textPrimary);
+        iconX += 12;
+    }
+    if (instagram) {
+        drawSocialIcon(doc, 'instagram', iconX, iconStartY, 6, textPrimary);
+        iconX += 12;
+    }
+    if (facebook) {
+        drawSocialIcon(doc, 'facebook', iconX, iconStartY, 6, textPrimary);
+        iconX += 12;
     }
 
     // CTA Secondary
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFont(layout.fonts.body, 'normal');
+    doc.setFontSize(9);
     doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
-    doc.text(ctaSecondary, centerX, footerY + 12, { align: 'center' });
+    doc.text(ctaSecondary, centerX, footerY, { align: 'center' });
 
-    // Domain/Powered by
-    doc.setFontSize(8);
-    doc.text(`Creado con Foto Fachada`, centerX, footerY + 22, { align: 'center' });
-
-    // ═══════════════════════════════════════════════════════════
-    // GENERATE OUTPUT
-    // ═══════════════════════════════════════════════════════════
+    // Output
     const safeName = brandData.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
     const filename = `poster_${safeName}_${Date.now()}.pdf`;
-    const blob = doc.output('blob');
-    const dataUrl = doc.output('dataurlstring');
 
-    return { blob, dataUrl, filename };
+    return {
+        blob: doc.output('blob'),
+        dataUrl: doc.output('dataurlstring'),
+        filename
+    };
 }
 
 // ─────────────────────────────────────────────────────────────

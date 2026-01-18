@@ -7,6 +7,98 @@ export type AudienceType = 'turista_uk' | 'turista_eu' | 'senior_nacional' | 'lo
 export type LocationContext = 'turistica' | 'barrio' | 'centro' | 'industrial';
 export type PriceRange = 'budget' | 'mid' | 'premium' | 'luxury';
 
+// ─────────────────────────────────────────────────────────────
+// UI SCHEMA GENERATIVO - Motor de Escaparates 2026
+// ─────────────────────────────────────────────────────────────
+
+/** Clasificación de Vibe 2026 para negocios */
+export type BrandVibe2026 =
+    | 'Urban-Tech'           // Moderno, tecnológico, startups
+    | 'Mediterranean-Gourmet' // Gastronomía mediterránea elegante
+    | 'Vintage-Cálido'       // Retro, acogedor, artesanal
+    | 'Neon-Nightlife'       // Vida nocturna, clubes, bares
+    | 'Chiringuito-Moderno'  // Playa, casual, veraniego
+    | 'Industrial-Chic'      // Lofts, cervecerías artesanas
+    | 'Wellness-Zen'         // Spa, yoga, bienestar
+    | 'Street-Food'          // Comida rápida gourmet
+    | 'Luxury-Boutique'      // Lujo, exclusividad
+    | 'Family-Friendly';     // Familiar, accesible
+
+/** Mapeo cromático avanzado con glassmorphism */
+export interface ChromaticPalette {
+    color_principal: string;   // Tono dominante de la fachada (hex)
+    color_acento: string;      // Tono de contraste de letreros (hex)
+    color_superficie: string;  // Tono para fondos con transparencia (rgba)
+    gradiente_sugerido: string; // CSS gradient para fondos inmersivos
+}
+
+/** Par tipográfico para el escaparate */
+export interface TypographyPair {
+    headline: string;  // Google Font para títulos (peso 700-900)
+    body: string;      // Google Font para cuerpo (peso 400)
+}
+
+/** Identidad de marca generada por IA */
+export interface BrandIdentity2026 {
+    vibe: BrandVibe2026;
+    palette: ChromaticPalette;
+    fonts: TypographyPair;
+    tagline_sugerido: string;
+    tono_copywriting: 'profesional' | 'casual' | 'premium' | 'juvenil';
+    valores_clave?: string[]; // Nuevos valores detectados
+    descripcion_visual?: string; // Descripción de la estética
+}
+
+/** Tipos de componentes UI disponibles para el escaparate */
+export type UIComponentType =
+    | 'HeroVideoBackground'   // Hero con video/imagen de fondo
+    | 'HeroGradient'          // Hero con gradiente
+    | 'FlashCard_Offer'       // Tarjeta de oferta flash
+    | 'Instagram_Feed_Style'  // Feed estilo Instagram
+    | 'Menu_Categories'       // Categorías de menú scrollable
+    | 'Contact_Glass'         // Tarjeta glassmorphism de contacto
+    | 'Location_Map'          // Mapa interactivo
+    | 'Reviews_Carousel'      // Carrusel de reseñas
+    | 'Gallery_Masonry'       // Galería tipo masonry
+    | 'Banner_Promocional'    // Banner de promoción
+    | 'Reservations_CTA'      // Botón de reservas
+    | 'Social_Links'          // Enlaces a redes sociales
+    | 'Services_Grid'         // Grid de servicios y precios
+    | 'Testimonials_Carousel' // Testimonios de clientes
+    | 'Event_Calendar'        // Calendario de eventos
+    | 'WhatsApp_Float'        // Botón flotante de WhatsApp
+    | 'Spacer'                // Espaciador vertical
+    | 'Footer_Simple';        // Footer simple de cierre
+
+/** Campo de configuración para un componente */
+export interface UIConfigField {
+    key: string;
+    label: string;           // Siempre en español
+    type: 'text' | 'tel' | 'url' | 'textarea' | 'file' | 'number' | 'color' | 'list';
+    placeholder: string;     // Siempre en español
+    required: boolean;
+    default?: string;
+}
+
+/** Componente individual del escaparate */
+export interface UIComponent {
+    id: string;
+    type: UIComponentType;
+    content: Record<string, string>;    // Contenido pre-generado por IA
+    config_fields: UIConfigField[];     // Campos que el usuario debe configurar
+    order: number;                      // Orden en la página
+    visible: boolean;
+}
+
+/** Schema completo del escaparate generado */
+export interface UISchema {
+    brand_identity: BrandIdentity2026;
+    escaparate_structure: UIComponent[];
+    generated_at: string;
+    version: number;
+    variability_seed: string;  // Para test de variabilidad
+}
+
 export interface BusinessDNA {
     // Identidad visual
     brand_vibe: BrandVibe;
