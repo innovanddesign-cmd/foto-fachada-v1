@@ -171,7 +171,7 @@ export function ShowcaseStep() {
             )}
 
             {/* Modal de preview completo */}
-            {showFullPreview && showcaseData?.uiSchema && (
+            {showFullPreview && showcaseData?.uiSchema && showcaseData?.brandIdentity && (
                 <div className="showcase-step__fullscreen-modal" onClick={() => setShowFullPreview(false)}>
                     <div className="showcase-step__fullscreen-content" onClick={e => e.stopPropagation()}>
                         <button

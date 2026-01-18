@@ -98,6 +98,18 @@ const COMPONENT_CONFIG_FIELDS: Record<UIComponentType, UIConfigField[]> = {
     WhatsApp_Float: [
         { key: 'numero_whatsapp', label: 'Número de WhatsApp', type: 'tel', placeholder: '+34 600 000 000', required: true },
         { key: 'mensaje_inicial', label: 'Mensaje Inicial', type: 'text', placeholder: 'Hola, me gustaría...', required: false, default: 'Hola, me interesa conocer más sobre vuestros servicios' }
+    ],
+    Testimonials_Carousel: [
+        { key: 'fuente_testimonios', label: 'Fuente', type: 'text', placeholder: 'Google Reviews', required: false, default: 'Google Reviews' }
+    ],
+    Event_Calendar: [
+        { key: 'url_calendario', label: 'Enlace al Calendario', type: 'url', placeholder: 'https://calendly.com/...', required: true }
+    ],
+    Spacer: [
+        { key: 'altura', label: 'Altura del espacio', type: 'text', placeholder: 'Pequeño, Medio, Grande', required: false, default: 'Medio' }
+    ],
+    Footer_Simple: [
+        { key: 'texto_copyright', label: 'Texto Copyright', type: 'text', placeholder: '© 2026 Mi Negocio', required: false }
     ]
 };
 
@@ -356,6 +368,20 @@ function generateMockContent(type: UIComponentType, brandData: BrandData, identi
         },
         WhatsApp_Float: {
             mensaje: '¡Hola! Me gustaría más información sobre ' + name
+        },
+        Testimonials_Carousel: {
+            titulo: 'Lo que dicen de nosotros',
+            subtitulo: 'Clientes felices'
+        },
+        Event_Calendar: {
+            titulo: 'Próximos Eventos',
+            subtitulo: 'No te lo pierdas'
+        },
+        Spacer: {
+            // Sin contenido visible
+        },
+        Footer_Simple: {
+            texto: `© ${new Date().getFullYear()} ${name}. Todos los derechos reservados.`
         }
     };
 

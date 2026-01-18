@@ -12,23 +12,23 @@ interface StateTransitionProps {
     direction?: 'forward' | 'backward';
 }
 
-const variants = {
+const slideVariants: any = {
     initial: (direction: 'forward' | 'backward') => ({
-        x: direction === 'forward' ? '100%' : '-100%',
+        x: direction === 'forward' ? '20%' : '-20%',
         opacity: 0,
-        position: 'absolute' as const // Necesario para que no ocupen espacio durante la transición
+        position: 'absolute' as const
     }),
     animate: {
         x: 0,
         opacity: 1,
-        position: 'relative' as const, // Restaurar flujo normal
+        position: 'relative' as const,
         transition: {
             x: { type: 'spring', stiffness: 300, damping: 30 },
             opacity: { duration: 0.2 }
         }
     },
     exit: (direction: 'forward' | 'backward') => ({
-        x: direction === 'forward' ? '-100%' : '100%',
+        x: direction === 'forward' ? '-20%' : '20%',
         opacity: 0,
         position: 'absolute' as const,
         transition: {
@@ -45,7 +45,7 @@ export function StateTransition({ children, stateKey, direction = 'forward' }: S
                 <motion.div
                     key={stateKey}
                     custom={direction}
-                    variants={variants}
+                    variants={slideVariants}
                     initial="initial"
                     animate="animate"
                     exit="exit"

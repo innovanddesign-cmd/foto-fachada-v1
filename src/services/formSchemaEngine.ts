@@ -140,6 +140,30 @@ const COMPONENT_META: Record<UIComponentType, { title: string; description: stri
         description: 'Contacto directo por WhatsApp',
         icon: '💬',
         category: 'contact'
+    },
+    'Testimonials_Carousel': {
+        title: 'Muro de Testimonios',
+        description: 'Muestra lo que dicen tus clientes',
+        icon: '🌟',
+        category: 'social'
+    },
+    'Event_Calendar': {
+        title: 'Calendario de Eventos',
+        description: 'Promociona tus próximas actividades',
+        icon: '📅',
+        category: 'social'
+    },
+    'Spacer': {
+        title: 'Espaciador',
+        description: 'Separación visual entre secciones',
+        icon: '⬍',
+        category: 'identity'
+    },
+    'Footer_Simple': {
+        title: 'Pie de Página',
+        description: 'Copyright y legal',
+        icon: '👣',
+        category: 'identity'
     }
 };
 
@@ -213,6 +237,18 @@ const DEFAULT_FIELDS: Record<UIComponentType, UIConfigField[]> = {
     'WhatsApp_Float': [
         { key: 'whatsapp', label: 'Número de WhatsApp', type: 'tel', placeholder: '+34 600 123 456', required: true },
         { key: 'mensaje_bienvenida', label: 'Mensaje de Bienvenida', type: 'textarea', placeholder: '¡Hola! ¿En qué podemos ayudarte?', required: false, default: '¡Hola! He visto tu escaparate digital y me gustaría más información' }
+    ],
+    'Testimonials_Carousel': [
+        { key: 'fuente', label: 'Fuente de Testimonios', type: 'text', placeholder: 'Google Reviews', required: false, default: 'Google Reviews' }
+    ],
+    'Event_Calendar': [
+        { key: 'url_calendario', label: 'URL del Calendario', type: 'url', placeholder: 'https://calendly.com/...', required: true }
+    ],
+    'Spacer': [
+        { key: 'altura', label: 'Altura', type: 'text', placeholder: 'Normal', required: false, default: 'Normal' }
+    ],
+    'Footer_Simple': [
+        { key: 'copyright', label: 'Texto Copyright', type: 'text', placeholder: '© 2026 Mi Negocio', required: false }
     ]
 };
 

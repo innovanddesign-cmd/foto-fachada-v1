@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Plus, QrCode, ArrowRight, BarChart2 } from 'lucide-react';
+import { QrCode, ArrowRight, BarChart2 } from 'lucide-react';
 import type { Project } from '../../types';
 
 interface DashboardV3Props {

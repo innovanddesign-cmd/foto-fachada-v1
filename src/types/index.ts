@@ -68,7 +68,10 @@ export type UIComponentType =
     | 'Event_Calendar'        // Calendario de eventos
     | 'WhatsApp_Float'        // Botón flotante de WhatsApp
     | 'Spacer'                // Espaciador vertical
-    | 'Footer_Simple';        // Footer simple de cierre
+    | 'Footer_Simple'         // Footer simple de cierre
+    | 'Team_Showcase'         // Presentación del equipo
+    | 'FAQ_Accordion'         // Preguntas frecuentes
+    | 'Testimonials_Wall';    // Muro de testimonios
 
 /** Campo de configuración para un componente */
 export interface UIConfigField {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, Sparkles, MapPin, Mail, Phone } from 'lucide-react';
+import { Github, Twitter, Linkedin, Sparkles, MapPin, Mail } from 'lucide-react';
 import './PublicFooter.css';
 
 export function PublicFooter() {
