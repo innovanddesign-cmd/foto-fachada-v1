@@ -1,5 +1,5 @@
 import { useCallback, useState, useEffect, Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { useAppStore } from './store/appStore';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { AuthModal } from './components/AuthModal';
@@ -52,6 +52,7 @@ function LoadingScreen() {
 }
 
 function AppContent() {
+  const location = useLocation();
   const {
     currentView,
     setCurrentView,
@@ -68,6 +69,15 @@ function AppContent() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Sincronizar URL con estado actual
+  useEffect(() => {
+    if (location.pathname === '/dashboard') {
+      if (currentView === 'home' || currentView === 'public') {
+        setCurrentView('dashboard');
+      }
+    }
+  }, [location.pathname, currentView, setCurrentView]);
 
   // Sincronizar cambios del store a local (temporal hasta refactor total)
   useEffect(() => {
