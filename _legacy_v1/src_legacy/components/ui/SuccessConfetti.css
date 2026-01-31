@@ -1,0 +1,126 @@
+/**
+ * Success Confetti Styles
+ * ========================
+ * Estilos para la animación de confeti de éxito
+ */
+
+.success-confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.success-confetti__particle {
+    position: absolute;
+    left: var(--start-x);
+    top: var(--start-y);
+    width: 12px;
+    height: 12px;
+    background: var(--color);
+    transform-origin: center;
+    animation: confetti-explode 1.5s ease-out forwards;
+    animation-delay: var(--delay);
+    opacity: 0;
+}
+
+.success-confetti__particle--circle {
+    border-radius: 50%;
+}
+
+.success-confetti__particle--square {
+    border-radius: 2px;
+}
+
+.success-confetti__particle--star {
+    clip-path: polygon(50% 0%,
+            61% 35%,
+            98% 35%,
+            68% 57%,
+            79% 91%,
+            50% 70%,
+            21% 91%,
+            32% 57%,
+            2% 35%,
+            39% 35%);
+}
+
+@keyframes confetti-explode {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(0);
+    }
+
+    20% {
+        opacity: 1;
+        transform:
+            translate(calc((var(--start-x) - 50%) * -3),
+                calc((var(--start-y) - 35%) * -5)) rotate(calc(var(--rotation) * 0.5)) scale(var(--scale));
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(calc((var(--start-x) - 50%) * -6),
+                200px) rotate(var(--rotation)) scale(calc(var(--scale) * 0.5));
+    }
+}
+
+.success-confetti__burst {
+    position: absolute;
+    left: 50%;
+    top: 35%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle,
+            rgba(99, 102, 241, 0.4) 0%,
+            rgba(99, 102, 241, 0.1) 40%,
+            transparent 70%);
+    border-radius: 50%;
+    animation: burst 0.5s ease-out forwards;
+}
+
+@keyframes burst {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+    }
+}
+
+/* Glow effect on success */
+.success-confetti::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 35%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle,
+            rgba(34, 197, 94, 0.2) 0%,
+            transparent 70%);
+    animation: glow-pulse 1s ease-out forwards;
+}
+
+@keyframes glow-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
+}

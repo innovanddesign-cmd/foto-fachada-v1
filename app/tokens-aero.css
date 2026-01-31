@@ -1,0 +1,207 @@
+/**
+ * FOTO FACHADA V2 — Sistema de Tokens Aero-Glassmorphism
+ * Motor: Antigravity v.2026 (Gemini 3 Pro)
+ * 
+ * Lenguaje de Diseño: Aero-Glassmorphism
+ * - Backdrop-blur: 40px
+ * - Border-radius: 40px-48px (rounded-5xl)
+ * - Gradientes de profundidad Z-axis
+ * - Sombras dinámicas de 4 capas
+ */
+
+:root {
+  /* ═══════════════════════════════════════════════════════════════
+     BLUR Y PROFUNDIDAD
+     ═══════════════════════════════════════════════════════════════ */
+  --aero-blur-cristal: 40px;
+  --aero-blur-suave: 24px;
+  --aero-blur-intenso: 56px;
+
+  /* ═══════════════════════════════════════════════════════════════
+     RADIOS DE BORDE (ROUNDED-5XL)
+     ═══════════════════════════════════════════════════════════════ */
+  --aero-radio-suave: 40px;
+  --aero-radio-esfera: 48px;
+  --aero-radio-pildora: 9999px;
+  --aero-radio-tarjeta: 32px;
+  --aero-radio-boton: 24px;
+
+  /* ═══════════════════════════════════════════════════════════════
+     SISTEMA DE SOMBRAS DE 4 CAPAS
+     Profundidad progresiva para efecto de elevación realista
+     ═══════════════════════════════════════════════════════════════ */
+  --aero-sombra-capa-1: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --aero-sombra-capa-2: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --aero-sombra-capa-3: 0 24px 48px rgba(0, 0, 0, 0.16);
+  --aero-sombra-capa-4: 0 48px 96px rgba(0, 0, 0, 0.24);
+
+  /* Sombra compuesta (todas las capas) */
+  --aero-sombra-elevacion-total:
+    var(--aero-sombra-capa-1),
+    var(--aero-sombra-capa-2),
+    var(--aero-sombra-capa-3),
+    var(--aero-sombra-capa-4);
+
+  /* Sombras para estados interactivos */
+  --aero-sombra-reposo:
+    var(--aero-sombra-capa-1),
+    var(--aero-sombra-capa-2);
+  
+  --aero-sombra-flotante:
+    var(--aero-sombra-capa-2),
+    var(--aero-sombra-capa-3),
+    var(--aero-sombra-capa-4);
+
+  --aero-sombra-presionado:
+    var(--aero-sombra-capa-1);
+
+  /* ═══════════════════════════════════════════════════════════════
+     GRADIENTES DE PROFUNDIDAD EJE-Z
+     ═══════════════════════════════════════════════════════════════ */
+  --aero-gradiente-cristal-claro:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+
+  --aero-gradiente-cristal-profundo:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.2) 40%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+
+  --aero-gradiente-cristal-oscuro:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+
+  --aero-gradiente-borde-luminoso:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+
+  /* ═══════════════════════════════════════════════════════════════
+     COLORES DEL SISTEMA (CASTELLANO NEUTRO)
+     ═══════════════════════════════════════════════════════════════ */
+  --aero-color-primario: hsl(220, 90%, 56%);
+  --aero-color-primario-claro: hsl(220, 90%, 70%);
+  --aero-color-primario-oscuro: hsl(220, 90%, 40%);
+
+  --aero-color-acento: hsl(340, 82%, 52%);
+  --aero-color-acento-claro: hsl(340, 82%, 66%);
+
+  --aero-color-exito: hsl(142, 76%, 36%);
+  --aero-color-advertencia: hsl(38, 92%, 50%);
+  --aero-color-error: hsl(0, 84%, 60%);
+
+  --aero-color-superficie: rgba(255, 255, 255, 0.08);
+  --aero-color-superficie-elevada: rgba(255, 255, 255, 0.12);
+  --aero-color-borde: rgba(255, 255, 255, 0.15);
+  --aero-color-borde-sutil: rgba(255, 255, 255, 0.08);
+
+  /* ═══════════════════════════════════════════════════════════════
+     TIPOGRAFÍA
+     ═══════════════════════════════════════════════════════════════ */
+  --aero-fuente-principal: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --aero-fuente-display: 'Outfit', var(--aero-fuente-principal);
+
+  /* ═══════════════════════════════════════════════════════════════
+     TRANSICIONES Y ANIMACIONES
+     ═══════════════════════════════════════════════════════════════ */
+  --aero-duracion-rapida: 150ms;
+  --aero-duracion-normal: 300ms;
+  --aero-duracion-lenta: 500ms;
+  
+  --aero-curva-elastica: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --aero-curva-suave: cubic-bezier(0.4, 0, 0.2, 1);
+  --aero-curva-salida: cubic-bezier(0, 0, 0.2, 1);
+  --aero-curva-entrada: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CLASES UTILITARIAS AERO-GLASSMORPHISM
+   ═══════════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* Contenedor cristal base */
+  .aero-cristal {
+    background: var(--aero-gradiente-cristal-claro);
+    backdrop-filter: blur(var(--aero-blur-cristal));
+    -webkit-backdrop-filter: blur(var(--aero-blur-cristal));
+    border: 1px solid var(--aero-color-borde);
+    border-radius: var(--aero-radio-suave);
+    box-shadow: var(--aero-sombra-reposo);
+    transition: 
+      box-shadow var(--aero-duracion-normal) var(--aero-curva-suave),
+      transform var(--aero-duracion-normal) var(--aero-curva-elastica);
+  }
+
+  .aero-cristal:hover {
+    box-shadow: var(--aero-sombra-flotante);
+    transform: translateY(-2px);
+  }
+
+  /* Contenedor cristal profundo */
+  .aero-cristal-profundo {
+    background: var(--aero-gradiente-cristal-profundo);
+    backdrop-filter: blur(var(--aero-blur-intenso));
+    -webkit-backdrop-filter: blur(var(--aero-blur-intenso));
+    border: 1px solid var(--aero-color-borde);
+    border-radius: var(--aero-radio-esfera);
+    box-shadow: var(--aero-sombra-elevacion-total);
+  }
+
+  /* Contenedor cristal oscuro */
+  .aero-cristal-oscuro {
+    background: var(--aero-gradiente-cristal-oscuro);
+    backdrop-filter: blur(var(--aero-blur-cristal));
+    -webkit-backdrop-filter: blur(var(--aero-blur-cristal));
+    border: 1px solid var(--aero-color-borde-sutil);
+    border-radius: var(--aero-radio-suave);
+    box-shadow: var(--aero-sombra-reposo);
+  }
+
+  /* Bordes redondeados 5XL */
+  .aero-redondeado-suave {
+    border-radius: var(--aero-radio-suave);
+  }
+
+  .aero-redondeado-esfera {
+    border-radius: var(--aero-radio-esfera);
+  }
+
+  /* Sombras de elevación */
+  .aero-elevacion-1 {
+    box-shadow: var(--aero-sombra-capa-1);
+  }
+
+  .aero-elevacion-2 {
+    box-shadow: var(--aero-sombra-capa-1), var(--aero-sombra-capa-2);
+  }
+
+  .aero-elevacion-3 {
+    box-shadow: 
+      var(--aero-sombra-capa-1),
+      var(--aero-sombra-capa-2),
+      var(--aero-sombra-capa-3);
+  }
+
+  .aero-elevacion-4 {
+    box-shadow: var(--aero-sombra-elevacion-total);
+  }
+
+  /* Transición elástica */
+  .aero-transicion-elastica {
+    transition: all var(--aero-duracion-normal) var(--aero-curva-elastica);
+  }
+}

@@ -1,0 +1,161 @@
+/**
+ * Error Pages Styles
+ * ===================
+ * Estilos compartidos para páginas 404 y 500
+ */
+
+.error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--bg-app, #0a0a0f);
+    position: relative;
+    overflow: hidden;
+}
+
+.error-page__container {
+    max-width: 480px;
+    width: 100%;
+    padding: 3rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 1;
+}
+
+.error-page__icon {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated, #1a1a24);
+    border-radius: 50%;
+    color: var(--text-secondary, #a0a0b0);
+}
+
+.error-page__icon--warning {
+    color: var(--warning, #f59e0b);
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.error-page__code {
+    font-size: 4rem;
+    font-weight: 800;
+    background: var(--accent-gradient, linear-gradient(135deg, #6366f1, #8b5cf6));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    line-height: 1;
+}
+
+.error-page__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary, #ffffff);
+    margin: 0;
+}
+
+.error-page__description {
+    font-size: 1rem;
+    color: var(--text-secondary, #a0a0b0);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 320px;
+}
+
+.error-page__details {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.error-page__details code {
+    font-size: 0.75rem;
+    color: var(--error, #ef4444);
+    word-break: break-word;
+}
+
+.error-page__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 280px;
+    margin-top: 0.5rem;
+}
+
+/* Background Decoration */
+.error-page__bg-decoration {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+            rgba(99, 102, 241, 0.15) 0%,
+            rgba(99, 102, 241, 0.05) 40%,
+            transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulse-bg 4s ease-in-out infinite;
+}
+
+.error-page__bg-decoration--error {
+    background: radial-gradient(circle,
+            rgba(245, 158, 11, 0.15) 0%,
+            rgba(245, 158, 11, 0.05) 40%,
+            transparent 70%);
+}
+
+@keyframes pulse-bg {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .error-page {
+        padding: 1rem;
+    }
+
+    .error-page__container {
+        padding: 2rem 1.5rem;
+    }
+
+    .error-page__code {
+        font-size: 3rem;
+    }
+
+    .error-page__title {
+        font-size: 1.25rem;
+    }
+
+    .error-page__icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .error-page__icon svg {
+        width: 48px;
+        height: 48px;
+    }
+}

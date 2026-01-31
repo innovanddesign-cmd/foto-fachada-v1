@@ -1,0 +1,5 @@
+# INSTRUCCIONES DE CONFIGURACIÓN
+1. Crea un archivo llamado .env.local en la raíz del proyecto.
+2. Pega el siguiente contenido:
+
+GEMINI_API_KEY=TU_CLAVE_AQUÍ

@@ -1,0 +1,170 @@
+.upgrade-modal {
+    width: 100%;
+    max-width: 480px;
+    animation: slideUp 0.3s ease-out;
+    position: relative;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+}
+
+/* Header */
+.upgrade-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.upgrade-icon {
+    color: var(--color-primary-light);
+    margin-bottom: var(--spacing-md);
+}
+
+.upgrade-header h2 {
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Price */
+.upgrade-price {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border-radius: var(--radius-lg);
+}
+
+.upgrade-price .price {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.upgrade-price .period {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+}
+
+/* Benefits */
+.upgrade-benefits {
+    margin-bottom: var(--spacing-xl);
+}
+
+.upgrade-benefits h4 {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.upgrade-benefits ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+}
+
+.upgrade-benefits li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.upgrade-benefits li svg {
+    color: var(--color-success);
+    flex-shrink: 0;
+}
+
+/* Payment Section */
+.payment-section {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--color-bg-darker);
+    border-radius: var(--radius-lg);
+}
+
+.payment-section .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.payment-section .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.payment-section label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-xs);
+}
+
+.payment-section input {
+    opacity: 0.7;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+/* Security Notice */
+.security-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.security-notice svg {
+    color: var(--color-success);
+}
+
+/* Actions */
+.upgrade-actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.upgrade-actions .btn {
+    flex: 1;
+}
+
+.cancel-notice {
+    text-align: center;
+    margin-top: var(--spacing-md);
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+}
+
+@media (max-width: 480px) {
+    .upgrade-benefits ul {
+        grid-template-columns: 1fr;
+    }
+
+    .upgrade-actions {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,242 @@
+/**
+ * Utilities Configurator Styles
+ * =============================
+ */
+
+.utilities-configurator {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Header */
+.configurator-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.configurator-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary, #fafafa);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.configurator-icon {
+    font-size: 1.75rem;
+}
+
+.configurator-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary, #888);
+}
+
+/* Empty State */
+.configurator-empty {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--bg-card, #141414);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    border-radius: 16px;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.configurator-empty p {
+    color: var(--text-muted, #666);
+    font-size: 0.95rem;
+}
+
+/* List */
+.configurator-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Item */
+.configurator-item {
+    background: var(--bg-card, #141414);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.configurator-item.complete {
+    border-color: rgba(52, 211, 153, 0.3);
+}
+
+.configurator-item.expanded {
+    border-color: var(--brand-primary, #8b5cf6);
+}
+
+/* Item Header */
+.configurator-item-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-primary, #fafafa);
+}
+
+.configurator-item-header:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.item-emoji {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.item-name {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.item-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 100px;
+}
+
+.item-badge.pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.item-badge.complete {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+}
+
+.item-chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--text-muted, #666);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.item-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+/* Item Body */
+.configurator-item-body {
+    padding: 0 1.25rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    margin-top: 0.5rem;
+    padding-top: 1.25rem;
+}
+
+/* Config Field */
+.config-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary, #888);
+}
+
+.field-label .required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+}
+
+.field-input,
+.field-textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text-primary, #fafafa);
+    background: var(--bg-dark, #0a0a0a);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    border-radius: 10px;
+    transition: border-color 0.2s;
+}
+
+.field-input:focus,
+.field-textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary, #8b5cf6);
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+    color: var(--text-muted, #555);
+}
+
+.field-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Progress */
+.configurator-progress {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-card, #141414);
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-primary, #8b5cf6), #34d399);
+    border-radius: 100px;
+    transition: width 0.4s ease;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--text-muted, #666);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .configurator-item-header {
+        padding: 0.875rem 1rem;
+    }
+
+    .configurator-item-body {
+        padding: 0 1rem 1rem;
+    }
+
+    .configurator-title {
+        font-size: 1.25rem;
+    }
+}
