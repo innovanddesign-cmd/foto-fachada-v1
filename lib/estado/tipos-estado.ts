@@ -98,6 +98,32 @@ export interface AdnMarca {
 // DATOS DEL ESCAPARATE GENERADO
 // ═══════════════════════════════════════════════════════════════
 
+export type TipoSeccion = 'Hero' | 'Catalog' | 'Promo' | 'Info' | 'Social';
+export type VarianteSeccion = 'Glass' | 'Mesh' | 'Gradient';
+
+export interface ContenidoSeccion {
+    titulo: string;
+    descripcion?: string;
+    cta?: {
+        texto: string;
+        accion: string;
+    };
+    elementos?: any[];
+}
+
+export interface SeccionEscaparate {
+    id: string;
+    tipo: TipoSeccion;
+    variante: VarianteSeccion;
+    contenido: ContenidoSeccion;
+}
+
+export interface OfertaProducto {
+    titulo: string;
+    precio: string;
+    descripcion?: string;
+}
+
 export interface DatosEscaparate {
     /** Titular principal */
     titularPrincipal: string;
@@ -110,12 +136,9 @@ export interface DatosEscaparate {
 
     /** Lista de ofertas */
     ofertas: OfertaProducto[];
-}
 
-export interface OfertaProducto {
-    titulo: string;
-    precio: string;
-    descripcion?: string;
+    /** ESTRUCTURA GENERATIVA FASE 3 */
+    secciones?: SeccionEscaparate[];
 }
 
 // ═══════════════════════════════════════════════════════════════

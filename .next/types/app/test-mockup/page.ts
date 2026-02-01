@@ -1,8 +1,8 @@
-// File: D:\DRIVE 2024\Google AI Studio\PROYECT - FOTO FACHADA\app\create\page.tsx
-import * as entry from '../../../../app/create/page.js'
+// File: D:\DRIVE 2024\Google AI Studio\PROYECT - FOTO FACHADA\app\test-mockup\page.tsx
+import * as entry from '../../../../app/test-mockup/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../app/create/page.js')
+type TEntry = typeof import('../../../../app/test-mockup/page.js')
 
 type SegmentParams<T extends Object = any> = T extends Record<string, any>
   ? { [K in keyof T]: T[K] extends string ? string | string[] | undefined : never }
