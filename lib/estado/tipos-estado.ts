@@ -92,13 +92,19 @@ export interface AdnMarca {
 
     /** Nivel de confianza del análisis (0-100) */
     confianza: number;
+
+    /** Estrategia de Conversión Recomendada (Fase 1) */
+    estrategiaPrincipal?: 'OFERTA_FLASH' | 'CITA_PREVIA' | 'LEAD_MAGNET';
+
+    /** Palabras clave visuales para generación de imágenes */
+    keywords?: string[];
 }
 
 // ═══════════════════════════════════════════════════════════════
 // DATOS DEL ESCAPARATE GENERADO
 // ═══════════════════════════════════════════════════════════════
 
-export type TipoSeccion = 'Hero' | 'Catalog' | 'Promo' | 'Info' | 'Social';
+export type TipoSeccion = 'Hero' | 'Catalog' | 'Promo' | 'Info' | 'Social' | 'Bento' | 'Masonry' | 'Conversion';
 export type VarianteSeccion = 'Glass' | 'Mesh' | 'Gradient';
 
 export interface ContenidoSeccion {

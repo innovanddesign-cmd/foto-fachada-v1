@@ -12,6 +12,8 @@ import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import CapturaFachada from '@/components/captura/CapturaFachada';
 import { AnalizadorADN } from '@/components/generative/AnalizadorADN';
+import { EscaparateInmersivo } from '@/src/components/generative/EscaparateInmersivo';
+import { SmartphoneMockup } from '@/components/ui/SmartphoneMockup';
 import { useTiendaEstado } from '@/store/useTiendaEstado';
 import type { DatosImagen } from '@/lib/estado/tipos-estado';
 
@@ -65,15 +67,10 @@ export default function PaginaCrear() {
                 {pasoActual === 'ANALISIS' ? (
                     <AnalizadorADN />
                 ) : pasoActual === 'ESCAPARATE' ? (
-                    <div className="flex flex-col items-center justify-center p-8 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 text-center animate-fade-in">
-                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
-                            <span className="text-2xl">✨</span>
-                        </div>
-                        <h2 className="text-2xl font-bold text-white mb-2">¡Análisis Completado!</h2>
-                        <p className="text-white/60 mb-6">Tu ADN de marca ha sido generado exitosamente.</p>
-                        <button className="px-6 py-3 bg-white text-black rounded-full font-bold hover:scale-105 transition-transform" onClick={() => router.push('/dashboard')}>
-                            Ir al Dashboard (Fase 3 Pending)
-                        </button>
+                    <div className="flex justify-center items-center w-full py-8">
+                        <SmartphoneMockup>
+                            <EscaparateInmersivo />
+                        </SmartphoneMockup>
                     </div>
                 ) : (
                     <CapturaFachada
