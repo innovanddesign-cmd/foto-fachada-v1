@@ -10,14 +10,15 @@ export const AIService = {
             });
 
             if (!response.ok) {
-                throw new Error("Fallo en la respuesta de la API");
+                const errorData = await response.json().catch(() => ({}));
+                const detalle = errorData.detalle || errorData.error || `HTTP ${response.status}`;
+                throw new Error(`Error de API: ${detalle}`);
             }
 
             return await response.json();
 
         } catch (error) {
             console.error("Error en Servicio AI:", error);
-            // Fallback en caso de error extremo
             return {
                 paletaColores: {
                     primario: "#000000",
@@ -38,15 +39,101 @@ export const AIService = {
     },
 
     generarEscaparate: async (adn: AdnMarca): Promise<DatosEscaparate> => {
-        // Generar datos basados en el ADN
-        return {
-            titularPrincipal: "Tu Negocio, Reinventado",
-            subtitulo: `Diseño generado basado en estilo ${adn.ambiente}`,
-            disenoSeleccionado: "heroe-centrado",
-            ofertas: [
-                { titulo: "Producto Estrella", precio: "$99.99", descripcion: "Lo mejor de tu catálogo" },
-                { titulo: "Servicio Premium", precio: "$149.00", descripcion: "Experiencia completa" }
-            ]
+        const nombre = adn.analisisVision?.nombreSugerido || "Tu Negocio";
+        const categoria = adn.analisisVision?.categoriaSugerida || "Servicios";
+        const servicios = adn.inteligenciaMarketing?.serviciosDetectados || [];
+        const gap = adn.inteligenciaMarketing?.gapDeMercado || "";
+        const arquetipoRaw = adn.inteligenciaMarketing?.arquetipoMarca || "El Explorador";
+
+        // Determinar estrategia de conversión basada en categoría
+        const categoriaLower = categoria.toLowerCase();
+        let estrategia: AdnMarca['estrategiaPrincipal'] = 'LEAD_MAGNET';
+        if (categoriaLower.includes('restaurante') || categoriaLower.includes('gastro') || categoriaLower.includes('café') || categoriaLower.includes('bar')) {
+            estrategia = 'OFERTA_FLASH';
+        } else if (categoriaLower.includes('peluquer') || categoriaLower.includes('salud') || categoriaLower.includes('clínica') || categoriaLower.includes('dentista')) {
+            estrategia = 'CITA_PREVIA';
+        }
+
+        // Generar titulares basados en el arquetipo
+        const titulares: Record<string, { principal: string; sub: string }> = {
+            'El Rebelde': { principal: `${nombre}: Rompemos las Reglas`, sub: "La experiencia que otros no se atreven a ofrecer." },
+            'El Cuidador': { principal: `${nombre} Cuida de Ti`, sub: "Tu bienestar es nuestra razón de ser." },
+            'El Sabio': { principal: `Confía en la Experiencia de ${nombre}`, sub: "Conocimiento que marca la diferencia." },
+            'El Mago': { principal: `${nombre}: Donde Ocurre la Magia`, sub: "Transformamos lo ordinario en extraordinario." },
+            'El Héroe': { principal: `${nombre}: Supera Tus Límites`, sub: "Aquí empieza tu transformación." },
+            'El Explorador': { principal: `Descubre ${nombre}`, sub: "Una nueva forma de vivir la experiencia." },
+            'El Creador': { principal: `${nombre}: Arte en Cada Detalle`, sub: "Diseñado para quienes aprecian lo diferente." },
+            'El Inocente': { principal: `${nombre}: Sencillamente Perfecto`, sub: "La pureza en su máxima expresión." },
         };
+
+        const titular = titulares[arquetipoRaw] || { principal: `Bienvenido a ${nombre}`, sub: `${categoria} de excelencia en tu zona.` };
+
+        // Generar ofertas desde servicios detectados
+        const ofertas = servicios.length > 0
+            ? servicios.slice(0, 3).map((s, i) => ({
+                titulo: s,
+                precio: i === 0 ? "Consultar" : `Desde €${(15 + i * 10).toFixed(0)}`,
+                descripcion: `${s} profesional con los mejores estándares.`
+            }))
+            : [
+                { titulo: "Servicio Destacado", precio: "Consultar", descripcion: "Nuestro servicio más solicitado." },
+                { titulo: "Pack Premium", precio: "Desde €49", descripcion: "La experiencia completa." }
+            ];
+
+        // Generar secciones dinámicas
+        const secciones = [
+            {
+                id: "hero-pro",
+                tipo: "Hero" as const,
+                variante: "Glass" as const,
+                contenido: {
+                    titulo: titular.principal,
+                    descripcion: titular.sub,
+                    cta: { texto: "Descubrir Más", accion: "#catalogo" }
+                }
+            },
+            {
+                id: "bento-valor",
+                tipo: "Bento" as const,
+                variante: "Glass" as const,
+                contenido: {
+                    titulo: "Propuesta de Valor",
+                    elementos: servicios.map((s, i) => ({ id: `sv-${i}`, titulo: s, descripcion: gap || "Excelencia garantizada." }))
+                }
+            },
+            {
+                id: "conversion-core",
+                tipo: "Conversion" as const,
+                variante: "Glass" as const,
+                contenido: {
+                    titulo: "Contacta con Nosotros",
+                    cta: {
+                        texto: estrategia === 'CITA_PREVIA' ? 'Reservar Cita' : estrategia === 'OFERTA_FLASH' ? 'Ver Oferta' : 'Contactar',
+                        accion: "#contacto"
+                    }
+                }
+            }
+        ];
+
+        // Actualizar la estrategia en el ADN (side effect controlado)
+        // Esto se hará en el store al completar análisis
+
+        const escaparate: DatosEscaparate = {
+            titularPrincipal: titular.principal,
+            subtitulo: titular.sub,
+            disenoSeleccionado: "heroe-centrado",
+            ofertas,
+            secciones,
+            datosSugeridos: {
+                titularPrincipal: titular.principal,
+                subtitulo: titular.sub,
+                descripcionValor: gap || `${categoria} de referencia.`,
+                ctaPrincipal: estrategia === 'CITA_PREVIA' ? 'Reservar Cita' : estrategia === 'OFERTA_FLASH' ? 'Ver Oferta' : 'Contactar Ahora',
+                horario: "Lunes a Sábado: 09:00 - 20:00",
+                telefono: "",
+            }
+        };
+
+        return escaparate;
     },
 };

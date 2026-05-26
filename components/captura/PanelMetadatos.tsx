@@ -40,7 +40,6 @@ interface PanelMetadatosProps {
 
 const REDES_SOCIALES: PlataformaSocial[] = [
     'instagram',
-    'facebook',
     'tiktok',
     'twitter',
     'linkedin',
@@ -248,11 +247,12 @@ export default function PanelMetadatos({
                                                     animate="visible"
                                                 >
                                                     <CampoUrlSocial
-                                                        plataforma={plataforma}
+                                                        tipo={plataforma as 'instagram' | 'tiktok' | 'web'}
                                                         valor={metadatos.redesSociales[plataforma] || ''}
-                                                        alCambiar={(valor, esValido) =>
-                                                            actualizarRedSocial(plataforma, valor, esValido)
+                                                        alCambiar={(valor) =>
+                                                            actualizarRedSocial(plataforma, valor, true)
                                                         }
+                                                        placeholder={`URL de ${plataforma}`}
                                                     />
                                                 </motion.div>
                                             ))}

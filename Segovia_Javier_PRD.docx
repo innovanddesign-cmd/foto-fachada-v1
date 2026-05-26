@@ -1,0 +1,58 @@
+Product Requirements Document (PRD): Foto Fachada - Optimización de Flujo MVP
+
+1. Resumen Ejecutivo
+Foto Fachada es una plataforma SaaS diseñada para digitalizar la presencia de pequeños comercios a partir de una simple fotografía o vídeo. Este proyecto se centra en la reestructuración del motor generativo del MVP, pasando de un modelo de "prompt único" a un flujo de trabajo secuencial automatizado. Esto garantizará resultados estéticos y funcionales de alta calidad desde el primer intento, eliminando los cuellos de botella técnicos actuales.
+
+2. Problema a Resolver
+El sistema actual procesa la creación del escaparate enviando instrucciones masivas y complejas a la IA de una sola vez. Esto provoca confusión en el modelo, generando entregables con múltiples deficiencias estéticas y estructurales. El fundador invierte actualmente un equivalente a 500 € mensuales en tiempo (aprox. varias horas diarias) intentando ajustar y corregir manualmente los resultados fallidos del código y diseño generados.
+
+3. Objetivos del Producto
+
+Principal: Traducir la visión de negocio en instrucciones precisas y segmentadas para que el MVP funcione a la primera, sin necesidad de intervención manual correctiva.
+
+Secundario: Establecer un "hilo conductor" sólido entre la recepción de la imagen y la entrega final (Web + Cartel QR).
+
+4. Audiencia Objetivo
+
+Usuario Final: Pequeños comercios y negocios locales que necesitan digitalizarse rápidamente sin conocimientos técnicos.
+
+Usuario Interno: El equipo gestor de Foto Fachada, que requiere una plataforma estable y automatizada que no demande microgestión ni corrección constante de errores de IA.
+
+5. Requisitos Funcionales
+El nuevo flujo del sistema debe ejecutar los siguientes pasos secuenciales:
+
+F1 - Recepción (Sin IA): El sistema captura la foto/vídeo inicial subida por el cliente y la almacena.
+
+F2 - Análisis de Identidad (Con IA): El sistema analiza visualmente la imagen para identificar el tipo de negocio, público objetivo, ubicación y paleta de colores.
+
+F3 - Generación de Estrategia (Con IA): Basado en el análisis, el sistema define estrategias de marketing y ventas personalizadas.
+
+F4 - Creación Web (Con IA): Se genera la estructura y el copywriting persuasivo para la web adaptada a la estrategia anterior.
+
+F5 - Diseño de Cartelería (Con IA): Se diseña un cartel estéticamente moderno (apoyado en estilos contemporáneos como el glassmorphism o cyber-dark si la marca lo requiere) que incluye un código QR enlazado a la web.
+
+6. Requisitos Técnicos
+
+Motor de Automatización: Make o n8n para orquestar el flujo de datos entre módulos (trigger inicial y movimiento de archivos).
+
+Motor de IA: Integración con Antigravity para procesar los nodos de análisis, estrategia, texto y diseño visual.
+
+Arquitectura: Modular. Cada paso de IA (F2 a F5) debe operar con su propio prompt específico e independiente, alimentándose únicamente de los datos estructurados del paso inmediatamente anterior.
+
+7. Métricas de Éxito (KPIs)
+
+Calidad: 100% de los escaparates y carteles generados correctamente en el primer intento, respetando la estructura definida.
+
+Eficiencia: Reducción del tiempo de mantenimiento y ajuste de prompts a un máximo de 1 hora al día.
+
+Resolución: 0% de recurrencia en problemas de flujo o diseño previamente parcheados.
+
+8. Cronograma Tentativo (Fase I & II)
+
+Semana 1: Mapeo final del proceso y configuración de webhooks de entrada en Make/n8n.
+
+Semana 2: Redacción y testeo aislado de los 4 prompts específicos para el motor de Antigravity (Análisis, Estrategia, Web, Cartel).
+
+Semana 3: Integración de los nodos de IA en el flujo de automatización y pruebas end-to-end.
+
+Semana 4: Despliegue del nuevo flujo en el MVP y medición de la reducción de tiempo de ajuste. (Pase a beta para evaluar opciones futuras como agrupación por campañas).

@@ -4,7 +4,15 @@ import path from "path";
 const nextConfig: NextConfig = {
     reactStrictMode: true,
     images: {
-        domains: [],
+        formats: ['image/avif', 'image/webp'],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+                port: '',
+                pathname: '/**',
+            },
+        ],
     },
     // Excluir carpetas legacy de la compilación
     webpack: (config, { isServer }) => {

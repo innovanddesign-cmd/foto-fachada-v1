@@ -30,6 +30,12 @@ dist-ssr
 chat-claude.txt
 landing-automation-mvp.tsx
 
+# Env files (all levels, all variants)
+**/.env
+**/.env.*
+!**/.env.example
+!env.production.example
+
 # Next.js
 .next/
 out/

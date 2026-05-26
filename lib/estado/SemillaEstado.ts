@@ -121,15 +121,33 @@ export async function importarSemilla(archivo: File): Promise<SemillaEstadoData 
 // FUNCIONES PARA USO EN STORE
 // ═══════════════════════════════════════════════════════════════
 
+const ESTADO_VACIO: EstadoTienda = {
+    pasoActual: 'CAPTURA',
+    imagenSubida: null,
+    analizando: false,
+    adnMarca: null,
+    datosEscaparate: null,
+    ultimaModificacion: '',
+    galeriaActivos: [],
+    redesSociales: {},
+    logoStatus: 'PENDING_AI',
+    mensajeExito: null,
+    slug: null,
+    cartelesGenerados: [],
+    indicePreguntaActual: 0,
+    seccionResaltada: null,
+    sugerenciasIA: {},
+    campañas: [],
+    registroEscaneos: [],
+    insightsIA: [],
+};
+
 export function crearSemillaInicial(estado: Partial<EstadoTienda>): SemillaEstadoData {
     return {
         versionEsquema: VERSION_ESQUEMA,
         estadoActual: {
-            pasoActual: estado.pasoActual ?? 'CAPTURA',
-            imagenSubida: estado.imagenSubida ?? null,
-            analizando: estado.analizando ?? false,
-            adnMarca: estado.adnMarca ?? null,
-            datosEscaparate: estado.datosEscaparate ?? null,
+            ...ESTADO_VACIO,
+            ...estado,
             ultimaModificacion: obtenerMarcaTiempo(),
         },
         historialCambios: [],
@@ -152,11 +170,8 @@ export function registrarCambio(
 
     const semillaActual = cargarSemilla() || crearSemillaInicial(estadoNuevo);
     semillaActual.estadoActual = {
-        pasoActual: estadoNuevo.pasoActual ?? semillaActual.estadoActual.pasoActual,
-        imagenSubida: estadoNuevo.imagenSubida ?? semillaActual.estadoActual.imagenSubida,
-        analizando: estadoNuevo.analizando ?? semillaActual.estadoActual.analizando,
-        adnMarca: estadoNuevo.adnMarca ?? semillaActual.estadoActual.adnMarca,
-        datosEscaparate: estadoNuevo.datosEscaparate ?? semillaActual.estadoActual.datosEscaparate,
+        ...semillaActual.estadoActual,
+        ...estadoNuevo,
         ultimaModificacion: obtenerMarcaTiempo(),
     };
     semillaActual.historialCambios = [

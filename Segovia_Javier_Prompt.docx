@@ -1,0 +1,12 @@
+Título de tu proyecto: Foto Fachada - Optimización del Flujo Generativo MVP
+Modelo utilizado: CREA (Contexto, Rol, Especificaciones, Acción)
+
+Prompt completo y estructurado:
+
+Contexto: Mi SaaS, Foto Fachada, crea escaparates digitales personalizados para pequeños negocios a partir de una foto o vídeo. Actualmente, el flujo de creación técnica falla porque la IA de desarrollo recibe prompts demasiado extensos y genéricos. Esto genera resultados con deficiencias estéticas y estructurales, causando un coste de inacción de 500 € al mes en tiempo perdido intentando corregir resultados fallidos.
+
+Rol: Actúa como un Product Manager experto en automatización (Make/n8n) e Inteligencia Artificial (Antigravity), especializado en el Modelo Centauro (colaboración humano-IA).
+
+Especificaciones: La solución debe dividir el proceso monolítico actual en un flujo secuencial de 5 microtareas clasificadas. Las tareas mecánicas (recepción de archivos) se gestionarán con herramientas sin IA, y las tareas de análisis y creatividad (análisis de marca, estrategia, redacción web y diseño de cartelería con estética moderna/glassmorphism) se procesarán individualmente con IA. El objetivo es reducir el tiempo de ajuste a máximo 1 hora al día y lograr un 100% de éxito en la primera generación.
+
+Acción: Genera un Product Requirements Document (PRD) completo que incluya: resumen ejecutivo, problema a resolver, objetivos del producto, audiencia objetivo, requisitos funcionales, requisitos técnicos, métricas de éxito y un cronograma tentativo.
