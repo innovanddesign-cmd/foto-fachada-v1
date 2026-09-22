@@ -8,6 +8,16 @@ import {
     Star, ChevronRight
 } from "lucide-react";
 import { accionesTienda } from "@/store/useTiendaEstado";
+import { CircularGallery } from "@/components/ui/circular-gallery";
+
+const GALLERY_ITEMS = [
+    { id: '1', title: 'Restaurante Mediterráneo', plan: 'ESCAPARATE', url: '/test-mockup', color: '#fbbf24' },
+    { id: '2', title: 'Boutique Moda', plan: 'PRO', url: '/test-mockup', color: '#d946ef' },
+    { id: '3', title: 'Cafetería Local', plan: 'FREE', url: '/test-mockup', color: '#00f3ff' },
+    { id: '4', title: 'Peluquería', plan: 'PRO', url: '/test-mockup', color: '#00ff9d' },
+    { id: '5', title: 'Hotel Boutique', plan: 'ESCAPARATE', url: '/test-mockup', color: '#fbbf24' },
+];
+
 
 const FEATURES = [
     {
