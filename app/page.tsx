@@ -265,6 +265,68 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ─── PRECIOS ─── */}
+            <section id="precios" className="px-6 py-24 max-w-6xl mx-auto scroll-mt-24">
+                <div className="text-center mb-16">
+                    <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">Precios</span>
+                    <h2 className="text-3xl sm:text-4xl font-black text-white mt-2">Planes para cada negocio</h2>
+                    <p className="text-white/50 mt-3">Oferta de lanzamiento: primeros 100 clientes de pago.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-6 rounded-3xl bg-white/4 border border-white/8 flex flex-col">
+                        <h3 className="text-white font-bold text-lg">FREE</h3>
+                        <p className="text-white/50 text-sm mb-4">Empieza sin coste</p>
+                        <div className="text-3xl font-black text-white mb-4">0€<span className="text-sm font-medium text-white/40"> /siempre</span></div>
+                        <ul className="space-y-2 text-sm text-white/60 flex-1 mb-6">
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Página personalizada</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Máx. 4 acciones</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> 1 campaña</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> 1 regeneración IA/mes</li>
+                        </ul>
+                        <button type="button" onClick={manejarInicio} className="w-full py-3 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all text-white font-bold text-sm">
+                            Empezar gratis
+                        </button>
+                    </div>
+                    <div className="p-6 rounded-3xl bg-purple-500/10 border border-purple-500/30 flex flex-col relative shadow-[0_0_30px_-10px_rgba(168,85,247,0.4)]">
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">Recomendado</span>
+                        <h3 className="text-white font-bold text-lg">PRO</h3>
+                        <p className="text-white/50 text-sm mb-4">Escaparate completo con estrategia</p>
+                        <div className="flex items-baseline gap-2 mb-4">
+                            <span className="text-white/30 line-through text-sm font-bold">200€</span>
+                            <span className="text-3xl font-black text-purple-300">100€<span className="text-sm font-medium text-white/40"> /año</span></span>
+                        </div>
+                        <ul className="space-y-2 text-sm text-white/60 flex-1 mb-6">
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-purple-400 shrink-0" /> Todo FREE +</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-purple-400 shrink-0" /> Landing completa + CTA</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-purple-400 shrink-0" /> 3 campañas</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-purple-400 shrink-0" /> 3 regeneraciones IA/mes</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-purple-400 shrink-0" /> Primer cartel físico</li>
+                        </ul>
+                        <a href="mailto:innovandesign@gmail.com?subject=Quiero%20el%20plan%20PRO" className="block w-full py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 transition-colors text-white font-bold text-sm text-center">
+                            Elegir PRO
+                        </a>
+                    </div>
+                    <div className="p-6 rounded-3xl bg-white/4 border border-white/8 flex flex-col">
+                        <h3 className="text-white font-bold text-lg">ESCAPARATE</h3>
+                        <p className="text-white/50 text-sm mb-4">Máxima experiencia visual</p>
+                        <div className="flex items-baseline gap-2 mb-4">
+                            <span className="text-white/30 line-through text-sm font-bold">400€</span>
+                            <span className="text-3xl font-black text-white">200€<span className="text-sm font-medium text-white/40"> /año</span></span>
+                        </div>
+                        <ul className="space-y-2 text-sm text-white/60 flex-1 mb-6">
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-pink-400 shrink-0" /> Todo PRO +</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-pink-400 shrink-0" /> Motion avanzado</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-pink-400 shrink-0" /> 10 campañas</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-pink-400 shrink-0" /> 10 regeneraciones IA/mes</li>
+                            <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-pink-400 shrink-0" /> Analítica avanzada</li>
+                        </ul>
+                        <a href="mailto:innovandesign@gmail.com?subject=Quiero%20el%20plan%20ESCAPARATE" className="block w-full py-3 rounded-2xl bg-white text-black hover:bg-gray-100 transition-colors font-bold text-sm text-center">
+                            Elegir ESCAPARATE
+                        </a>
+                    </div>
+                </div>
+            </section>
+
             {/* ─── TESTIMONIALS ─── */}
             <section className="px-6 py-24 max-w-5xl mx-auto">
                 <div className="text-center mb-16">
@@ -332,9 +394,9 @@ export default function Home() {
                     </div>
                     <p className="text-white/25 text-xs font-mono">Motor Antigravity v.2026 · Diseño Aero-Glassmorphism · Impulsado por Gemini</p>
                     <div className="flex gap-4 text-white/30 text-xs">
-                        <a href="#" className="hover:text-white/60 transition-colors">Privacidad</a>
-                        <a href="#" className="hover:text-white/60 transition-colors">Términos</a>
-                        <a href="#" className="hover:text-white/60 transition-colors">Contacto</a>
+                        <a href="/legal/privacidad" className="hover:text-white/60 transition-colors">Privacidad</a>
+                        <a href="/legal/terminos" className="hover:text-white/60 transition-colors">Términos</a>
+                        <a href="mailto:innovandesign@gmail.com?subject=Escaparate%20Digital" className="hover:text-white/60 transition-colors">Contacto</a>
                     </div>
                 </div>
             </footer>

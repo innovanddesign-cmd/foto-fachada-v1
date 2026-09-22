@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
     Plus, LayoutGrid, BarChart3, Settings, HelpCircle,
     Zap, TrendingUp, QrCode, Eye, ChevronRight,
-    LayoutDashboard, Sparkles
+    LayoutDashboard, Sparkles, Store, Tag, Target, Smartphone
 } from 'lucide-react';
 import { useTiendaEstado, accionesTienda } from '@/store/useTiendaEstado';
 import { DashboardPrincipal } from '@/components/dashboard/DashboardPrincipal';
@@ -18,9 +18,16 @@ const SIDEBAR_ITEMS = [
     { id: 'ayuda', label: 'Ayuda', icon: HelpCircle },
 ];
 
+const SECCIONES_VALIDAS = ['campañas', 'analiticas', 'ajustes', 'ayuda'];
+
 export default function PaginaDashboard() {
     const router = useRouter();
     const [seccionActiva, setSeccionActiva] = useState('campañas');
+
+    useEffect(() => {
+        const s = new URLSearchParams(window.location.search).get('seccion');
+        if (s && SECCIONES_VALIDAS.includes(s)) setSeccionActiva(s);
+    }, []);
 
     const campañas = useTiendaEstado((s) => s.campañas);
     const adnMarca = useTiendaEstado((s) => s.adnMarca);
@@ -65,6 +72,7 @@ export default function PaginaDashboard() {
                                 key={item.id}
                                 type="button"
                                 onClick={() => setSeccionActiva(item.id)}
+                                aria-current={activo ? 'page' : undefined}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${activo
                                     ? 'bg-white/10 text-white'
                                     : 'text-white/50 hover:text-white hover:bg-white/5'
@@ -89,7 +97,7 @@ export default function PaginaDashboard() {
                         <span className="text-white text-xs font-bold">Plan Gratuito</span>
                     </div>
                     <p className="text-white/40 text-[10px] mb-3">Hasta 3 campañas activas. Actualiza para ilimitado.</p>
-                    <button type="button" className="w-full py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold hover:opacity-90 transition-opacity">
+                    <button type="button" onClick={() => { window.location.href = '/#precios'; }} className="w-full py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold hover:opacity-90 transition-opacity">
                         Actualizar a Pro
                     </button>
                 </div>
@@ -176,20 +184,21 @@ export default function PaginaDashboard() {
                         <div className="max-w-2xl space-y-4">
                             <h2 className="text-xl font-bold text-white mb-6">Configuración</h2>
                             {[
-                                { titulo: "Nombre del negocio", desc: adnMarca?.analisisVision?.nombreSugerido || "Sin configurar", icon: "🏪" },
-                                { titulo: "Categoría detectada", desc: adnMarca?.analisisVision?.categoriaSugerida || "Sin configurar", icon: "🏷️" },
-                                { titulo: "Estrategia de conversión", desc: adnMarca?.estrategiaPrincipal || "LEAD_MAGNET", icon: "🎯" },
-                                { titulo: "Redes sociales", desc: "Instagram, TikTok, Web", icon: "📱" },
+                                { titulo: "Nombre del negocio", desc: adnMarca?.analisisVision?.nombreSugerido || "Sin configurar", Icon: Store },
+                                { titulo: "Categoría detectada", desc: adnMarca?.analisisVision?.categoriaSugerida || "Sin configurar", Icon: Tag },
+                                { titulo: "Estrategia de conversión", desc: adnMarca?.estrategiaPrincipal || "LEAD_MAGNET", Icon: Target },
+                                { titulo: "Redes sociales", desc: "Instagram, TikTok, Web", Icon: Smartphone },
                             ].map((item) => (
-                                <div key={item.titulo} className="flex items-center justify-between p-5 rounded-2xl bg-white/4 border border-white/8 hover:border-white/15 transition-colors group cursor-pointer">
+                                <div key={item.titulo} className="flex items-center justify-between p-5 rounded-2xl bg-white/4 border border-white/8 hover:border-white/15 transition-colors group">
                                     <div className="flex items-center gap-4">
-                                        <span className="text-2xl">{item.icon}</span>
+                                        <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                            <item.Icon className="w-4 h-4 text-white/50" />
+                                        </div>
                                         <div>
                                             <p className="text-white font-medium text-sm">{item.titulo}</p>
                                             <p className="text-white/40 text-xs">{item.desc}</p>
                                         </div>
                                     </div>
-                                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors" />
                                 </div>
                             ))}
                         </div>

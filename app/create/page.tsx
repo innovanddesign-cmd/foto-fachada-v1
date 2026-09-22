@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Zap, Target, Sparkles } from 'lucide-react';
 import { useTiendaEstado } from '@/store/useTiendaEstado';
 import { guardarCampañaEnStore } from '@/lib/campañas/GestionCampañas';
 
@@ -170,13 +171,16 @@ export default function PaginaCrear() {
                 {/* Características (Visual solo en Ingesta) */}
                 {pasoActual === 'CAPTURA' && (
                     <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 opacity-60">
-                        {CARACTERISTICAS.map((car, idx) => (
-                            <div key={idx} className="p-6 rounded-[2rem] bg-white/5 border border-white/5 backdrop-blur-md text-center">
-                                <div className="text-2xl mb-2">{car.icono}</div>
-                                <div className="text-white font-bold text-sm mb-1">{car.titulo}</div>
-                                <div className="text-white/40 text-[10px] uppercase tracking-tighter">{car.desc}</div>
-                            </div>
-                        ))}
+                        {CARACTERISTICAS.map((car, idx) => {
+                            const CarIcon = car.icono;
+                            return (
+                                <div key={idx} className="p-6 rounded-[2rem] bg-white/5 border border-white/5 backdrop-blur-md text-center">
+                                    <div className="flex justify-center mb-2 text-purple-400"><CarIcon className="w-5 h-5" /></div>
+                                    <div className="text-white font-bold text-sm mb-1">{car.titulo}</div>
+                                    <div className="text-white/40 text-[10px] uppercase tracking-tighter">{car.desc}</div>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
 
@@ -278,7 +282,7 @@ function StepperFlujo({ pasoActual }: { pasoActual: string }) {
 }
 
 const CARACTERISTICAS = [
-    { icono: '⚡', titulo: 'Ultra Rápido', desc: 'Análisis en milisegundos' },
-    { icono: '🎯', titulo: 'Precisión IA', desc: 'Extracción de ADN visual' },
-    { icono: '✨', titulo: 'Generativo', desc: 'Diseños únicos por negocio' }
+    { icono: Zap, titulo: 'Ultra Rápido', desc: 'Análisis en milisegundos' },
+    { icono: Target, titulo: 'Precisión IA', desc: 'Extracción de ADN visual' },
+    { icono: Sparkles, titulo: 'Generativo', desc: 'Diseños únicos por negocio' }
 ];

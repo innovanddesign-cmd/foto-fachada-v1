@@ -74,6 +74,7 @@ export const NavbarGlobal = () => {
                                     <Link
                                         key={item.href}
                                         href={item.href}
+                                        aria-current={activo ? 'page' : undefined}
                                         className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all ${activo
                                             ? 'bg-white/10 text-white'
                                             : 'text-white/60 hover:text-white hover:bg-white/5'
@@ -100,6 +101,7 @@ export const NavbarGlobal = () => {
                             <button
                                 type="button"
                                 aria-label="Notificaciones"
+                                onClick={() => router.push('/dashboard?seccion=analiticas')}
                                 className="hidden sm:flex w-8 h-8 rounded-xl bg-white/5 border border-white/10 items-center justify-center hover:bg-white/10 transition-colors relative"
                             >
                                 <Bell className="w-3.5 h-3.5 text-white/60" />
@@ -135,11 +137,16 @@ export const NavbarGlobal = () => {
                                                 <p className="text-[10px] text-white/40">Plan Gratuito</p>
                                             </div>
                                             <div className="p-1.5">
-                                                <MenuPerfil icon={Zap} label="Actualizar a Pro" onClick={() => setPerfilAbierto(false)} accent />
-                                                <MenuPerfil icon={Settings} label="Configuración" onClick={() => setPerfilAbierto(false)} />
-                                                <MenuPerfil icon={HelpCircle} label="Ayuda y Soporte" onClick={() => setPerfilAbierto(false)} />
+                                                <MenuPerfil icon={Zap} label="Actualizar a Pro" onClick={() => { setPerfilAbierto(false); window.location.href = '/#precios'; }} accent />
+                                                <MenuPerfil icon={Settings} label="Configuración" onClick={() => { setPerfilAbierto(false); router.push('/dashboard?seccion=ajustes'); }} />
+                                                <MenuPerfil icon={HelpCircle} label="Ayuda y Soporte" onClick={() => { setPerfilAbierto(false); router.push('/dashboard?seccion=ayuda'); }} />
                                                 <div className="my-1 border-t border-white/5" />
-                                                <MenuPerfil icon={LogOut} label="Cerrar Sesión" onClick={() => setPerfilAbierto(false)} danger />
+                                                <MenuPerfil icon={LogOut} label="Cerrar Sesión" onClick={() => {
+                                                    setPerfilAbierto(false);
+                                                    accionesTienda.reiniciar();
+                                                    localStorage.clear();
+                                                    router.push('/');
+                                                }} danger />
                                             </div>
                                         </motion.div>
                                     )}
