@@ -92,7 +92,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
         <div
           className="relative w-full h-full"
           style={{
-            transform: \otateY(\deg)\,
+            transform: `rotateY(${rotation}deg)`,
             transformStyle: 'preserve-3d',
             transition: isDragging ? 'none' : 'transform 0.1s linear',
           }}
@@ -110,7 +110,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                 key={item.id}
                 className="absolute w-[280px] h-[550px] group transition-transform duration-300 ease-out"
                 style={{
-                  transform: \otateY(\deg) translateZ(\px) \\,
+                  transform: `rotateY(${relativeAngle}deg) translateZ(${radius}px)`,
                   left: '50%',
                   top: '50%',
                   marginLeft: '-140px',
@@ -139,7 +139,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                       strokeDasharray="8000"
                       strokeDashoffset={isHovered ? "0" : "8000"}
                       className="transition-all duration-1000 ease-out"
-                      style={{ filter: \drop-shadow(0 0 12px \)\ }}
+                      style={{ filter: `drop-shadow(0 0 12px ${item.color})` }}
                     />
                   </svg>
 
@@ -182,3 +182,4 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
 
 CircularGallery.displayName = 'CircularGallery';
 export { CircularGallery };
+
