@@ -177,6 +177,37 @@ export default function Home() {
                 </motion.div>
             </section>
 
+            {/* ─── CARRUSEL 3D ─── */}
+            <section className="relative w-full py-24 overflow-hidden bg-black/50">
+                <div className="text-center mb-16 relative z-10 px-4">
+                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                        <span className="text-purple-400 text-xs font-bold uppercase tracking-widest">Demos</span>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mt-2 mb-4">
+                            Explora los <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Escaparates</span>
+                        </h2>
+                        <p className="text-slate-400 max-w-xl mx-auto">
+                            Arrastra para girar. Haz clic en un móvil para interactuar con demos reales de nuestros planes.
+                        </p>
+                    </motion.div>
+                </div>
+
+                <div className="relative z-10 w-full mb-16">
+                    <CircularGallery items={GALLERY_ITEMS} />
+                </div>
+
+                <div className="text-center relative z-10">
+                    <motion.button
+                        onClick={manejarInicio}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 px-8 rounded-full transition-all text-lg shadow-[0_0_20px_rgba(168,85,247,0.4)]"
+                    >
+                        <Sparkles className="w-5 h-5" />
+                        Obtener tu muestra gratis con IA
+                    </motion.button>
+                </div>
+            </section>
+
             {/* ─── CÓMO FUNCIONA ─── */}
             <section className="px-6 py-24 max-w-5xl mx-auto">
                 <div className="text-center mb-16">
