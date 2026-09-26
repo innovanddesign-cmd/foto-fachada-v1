@@ -176,27 +176,27 @@ body {
     }
 }
 /* INNOVA workspace — UI UX Pro Max: readable surfaces, predictable hierarchy, touch-first controls. */
-.studio-shell { --studio-text:#1e293b; --studio-muted:#475569; --studio-primary:#2563eb; background:#f8fafc; color:var(--studio-text); font-size:16px; line-height:1.6; }
+.studio-shell { --studio-text:#edf5ef; --studio-muted:#a9b8af; --studio-primary:#00ff9d; background:#080b09; color:var(--studio-text); font-size:16px; line-height:1.6; }
 .studio-container { max-width:1280px; margin:auto; padding:32px 24px 64px; }
-.studio-panel { background:white; border:1px solid #e2e8f0; border-radius:20px; padding:24px; color:#1e293b; box-shadow:0 4px 20px #0f172a05; }
-.studio-muted { color:#475569; }
-.studio-eyebrow { font-size:12px; font-weight:700; letter-spacing:.12em; color:#2563eb; }
+.studio-panel { background:#111a15; border:1px solid #28372e; border-radius:20px; padding:24px; color:#edf5ef; box-shadow:0 4px 20px #00000025; }
+.studio-muted { color:#a9b8af; }
+.studio-eyebrow { font-size:12px; font-weight:700; letter-spacing:.12em; color:#00ff9d; }
 .studio-button,.studio-primary { min-height:44px; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:12px; font-size:14px; font-weight:600; line-height:1.4; transition:background-color .15s; cursor:pointer; text-decoration:none; }
-.studio-button { background:white; border:1px solid #cbd5e1; color:#334155; }
-.studio-button:hover { background:#f1f5f9; }
-.studio-primary { background:#2563eb; border:1px solid #2563eb; color:white; }
-.studio-primary:hover { background:#1d4ed8; }
+.studio-button { background:#111a15; border:1px solid #3b5043; color:#dbe8df; }
+.studio-button:hover { background:#1b2921; }
+.studio-primary { background:#00ff9d; border:1px solid #00ff9d; color:#06150d; }
+.studio-primary:hover { background:#50ffb8; }
 .studio-shell button:disabled { cursor:not-allowed; opacity:.5; }
-.studio-shell :is(button,a,input,textarea,summary):focus-visible { outline:3px solid #2563eb; outline-offset:4px; }
+.studio-shell :is(button,a,input,textarea,summary):focus-visible { outline:3px solid #00ff9d; outline-offset:4px; }
 .studio-field { display:flex; flex-direction:column; gap:8px; font-size:14px; font-weight:600; }
-.studio-field input,.studio-field textarea { width:100%; min-height:48px; background:#fff; border:1px solid #94a3b8; border-radius:10px; padding:12px; font-size:16px; font-weight:400; color:#0f172a; }
-.studio-notice { border:1px solid #bfdbfe; background:#eff6ff; padding:16px; border-radius:12px; color:#1e40af; font-size:14px; }
+.studio-field input,.studio-field textarea { width:100%; min-height:48px; background:#0b120e; border:1px solid #587060; border-radius:10px; padding:12px; font-size:16px; font-weight:400; color:#edf5ef; }
+.studio-notice { border:1px solid #325b43; background:#13271c; padding:16px; border-radius:12px; color:#bcf6d3; font-size:14px; }
 .studio-steps { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; }
-.studio-steps button { min-height:64px; display:flex; align-items:center; gap:8px; justify-content:center; padding:10px 6px; border:1px solid #cbd5e1; border-radius:12px; font-size:14px; background:#fff; color:#475569; }
+.studio-steps button { min-height:64px; display:flex; align-items:center; gap:8px; justify-content:center; padding:10px 6px; border:1px solid #3b5043; border-radius:12px; font-size:14px; background:#0b120e; color:#a9b8af; }
 .studio-steps button span { font-weight:700; }
-.studio-steps button[aria-current] { background:#2563eb; color:white; border-color:#2563eb; }
-.studio-legacy { background:#101827; color:#f8fafc; }
-.studio-legacy :is([class*="text-white/20"],[class*="text-white/30"],[class*="text-white/40"]) { color:#b7c3d5; }
+.studio-steps button[aria-current] { background:#00ff9d; color:#06150d; border-color:#00ff9d; }
+.studio-legacy { background:#0d1510; color:#080b09; }
+.studio-legacy :is([class*="text-white/20"],[class*="text-white/30"],[class*="text-white/40"]) { color:#b5c4ba; }
 .studio-legacy :is(button,input,textarea) { min-height:44px; }
 .studio-legacy :is([class*="text-[10px]"],[class*="text-[8px]"]) { font-size:12px; }
 .studio-legacy .min-h-screen { min-height:0; }

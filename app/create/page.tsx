@@ -84,7 +84,7 @@ export default function PaginaCrear() {
      {step === 'CARTELERIA' && ready && <BibliotecaCarteles />}
      {step === 'DESPLIEGUE' && ready && <RemoteSyncPanel />}
      {!ready && !['CAPTURA', 'ANALISIS'].includes(step) && <div className="studio-panel"><h2 className="font-semibold">No hay un borrador abierto</h2><p className="studio-muted my-4">Abre un escaparate desde tu panel o empieza con una foto.</p><button className="studio-primary" onClick={() => go('CAPTURA')}>Empezar con una foto</button></div>}
-     <footer className="flex flex-wrap justify-between gap-3 mt-8 pt-6 border-t border-slate-200">
+     <footer className="flex flex-wrap justify-between gap-3 mt-8 pt-6 border-t border-emerald-900">
        {index > 0 ? <button className="studio-button" onClick={() => go(steps[index - 1].id)}><ArrowLeft size={18} /> Volver a {steps[index - 1].label.toLowerCase()}</button> : <Link href="/dashboard" className="studio-button">Volver al panel</Link>}
        {ready && index >= 1 && index < steps.length - 1 && <button className="studio-primary" onClick={() => go(steps[index + 1].id)}>Continuar a {steps[index + 1].label.toLowerCase()}<ArrowRight size={18} /></button>}
      </footer>

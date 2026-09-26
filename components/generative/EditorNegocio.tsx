@@ -25,7 +25,7 @@ export function EditorNegocio() {
     </label>)}
     <fieldset className="space-y-4"><legend className="font-semibold mb-3">Servicios y productos</legend>
       <p className="studio-muted text-sm">Añade solo servicios reales. Puedes quitar las propuestas que no correspondan a tu negocio.</p>
-      {datos.ofertas.map((offer, i) => <div key={i} className="border border-slate-200 p-4 rounded-xl space-y-3">
+      {datos.ofertas.map((offer, i) => <div key={i} className="border border-emerald-900 p-4 rounded-xl space-y-3">
         {(['titulo', 'descripcion', 'precio'] as const).map(key => <label className="studio-field" key={key}>{key === 'titulo' ? 'Nombre del servicio' : key === 'precio' ? 'Precio o información de precio' : 'Descripción'}<input value={offer[key] || ''} onChange={e => s.regenerarEscaparate({ ...datos, ofertas: datos.ofertas.map((o, j) => j === i ? { ...o, [key]: e.target.value } : o) })} /></label>)}
         <button className="studio-button" onClick={() => s.regenerarEscaparate({ ...datos, ofertas: datos.ofertas.filter((_, j) => j !== i) })}>Quitar servicio {i + 1}</button>
       </div>)}

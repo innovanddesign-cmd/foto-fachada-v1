@@ -18,6 +18,6 @@ export default function PaginaDashboard() {
      ['3. Guarda en tu cuenta', 'El borrador local está en este navegador. Guardar en tu cuenta permite recuperarlo desde otro dispositivo con la misma sesión.'],
      ['4. Publica y prueba', 'En Publicar, guarda el borrador y pulsa Publicar web. Abre Ver web para revisar lo que verá el cliente. Si editas después, pulsa Actualizar web pública.'],
      ['5. Descarga el cartel', 'Elige A4, A5 o cuadrado. Descarga el PNG o usa Imprimir / PDF. Prueba el QR con otro móvil antes de imprimir: la web debe estar publicada.']
-   ].map(([q,a]) => <details key={q} className="border-b border-slate-200 pb-4"><summary className="font-semibold cursor-pointer py-3">{q}</summary><p className="studio-muted mt-2">{a}</p></details>)}<Link className="studio-button" href="/#precios">Consultar planes y precios</Link></section>}
+   ].map(([q,a]) => <details key={q} className="border-b border-emerald-900 pb-4"><summary className="font-semibold cursor-pointer py-3">{q}</summary><p className="studio-muted mt-2">{a}</p></details>)}<Link className="studio-button" href="/#precios">Consultar planes y precios</Link></section>}
  </div></main>;
 }
