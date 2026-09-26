@@ -22,7 +22,7 @@ export default function BotonAnalisis() {
         // Simulación de inicio de análisis
         accionesTienda.iniciarAnalisis();
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+
 
         // Aquí se navegaría a la siguiente fase o se actualizaría el paso
         accionesTienda.establecerPaso('ANALISIS');

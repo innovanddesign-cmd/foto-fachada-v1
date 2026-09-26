@@ -141,6 +141,7 @@ export function crearCampañaDesdeEstadoActual(nombrePersonalizado?: string): Ca
             imagenSubida: store.imagenSubida,
             slug,
             galeriaActivos: store.galeriaActivos,
+            cartelesGenerados: store.cartelesGenerados,
             redesSociales: store.redesSociales,
         },
     };
@@ -158,7 +159,12 @@ export function guardarCampañaEnStore(nombrePersonalizado?: string): CampañaUs
 
     // Evitar duplicado del mismo escaparate
     if (slug && campañas.some(c => c.idEscaparate === slug)) {
-        return campañas.find(c => c.idEscaparate === slug) || null;
+        const existing = campañas.find(c => c.idEscaparate === slug)!;
+        const fresh = crearCampañaDesdeEstadoActual(nombrePersonalizado || existing.nombreCampaña);
+        if (!fresh) return existing;
+        const updated = { ...existing, snapshot: fresh.snapshot, nombreCampaña: fresh.nombreCampaña, ultimaActualizacion: fresh.ultimaActualizacion };
+        store.guardarCampaña(updated);
+        return updated;
     }
 
     const nuevaCampaña = crearCampañaDesdeEstadoActual(nombrePersonalizado);

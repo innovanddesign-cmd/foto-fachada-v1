@@ -295,7 +295,7 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
 
         guardarCartel: (cartel: CartelGenerado) => {
             const anterior = get();
-            const nuevosCarteles = [...anterior.cartelesGenerados, cartel];
+            const nuevosCarteles = anterior.cartelesGenerados.some(c => c.id === cartel.id) ? anterior.cartelesGenerados.map(c => c.id === cartel.id ? cartel : c) : [...anterior.cartelesGenerados, cartel];
             set({
                 cartelesGenerados: nuevosCarteles,
                 ultimaModificacion: obtenerMarcaTiempo()
@@ -390,15 +390,18 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
             if (!original) return;
 
             const ahora = new Date().toISOString();
+            const nuevoSlug = `${original.idEscaparate.slice(0, 70)}-copia-${Date.now().toString(36)}`;
             const copia: CampañaUsuario & { snapshot?: any } = {
                 ...original,
                 id: `camp_${Date.now()}`,
                 nombreCampaña: nuevoNombre,
+                idEscaparate: nuevoSlug,
+                urlPublica: undefined,
                 estado: 'BORRADOR',
                 fechaCreacion: ahora,
                 ultimaActualizacion: ahora,
                 metricas: { ...original.metricas, visitas: 0, conversiones: 0, escaneos: 0 },
-                snapshot: (original as any).snapshot ? { ...((original as any).snapshot || {}) } : undefined,
+                snapshot: original.snapshot ? { ...original.snapshot, slug: nuevoSlug, cartelesGenerados: [] } : undefined,
             };
 
             const nuevasCampañas = [...anterior.campañas, copia];

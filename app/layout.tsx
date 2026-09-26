@@ -21,11 +21,11 @@ export default function RootLayout({
             <body className={inter.className}>
                 <div className="mesh-bg" />
                 <NavbarGlobal />
-                <main className="relative z-10 min-h-screen flex flex-col">
+                <div className="relative z-10 min-h-screen flex flex-col">
                     <CapaDeMovimiento>
                         {children}
                     </CapaDeMovimiento>
-                </main>
+                </div>
             </body>
         </html>
     );

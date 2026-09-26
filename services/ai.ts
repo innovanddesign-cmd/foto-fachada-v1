@@ -76,10 +76,7 @@ export const AIService = {
                 precio: "Consultar",
                 descripcion: `${s} profesional con los mejores estándares.`
             }))
-            : [
-                { titulo: "Servicio Destacado", precio: "Consultar", descripcion: "Nuestro servicio más solicitado." },
-                { titulo: "Pack Premium", precio: "Consultar", descripcion: "La experiencia completa." }
-            ];
+            : [];
 
         // Generar secciones dinámicas
         const secciones = [
@@ -128,9 +125,9 @@ export const AIService = {
             datosSugeridos: {
                 titularPrincipal: titular.principal,
                 subtitulo: titular.sub,
-                descripcionValor: gap || `${categoria} de referencia.`,
+                descripcionValor: adn.analisisMarketing || gap || "",
                 ctaPrincipal: estrategia === 'CITA_PREVIA' ? 'Reservar Cita' : estrategia === 'OFERTA_FLASH' ? 'Ver Oferta' : 'Contactar Ahora',
-                horario: "Lunes a Sábado: 09:00 - 20:00",
+                horario: "",
                 telefono: "",
             }
         };

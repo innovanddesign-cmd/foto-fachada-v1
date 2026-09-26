@@ -51,7 +51,7 @@ export function resolverDatoHibrido<K extends keyof DatosEscaparateBase>(
     if (!escaparate) return '';
 
     // 1. Prioridad: Dato Real del Usuario
-    if (escaparate.datosReales?.[campo]) {
+    if (typeof escaparate.datosReales?.[campo] === 'string') {
         return escaparate.datosReales[campo]!;
     }
 

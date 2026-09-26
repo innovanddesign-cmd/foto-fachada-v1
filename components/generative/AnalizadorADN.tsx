@@ -53,7 +53,7 @@ export const AnalizadorADN = () => {
 
                 const endTime = Date.now();
                 const duration = endTime - startTime;
-                const minDuration = 3000; // 3 segundos de show para asimilación
+                const minDuration = 0;
 
                 if (duration < minDuration) {
                     await new Promise(resolve => setTimeout(resolve, minDuration - duration));
@@ -134,14 +134,14 @@ export const AnalizadorADN = () => {
 
     return (
         <div className="flex flex-col items-center justify-center w-full min-h-[60vh] py-12">
-            <EscaneoProgresivo />
+            <div role="status" className="text-slate-200 text-lg">Preparando la identidad del negocio…</div>
 
             <div className="mt-8 text-center space-y-2">
                 <p className="text-white/50 text-sm animate-pulse">
-                    Procesando datos biométricos del edificio...
+                    Analizando la foto de tu negocio…
                 </p>
                 <p className="text-xs text-white/30 font-mono">
-                    MOTOR NEURONAL v2.2 ACTIVO
+                    Si la IA no está disponible, podrás continuar manualmente.
                 </p>
             </div>
         </div>

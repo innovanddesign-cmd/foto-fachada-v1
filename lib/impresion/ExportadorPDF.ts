@@ -9,6 +9,7 @@ export type ExportFormat = 'PDF' | 'PNG' | 'JPG';
 
 interface ExportConfig {
     formato: ExportFormat;
+    papel?: 'A4' | 'A5' | 'SQUARE';
     nombreArchivo: string;
     escala?: number; // Default 3 for 300 DPI
     anadirMarcasCorte?: boolean;
@@ -38,6 +39,8 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
             backgroundColor: null,
             logging: false,
             onclone: (doc) => {
+                // Preview is scaled to fit the device; export the original print dimensions.
+                doc.querySelectorAll<HTMLElement>('[data-poster-scale]').forEach(node => { node.style.transform = 'none'; });
                 // Manipulación del DOM clonado antes de la captura (ej: marcas de corte)
                 if (config.anadirMarcasCorte) {
                     const cloned = doc.getElementById(elementId);
@@ -53,7 +56,7 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
         if (config.formato === 'PDF') {
             // Nota: Integración con jsPDF se realizaría aquí. 
             // Como fallback profesional, abrimos el diálogo de impresión con el canvas.
-            imprimirCanvas(dataUrl, config.nombreArchivo, ventana!);
+            imprimirCanvas(dataUrl, config.nombreArchivo, ventana!, config.papel || 'A4');
         } else {
             const link = document.createElement('a');
             link.download = `${config.nombreArchivo}.${config.formato.toLowerCase()}`;
@@ -73,7 +76,8 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
  * Fallback de impresión profesional.
  * Abre ventana antes de operación asíncrona para evitar popup blocker.
  */
-const imprimirCanvas = (dataUrl: string, titulo: string, win: Window) => {
+const imprimirCanvas = (dataUrl: string, titulo: string, win: Window, papel: 'A4' | 'A5' | 'SQUARE') => {
+    const pageSize = papel === 'SQUARE' ? '210mm 210mm' : papel;
     const tituloSeguro = titulo.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 
     win.document.write(`
@@ -81,6 +85,7 @@ const imprimirCanvas = (dataUrl: string, titulo: string, win: Window) => {
             <head>
                 <title>Imprimir - ${tituloSeguro}</title>
                 <style>
+                    @page { size: ${pageSize}; margin: 0; }
                     body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; background: #333; }
                     img { max-width: 100%; height: auto; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
                     @media print {
