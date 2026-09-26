@@ -1,5 +1,6 @@
 "use client";
 import Link from 'next/link';
+import { InnovaFooter } from '@/components/marketing/InnovaFooter';
 import { NeonPhone } from '@/components/marketing/NeonPhone';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, CheckCircle, Camera, Pencil, QrCode } from 'lucide-react';
@@ -83,6 +84,6 @@ export default function Home() {
                     </div>
                 </div>
             </section><p className="text-center text-slate-300 max-w-2xl mx-auto pb-12 px-6">La analítica avanzada y las cuotas de IA requieren activación del servicio. Consulta su disponibilidad antes de contratar.</p></div>
- <footer className="bg-black"><div className="studio-container flex flex-wrap justify-between gap-5 text-sm"><div className="flex items-center gap-4"><img src="/brand/innova-logo.png" alt="INNOVA AND DESIGN" width={112} height={112} className="rounded-xl"/><p>Escaparates Digitales</p></div><div className="flex gap-5"><Link href="/legal/privacidad">Privacidad</Link><Link href="/legal/terminos">Términos</Link><Link href="/dashboard?seccion=ayuda">Ayuda</Link></div></div></footer>
+ <InnovaFooter onCreate={manejarInicio}/>
  </main>;
 }

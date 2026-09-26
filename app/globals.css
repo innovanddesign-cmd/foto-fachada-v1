@@ -232,3 +232,20 @@ body {
 @media(max-width:700px){.innova-phone-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 24px}.innova-phone-heading{min-height:100px}.innova-phone-heading h3{font-size:18px}.innova-phone-hero{gap:22px}.innova-phone-hero .innova-phone-heading h3{font-size:16px}}
 @media(max-width:440px){.innova-phone-gallery{grid-template-columns:1fr}.innova-phone-gallery .innova-phone-example{max-width:300px;width:100%;margin:auto}}
 @media(prefers-reduced-motion:reduce){.innova-phone-blue,.innova-phone-green{animation:none}}
+
+.innova-footer{background:#000;color:#edf5ef;border-top:1px solid #173223}
+.innova-footer-invitation{display:flex;align-items:center;justify-content:space-between;gap:40px;padding:32px 0 56px;border-bottom:1px solid #253029}
+.innova-footer-invitation h2{font-size:clamp(30px,3.5vw,46px);line-height:1.12;letter-spacing:-.035em;font-weight:600;margin-top:16px}
+.innova-footer-invitation h2 span{color:#00ff9d}
+.innova-footer-columns{display:grid;grid-template-columns:1.35fr 1fr 1fr 1.3fr;gap:40px;padding:48px 0}
+.innova-footer-columns h3{font-size:14px;font-weight:600;margin:22px 0 0;color:#fff}
+.innova-footer-columns ul{list-style:none;padding:0;margin:16px 0 0}
+.innova-footer-columns li a,.innova-footer-columns li button,.innova-footer-link{display:inline-flex;gap:8px;align-items:center;min-height:44px;font-size:14px;color:#a9b8af;text-align:left;text-decoration:none}
+.innova-footer-email{display:flex;align-items:center;gap:10px;min-height:44px;font-size:13px;color:#00ff9d;margin-top:12px;overflow-wrap:anywhere}
+.innova-footer-email svg{flex-shrink:0}
+.innova-footer-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;border-top:1px solid #253029;padding-top:24px;font-size:12px;color:#a9b8af}
+.innova-footer-bottom a{display:inline-flex;align-items:center;min-height:44px}
+.innova-footer a:hover,.innova-footer-columns button:hover{color:#00ff9d}
+.innova-footer a:focus-visible,.innova-footer button:focus-visible{outline:2px solid #00ff9d;outline-offset:5px}
+@media(max-width:1050px){.innova-footer-columns{grid-template-columns:repeat(2,minmax(0,1fr))}.innova-footer-invitation{align-items:flex-start;flex-direction:column;gap:24px}}
+@media(max-width:540px){.innova-footer-columns{grid-template-columns:1fr;gap:20px;padding:32px 0}.innova-footer-invitation{padding:16px 0 32px}.innova-footer-columns h3{margin-top:12px}.innova-footer-bottom{flex-direction:column}}
