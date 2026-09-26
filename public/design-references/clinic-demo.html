@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DermaScience V2 - Edición Estándar</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+
+<style >
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .clinical-grid {
+            background-size: 20px 20px;
+            background-image: linear-gradient(to right, rgba(19, 127, 236, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(19, 127, 236, 0.05) 1px, transparent 1px);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  <link rel="stylesheet" href="./clinic-demo.css"></head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white">
+<div class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-[#dbe0e6] dark:border-white/10">
+<div class="flex items-center p-4 justify-between max-w-md mx-auto">
+<div class="text-[#111418] dark:text-white flex size-10 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</div>
+<h2 class="text-primary text-xl font-bold leading-tight tracking-tight flex-1 text-center uppercase">DermaScience</h2>
+<div class="flex w-10 items-center justify-end">
+<span class="material-symbols-outlined text-2xl">search</span>
+</div>
+</div>
+</div>
+<main class="max-w-md mx-auto bg-white dark:bg-background-dark min-h-screen shadow-2xl">
+<div class="@container">
+<div class="p-0">
+<div class="bg-cover bg-center flex flex-col justify-end overflow-hidden min-h-[380px] relative" style='background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 100%), url("./clinic-original-0.jpg");'>
+<div class="absolute top-6 left-6 border-l-2 border-primary pl-4">
+<span class="text-[10px] uppercase tracking-widest text-primary font-bold">Serie Clínica 02</span>
+</div>
+<div class="flex flex-col p-6 gap-2">
+<h1 class="text-[#111418] dark:text-white text-4xl font-bold leading-none tracking-tight">Dermatología<br/>de Precisión</h1>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-medium tracking-wide">VALIDACIÓN CLÍNICA FASE 4</p>
+</div>
+</div>
+</div>
+</div>
+<div class="px-4 py-6">
+<div class="flex flex-col gap-5 rounded-xl border border-[#dbe0e6] dark:border-white/10 bg-white dark:bg-white/5 p-6 shadow-sm">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">assignment_ind</span>
+<p class="text-primary text-xs font-bold uppercase tracking-widest">Solicitud de Diagnóstico</p>
+</div>
+<p class="text-[#111418] dark:text-white text-xl font-bold leading-tight">Análisis de Piel Avanzado</p>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal">Complete sus datos para una evaluación clínica personalizada por nuestros especialistas.</p>
+</div>
+<form class="flex flex-col gap-4">
+<div>
+<label class="block text-[10px] font-bold uppercase text-[#617589] mb-1 ml-1">Preocupación Principal</label>
+<select class="w-full h-11 bg-gray-50 dark:bg-white/5 border border-[#dbe0e6] dark:border-white/10 rounded px-3 text-sm focus:ring-primary focus:border-primary">
+<option>Acné y Textura</option>
+<option>Hiperpigmentación</option>
+<option>Líneas de Expresión</option>
+<option>Sensibilidad / Rosácea</option>
+</select>
+</div>
+<div>
+<label class="block text-[10px] font-bold uppercase text-[#617589] mb-1 ml-1">Tipo de Piel</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="h-10 text-[10px] font-bold border border-primary bg-primary/5 text-primary rounded uppercase" type="button">Seca</button>
+<button class="h-10 text-[10px] font-bold border border-[#dbe0e6] dark:border-white/10 text-[#617589] rounded uppercase" type="button">Mixta</button>
+<button class="h-10 text-[10px] font-bold border border-[#dbe0e6] dark:border-white/10 text-[#617589] rounded uppercase" type="button">Grasa</button>
+</div>
+</div>
+<button class="flex w-full items-center justify-center rounded bg-primary text-white h-12 gap-2 text-sm font-bold uppercase tracking-widest transition-all hover:opacity-90 mt-2" type="button">
+<span class="truncate">Iniciar Consulta</span>
+<span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</form>
+</div>
+</div>
+<div class="pt-8 pb-4 clinical-grid">
+<h2 class="text-[#111418] dark:text-white tracking-tight text-2xl font-bold px-6 border-l-4 border-primary">Resultados Científicos</h2>
+<p class="text-[#617589] dark:text-gray-400 text-sm font-normal px-6 pt-2">Evidencia clínica basada en estudios de alta frecuencia y corneometría.</p>
+</div>
+<div class="grid grid-cols-2 gap-4 px-4 py-4">
+<div class="border border-[#dbe0e6] dark:border-white/10 p-5 bg-white dark:bg-white/5 rounded-lg text-center">
+<p class="text-primary text-3xl font-bold tracking-tighter">98%</p>
+<p class="text-[#111418] dark:text-white text-[10px] font-bold uppercase tracking-wider mt-2">Éxito en Regeneración</p>
+<p class="text-[#617589] dark:text-gray-400 text-[9px] mt-1 italic">Nivel Celular</p>
+</div>
+<div class="border border-[#dbe0e6] dark:border-white/10 p-5 bg-white dark:bg-white/5 rounded-lg text-center">
+<p class="text-primary text-3xl font-bold tracking-tighter">-42%</p>
+<p class="text-[#111418] dark:text-white text-[10px] font-bold uppercase tracking-wider mt-2">Densidad de Melanina</p>
+<p class="text-[#617589] dark:text-gray-400 text-[9px] mt-1 italic">Post-Tratamiento</p>
+</div>
+</div>
+<div class="py-6">
+<div class="px-6 flex justify-between items-end mb-4">
+<h3 class="text-[#111418] dark:text-white text-lg font-bold">Elementos Activos</h3>
+<span class="text-primary text-[10px] font-bold uppercase border-b border-primary">Índice Completo</span>
+</div>
+<div class="flex overflow-x-auto gap-4 px-6 no-scrollbar pb-4">
+<div class="min-w-[140px] border border-[#dbe0e6] dark:border-white/10 p-4 rounded-lg">
+<span class="material-symbols-outlined text-primary mb-2">blur_on</span>
+<p class="text-[#111418] dark:text-white text-sm font-bold">HA-Bajo</p>
+<p class="text-[#617589] dark:text-gray-400 text-[10px]">Hidratación Profunda</p>
+</div>
+<div class="min-w-[140px] border border-[#dbe0e6] dark:border-white/10 p-4 rounded-lg">
+<span class="material-symbols-outlined text-primary mb-2">science</span>
+<p class="text-[#111418] dark:text-white text-sm font-bold">Matrixyl</p>
+<p class="text-[#617589] dark:text-gray-400 text-[10px]">Tecnología Péptida</p>
+</div>
+<div class="min-w-[140px] border border-[#dbe0e6] dark:border-white/10 p-4 rounded-lg">
+<span class="material-symbols-outlined text-primary mb-2">vital_signs</span>
+<p class="text-[#111418] dark:text-white text-sm font-bold">Retin-C</p>
+<p class="text-[#617589] dark:text-gray-400 text-[10px]">Acelerador Celular</p>
+</div>
+</div>
+</div>
+<div class="px-6 py-10 bg-[#f8f9fb] dark:bg-white/5">
+<h3 class="text-[#111418] dark:text-white text-xl font-bold mb-10">Protocolo Clínico</h3>
+<div class="relative flex flex-col gap-12"> 
+<div class="absolute left-[11px] top-0 bottom-0 w-[1px] bg-[#dbe0e6] dark:bg-white/20"></div>
+<div class="relative flex gap-8">
+<div class="z-10 size-[23px] rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold outline outline-4 outline-[#f8f9fb] dark:outline-[#1a242d]">01</div>
+<div class="flex-1">
+<p class="text-[#111418] dark:text-white text-sm font-bold uppercase tracking-wide">Macro-Análisis</p>
+<p class="text-[#617589] dark:text-gray-400 text-xs mt-1 leading-relaxed">Imagen multiespectral para detectar imperfecciones subdérmicas invisibles al ojo humano.</p>
+</div>
+</div>
+<div class="relative flex gap-8">
+<div class="z-10 size-[23px] rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold outline outline-4 outline-[#f8f9fb] dark:outline-[#1a242d]">02</div>
+<div class="flex-1">
+<p class="text-[#111418] dark:text-white text-sm font-bold uppercase tracking-wide">Síntesis Personalizada</p>
+<p class="text-[#617589] dark:text-gray-400 text-xs mt-1 leading-relaxed">Formulación de principios activos en nuestro laboratorio estéril según sus biomarcadores.</p>
+</div>
+</div>
+<div class="relative flex gap-8">
+<div class="z-10 size-[23px] rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold outline outline-4 outline-[#f8f9fb] dark:outline-[#1a242d]">03</div>
+<div class="flex-1">
+<p class="text-[#111418] dark:text-white text-sm font-bold uppercase tracking-wide">Evolución Controlada</p>
+<p class="text-[#617589] dark:text-gray-400 text-xs mt-1 leading-relaxed">Monitoreo continuo y ajuste del régimen cada ciclo celular de 28 días.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-[#111418] dark:text-white text-lg font-bold mb-5 uppercase tracking-tighter">Casos Clínicos #402</h3>
+<div class="flex gap-4 mb-5">
+<div class="flex-1 relative aspect-[4/5] bg-gray-200 overflow-hidden rounded-lg shadow-sm">
+<img alt="Antes" class="w-full h-full object-cover" src="./clinic-original-1.jpg"/>
+<div class="absolute top-0 left-0 bg-black/60 text-white text-[9px] font-bold px-3 py-1.5 m-2 rounded backdrop-blur-sm uppercase">Día 00</div>
+<div class="absolute bottom-0 w-full text-center py-2 bg-gradient-to-t from-black/50 to-transparent text-white text-[8px] uppercase font-bold">Antes</div>
+</div>
+<div class="flex-1 relative aspect-[4/5] bg-gray-200 overflow-hidden rounded-lg shadow-sm">
+<img alt="Después" class="w-full h-full object-cover" src="./clinic-original-2.jpg"/>
+<div class="absolute top-0 left-0 bg-primary/90 text-white text-[9px] font-bold px-3 py-1.5 m-2 rounded shadow-lg uppercase">Día 45</div>
+<div class="absolute bottom-0 w-full text-center py-2 bg-gradient-to-t from-primary/50 to-transparent text-white text-[8px] uppercase font-bold">Después</div>
+</div>
+</div>
+<div class="bg-gray-50 dark:bg-white/5 p-4 rounded-lg border-l-4 border-primary">
+<p class="text-[#617589] dark:text-gray-400 text-xs italic leading-snug">"Se midió una reducción del 67% en marcadores inflamatorios tras el protocolo de Síntesis DermaScience." — Observador Clínico</p>
+</div>
+</div>
+<div class="h-32"></div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 z-50 p-4 max-w-md mx-auto">
+<div class="bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border border-[#dbe0e6] dark:border-white/10 rounded-2xl p-3 shadow-2xl flex items-center justify-between">
+<div class="flex flex-col pl-3">
+<span class="text-[10px] text-[#617589] dark:text-gray-400 uppercase font-bold tracking-widest">Próxima Cita</span>
+<span class="text-sm font-bold text-[#111418] dark:text-white">Hoy, 16:30 PM</span>
+</div>
+<button class="bg-primary text-white px-5 h-12 rounded-xl font-bold text-sm uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+            Reservar
+            <span class="material-symbols-outlined text-sm">calendar_month</span>
+</button>
+</div>
+</div>
+
+</body></html>
