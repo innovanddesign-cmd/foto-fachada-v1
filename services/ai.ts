@@ -28,11 +28,12 @@ export const AIService = {
                     superficieGlass: "rgba(0,0,0,0.1)"
                 },
                 estiloTipografico: "SANS_GEOMETRICA",
-                ambiente: "Error Fallback",
-                analisisMarketing: "No se pudo conectar con el motor de IA. Por favor verifica tu conexión o API Key.",
+                ambiente: "Edición manual",
+                analisisMarketing: "La IA no está disponible. Completa el nombre y la categoría para crear tu escaparate con las mismas plantillas.",
                 logoExtraido: null,
                 publicoObjetivo: "Desconocido",
                 contextoMercado: "Sin datos",
+                analisisVision: {nombreSugerido:'Mi negocio',categoriaSugerida:'Comercio local',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true},
                 confianza: 0
             };
         }
@@ -137,3 +138,4 @@ export const AIService = {
         return escaparate;
     },
 };
+

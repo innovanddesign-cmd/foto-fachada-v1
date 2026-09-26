@@ -108,14 +108,7 @@ Reglas:
 - Idioma: ESPAÑOL`;
 
         // Modelos confirmados disponibles para esta API key (via /api/test-gemini)
-        const MODELOS_FALLBACK = [
-            "gemini-2.0-flash-lite",
-            "gemini-2.0-flash-lite-001",
-            "gemini-2.0-flash-001",
-            "gemini-2.0-flash",
-            "gemini-2.5-flash-lite",
-            "gemini-2.5-flash",
-        ];
+        const MODELOS_FALLBACK = [process.env.GEMINI_MODEL || 'gemini-3.8-flash', 'gemini-3.1-flash-lite'];
 
         let text = "";
         let modeloUsado = "";
@@ -143,7 +136,7 @@ Reglas:
 
         if (!text) {
             return NextResponse.json(
-                { error: "Cuota de API agotada en todos los modelos. Espera unos minutos e inténtalo de nuevo.", detalle: ultimoError },
+                { error: "El servicio de IA no está disponible ahora. Puedes continuar en modo manual.", detalle: "Los modelos configurados no han podido completar el análisis." },
                 { status: 429 }
             );
         }
@@ -220,3 +213,4 @@ Reglas:
         );
     }
 }
+

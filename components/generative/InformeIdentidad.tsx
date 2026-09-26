@@ -80,6 +80,8 @@ export default function InformeIdentidad({ adn, onConfirmar }: Props) {
             animate="visible"
             className="w-full max-w-6xl mx-auto space-y-12 pb-32 px-4"
         >
+            {adn.confianza===0&&<p role="status" className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-amber-200">Modo manual: la IA no ha podido analizar la imagen. Revisa los datos y continúa con las mismas plantillas de diseño.</p>}
+            <label className="block text-white text-sm">Categoría del negocio<input value={adn.analisisVision?.categoriaSugerida||''} onChange={e=>actualizarCampo('analisisVision.categoriaSugerida',e.target.value)} className="block mt-2 rounded-xl bg-white/10 border border-white/20 p-3 w-full" placeholder="Restaurante, peluquería, tienda…"/></label>
             {/* Cabecera */}
             <motion.header variants={itemVariants} className="text-center space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
@@ -309,3 +311,4 @@ export default function InformeIdentidad({ adn, onConfirmar }: Props) {
         </motion.div>
     );
 }
+

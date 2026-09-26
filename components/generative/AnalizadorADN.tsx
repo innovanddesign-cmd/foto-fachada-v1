@@ -10,6 +10,7 @@ import { AdnMarca } from "@/lib/estado/tipos-estado";
 
 export const AnalizadorADN = () => {
     const imagenSubida = useTiendaEstado((s) => s.imagenSubida);
+    const adnEditado = useTiendaEstado((s) => s.adnMarca);
     const completarAnalisis = useTiendaEstado((s) => s.completarAnalisis);
 
     const [error, setError] = useState<string | null>(null);
@@ -59,6 +60,7 @@ export const AnalizadorADN = () => {
                 }
 
                 if (isMounted) {
+                    useTiendaEstado.setState({adnMarca:adn});
                     setResultadoAdn(adn);
                     setAnalizado(true);
                 }
@@ -76,13 +78,14 @@ export const AnalizadorADN = () => {
 
     const manejarContinuar = async () => {
         if (!resultadoAdn) return;
+        const adnActual=useTiendaEstado.getState().adnMarca || resultadoAdn;
 
         try {
             // Generar escaparate basado en el ADN analizado
-            const escaparate = await AIService.generarEscaparate(resultadoAdn);
+            const escaparate = await AIService.generarEscaparate(adnActual);
 
             // Deducir estrategia de conversión
-            const cat = (resultadoAdn.analisisVision?.categoriaSugerida || "").toLowerCase();
+            const cat = (adnActual.analisisVision?.categoriaSugerida || "").toLowerCase();
             let estrategia: AdnMarca['estrategiaPrincipal'] = 'LEAD_MAGNET';
             if (cat.includes('restaurante') || cat.includes('gastro') || cat.includes('café') || cat.includes('bar')) {
                 estrategia = 'OFERTA_FLASH';
@@ -92,9 +95,9 @@ export const AnalizadorADN = () => {
 
             // Enriquecer ADN con estrategia y keywords
             const adnEnriquecido: AdnMarca = {
-                ...resultadoAdn,
+                ...adnActual,
                 estrategiaPrincipal: estrategia,
-                keywords: resultadoAdn.analisisVision?.objetosDetectados || [resultadoAdn.ambiente || "negocio"],
+                keywords: adnActual.analisisVision?.objetosDetectados || [adnActual.ambiente || "negocio"],
             };
 
             // Completar en Store Global (esto genera slug y avanza a ESCAPARATE)
@@ -123,7 +126,7 @@ export const AnalizadorADN = () => {
     if (analizado && resultadoAdn) {
         return (
             <InformeIdentidad
-                adn={resultadoAdn}
+                adn={adnEditado || resultadoAdn}
                 onConfirmar={manejarContinuar}
             />
         );
@@ -144,3 +147,4 @@ export const AnalizadorADN = () => {
         </div>
     );
 };
+
