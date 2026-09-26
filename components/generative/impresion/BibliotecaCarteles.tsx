@@ -181,7 +181,12 @@ export const BibliotecaCarteles = () => {
                                 >
                                     <div className="aspect-[3/4] bg-white/5 rounded-xl mb-4 overflow-hidden flex items-center justify-center border border-white/10">
                                         <div className="scale-[0.2] origin-center opacity-40 group-hover:opacity-100 transition-opacity">
-                                            <GeneradorCartel formato={cartel.formato} />
+                                            <GeneradorCartel
+                                                formato={cartel.formato}
+                                                containerId={`poster-thumb-${cartel.id}`}
+                                                configVisual={cartel.configVisual}
+                                                campana={cartel.campana}
+                                            />
                                         </div>
                                     </div>
 
@@ -193,9 +198,6 @@ export const BibliotecaCarteles = () => {
                                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button onClick={() => eliminarCartel(cartel.id)} className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg">
                                                 <Trash2 size={12} />
-                                            </button>
-                                            <button className="p-1.5 text-white/60 hover:bg-white/10 rounded-lg">
-                                                <Copy size={12} />
                                             </button>
                                         </div>
                                     </div>
@@ -222,7 +224,10 @@ export const BibliotecaCarteles = () => {
                             <p className="text-white/40 text-[10px] uppercase tracking-widest leading-relaxed mb-6">
                                 Exporta todos tus formatos A4, A5 y Square listos para imprenta y redes sociales en un solo archivo.
                             </p>
-                            <button className="w-full py-4 bg-white text-black font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-blue-50 transition-colors flex items-center justify-center gap-3">
+                            <button
+                                onClick={() => alert('Exportación ZIP profesional próximamente. Por ahora puedes exportar cada cartel individualmente en PNG o PDF.')}
+                                className="w-full py-4 bg-white text-black font-black text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-blue-50 transition-colors flex items-center justify-center gap-3"
+                            >
                                 <Download size={16} />
                                 Descargar ZIP Profesional
                             </button>

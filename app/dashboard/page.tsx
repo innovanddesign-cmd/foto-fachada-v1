@@ -43,7 +43,6 @@ export default function PaginaDashboard() {
 
     const iniciarNuevo = () => {
         accionesTienda.reiniciar();
-        localStorage.removeItem('foto-fachada-v2-semilla');
         router.push('/create');
     };
 

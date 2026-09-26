@@ -49,6 +49,13 @@ export const PreviewCartel = () => {
         const poster = document.getElementById('poster-container');
         if (!poster) return;
 
+        // Abrir ventana ANTES de la operación asíncrona para evitar popup blocker
+        const ventana = window.open('', '_blank');
+        if (!ventana) {
+            alert('El navegador bloqueó la ventana de impresión. Permite ventanas emergentes para este sitio.');
+            return;
+        }
+
         try {
             const canvas = await html2canvas(poster, {
                 scale: 3,
@@ -56,9 +63,6 @@ export const PreviewCartel = () => {
                 backgroundColor: null,
                 logging: false,
             });
-
-            const ventana = window.open('', '_blank');
-            if (!ventana) return;
 
             ventana.document.write(`
                 <!DOCTYPE html>
@@ -78,6 +82,8 @@ export const PreviewCartel = () => {
             };
         } catch (err) {
             console.error("Error imprimiendo:", err);
+            ventana.close();
+            alert('Error al generar la imagen para imprimir. Inténtalo de nuevo.');
         }
     };
 

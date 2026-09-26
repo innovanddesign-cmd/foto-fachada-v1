@@ -44,6 +44,7 @@ export interface CampañaUsuario {
     ultimaActualizacion: string; // ISO 8601
     urlPublica?: string;
     thumbnailUrl?: string;
+    snapshot?: any;
 }
 
 export interface DatosDashboard {
@@ -237,10 +238,13 @@ export interface CartelGenerado {
         mostrarIconos: boolean;
         filtroPapel: boolean;
     };
-    thumbnailUrl?: string; // Preview en base64 para la biblioteca
+    thumbnailUrl?: string;
+    // Preview en base64 para la biblioteca
 }
 
 export interface DatosEscaparate {
+    /** Visual tier; optional for compatibility with existing saved campaigns. */
+    planVisual?: 'FREE' | 'PRO' | 'ESCAPARATE';
     /** Titular principal */
     titularPrincipal: string;
 
@@ -504,3 +508,5 @@ export interface SemillaEstadoData {
     /** Última sincronización */
     ultimaSincronizacion: string; // ISO 8601
 }
+
+

@@ -1,0 +1,283 @@
+<html class="dark" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Elite Detail Pro V1</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .glass-nav {
+            background: rgba(16, 22, 34, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .before-after-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .comparison-slider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: white;
+            left: 50%;
+            cursor: ew-resize;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  <link rel="stylesheet" href="./detail.css"></head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white selection:bg-primary/30">
+<!-- Top Navigation -->
+<nav class="sticky top-0 z-50 glass-nav">
+<div class="flex items-center p-4 justify-between max-w-md mx-auto">
+<div class="text-white flex size-10 items-center justify-center">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<h2 class="text-white text-base font-extrabold tracking-tighter uppercase">Elite Detail Pro</h2>
+<div class="flex w-10 items-center justify-end">
+<button class="flex items-center justify-center rounded-full size-10 bg-primary/10 text-primary">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="max-w-md mx-auto pb-24">
+<!-- Hero Section -->
+<div class="@container">
+<div class="p-0">
+<div class="flex min-h-[560px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-end pb-12 px-6 text-center" data-alt="Luxury car with cinematic water beading detail" style="background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(16, 22, 34, 1) 95%), url(&quot;./detail-0.jpg&quot;);">
+<div class="flex flex-col gap-3">
+<span class="text-primary font-bold text-xs uppercase tracking-[0.2em]">Excellence in Motion</span>
+<h1 class="text-white text-4xl font-black leading-tight tracking-tight">
+                            The Art of Automotive Perfection
+                        </h1>
+<p class="text-silver text-sm font-medium leading-relaxed">
+                            Experience the ultimate in high-end car care, restoration, and ceramic protection.
+                        </p>
+</div>
+<div class="flex flex-col w-full gap-3 mt-4">
+<button class="flex w-full cursor-pointer items-center justify-center rounded-xl h-14 bg-primary text-white text-base font-bold tracking-wide shadow-lg shadow-primary/20">
+<span class="truncate">Book Appointment</span>
+</button>
+<button class="flex w-full cursor-pointer items-center justify-center rounded-xl h-14 bg-white/5 border border-white/10 text-white text-base font-bold tracking-wide backdrop-blur-sm">
+<span class="truncate">View Our Process</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Service Menu Header -->
+<div class="px-6 pt-10 pb-4">
+<h2 class="text-white text-2xl font-extrabold tracking-tight">Service Menu</h2>
+<p class="text-silver text-sm mt-1">Tiered packages for every level of care.</p>
+</div>
+<!-- Pricing Cards -->
+<div class="flex flex-col gap-4 px-6 py-3">
+<!-- Express -->
+<div class="flex flex-col gap-5 rounded-xl border border-white/5 bg-[#1c1f27] p-6 shadow-xl">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h3 class="text-silver text-xs font-bold uppercase tracking-widest">The Refresh</h3>
+<h2 class="text-white text-xl font-bold">Express</h2>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-white text-3xl font-black">$99</span>
+<span class="text-silver text-[10px] font-bold uppercase">Starting At</span>
+</div>
+</div>
+<div class="h-px bg-white/5 w-full"></div>
+<div class="flex flex-col gap-3">
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Hand Foam Wash &amp; Dry
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Deep Wheel &amp; Tire Clean
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Interior Vacuum &amp; Dust
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Hydrated SiO2 Spray Wax
+                    </div>
+</div>
+<button class="w-full rounded-lg h-12 bg-white/5 border border-white/10 text-white text-sm font-bold mt-2">
+                    Select Express
+                </button>
+</div>
+<!-- Premium (Featured) -->
+<div class="flex flex-col gap-5 rounded-xl border-2 border-primary bg-[#1c1f27] p-6 shadow-2xl relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-primary text-white text-[10px] font-black px-4 py-1 rounded-bl-lg uppercase tracking-tighter">Most Popular</div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h3 class="text-primary text-xs font-bold uppercase tracking-widest">The Correction</h3>
+<h2 class="text-white text-xl font-bold">Premium</h2>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-white text-3xl font-black">$249</span>
+<span class="text-silver text-[10px] font-bold uppercase">Starting At</span>
+</div>
+</div>
+<div class="h-px bg-white/10 w-full"></div>
+<div class="flex flex-col gap-3">
+<div class="text-sm font-medium flex gap-3 text-white">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Single Stage Paint Correction
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-white">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Clay Bar Decontamination
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-white">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Steam Interior Deep Clean
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-white">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        6-Month Polish Protection
+                    </div>
+</div>
+<button class="w-full rounded-lg h-12 bg-primary text-white text-sm font-bold mt-2">
+                    Book Premium
+                </button>
+</div>
+<!-- Concours -->
+<div class="flex flex-col gap-5 rounded-xl border border-white/5 bg-[#1c1f27] p-6 shadow-xl">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h3 class="text-silver text-xs font-bold uppercase tracking-widest">The Ultimate</h3>
+<h2 class="text-white text-xl font-bold">Concours</h2>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-white text-3xl font-black">$599</span>
+<span class="text-silver text-[10px] font-bold uppercase">Starting At</span>
+</div>
+</div>
+<div class="h-px bg-white/5 w-full"></div>
+<div class="flex flex-col gap-3">
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Multi-Stage Paint Restoration
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Ceramic Coating (3-Year)
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Engine Bay Restoration
+                    </div>
+<div class="text-sm font-medium flex gap-3 text-silver">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                        Leather Conditioning Pro
+                    </div>
+</div>
+<button class="w-full rounded-lg h-12 bg-white/5 border border-white/10 text-white text-sm font-bold mt-2">
+                    Select Concours
+                </button>
+</div>
+</div>
+<!-- Before & After Section -->
+<div class="px-6 pt-12 pb-4">
+<h2 class="text-white text-2xl font-extrabold tracking-tight">Before &amp; After</h2>
+<p class="text-silver text-sm mt-1">Witness the transformation results.</p>
+</div>
+<div class="px-6 mb-10">
+<div class="before-after-container rounded-xl aspect-[4/3] bg-background-dark border border-white/10 relative">
+<img class="absolute inset-0 w-full h-full object-cover grayscale brightness-50" data-alt="Dull scratched car paint before detailing" src="./detail-1.jpg">
+<div class="absolute inset-0 w-1/2 overflow-hidden border-r-2 border-white pointer-events-none">
+<img class="absolute inset-0 w-[400px] h-full object-cover max-w-none" data-alt="Mirror-like reflective car paint after detailing" src="./detail-2.jpg">
+</div>
+<div class="comparison-slider flex items-center justify-center">
+<div class="size-8 rounded-full bg-white text-primary flex items-center justify-center shadow-xl">
+<span class="material-symbols-outlined font-bold text-sm">unfold_more_double</span>
+</div>
+</div>
+<div class="absolute bottom-4 left-4 bg-black/60 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">Before</div>
+<div class="absolute bottom-4 right-4 bg-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">After</div>
+</div>
+</div>
+<!-- Professional Process -->
+<div class="px-6 py-10 bg-white/5 border-y border-white/5">
+<h2 class="text-white text-xl font-extrabold tracking-tight mb-8 text-center uppercase tracking-widest">Our Elite Process</h2>
+<div class="space-y-8 relative">
+<div class="absolute left-4 top-0 bottom-0 w-px bg-white/10"></div>
+<div class="flex gap-6 relative">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center z-10 shadow-[0_0_15px_rgba(19,91,236,0.5)]">
+<span class="material-symbols-outlined text-sm">water_drop</span>
+</div>
+<div>
+<h4 class="text-white font-bold text-base">Chemical Decontamination</h4>
+<p class="text-silver text-xs mt-1">Iron fallout removal and deep surface cleansing to ensure a pure bonding surface.</p>
+</div>
+</div>
+<div class="flex gap-6 relative">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center z-10 shadow-[0_0_15px_rgba(19,91,236,0.5)]">
+<span class="material-symbols-outlined text-sm">precision_manufacturing</span>
+</div>
+<div>
+<h4 class="text-white font-bold text-base">Precision Correction</h4>
+<p class="text-silver text-xs mt-1">Multi-stage machine polishing to eliminate swirls, scratches, and oxidation.</p>
+</div>
+</div>
+<div class="flex gap-6 relative">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center z-10 shadow-[0_0_15px_rgba(19,91,236,0.5)]">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+</div>
+<div>
+<h4 class="text-white font-bold text-base">Ceramic Shield</h4>
+<p class="text-silver text-xs mt-1">Application of ultra-hydrophobic nanocoatings for years of gloss and protection.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Final CTA -->
+<div class="p-8 text-center">
+<h3 class="text-2xl font-black mb-4">Ready for Perfection?</h3>
+<p class="text-silver text-sm mb-8 px-4">Secure your spot in our detailing studio. Spots fill up 2 weeks in advance.</p>
+<button class="bg-primary text-white px-10 py-4 rounded-xl font-bold shadow-lg shadow-primary/20">
+                Check Availability
+            </button>
+</div>
+<!-- Footer Info -->
+<footer class="p-8 text-center border-t border-white/5">
+<p class="text-silver text-[10px] uppercase tracking-[0.2em] font-bold">Elite Detail Pro © 2024</p>
+<div class="flex justify-center gap-4 mt-4 text-silver">
+<span class="material-symbols-outlined text-xl">camera_outdoor</span>
+<span class="material-symbols-outlined text-xl">share</span>
+<span class="material-symbols-outlined text-xl">mail</span>
+</div>
+</footer>
+</main>
+<!-- Bottom Mobile Tab Bar (iOS Feel) -->
+<div class="fixed bottom-0 left-0 right-0 z-50 glass-nav h-20 px-6 flex items-center justify-between max-w-md mx-auto rounded-t-2xl border-t border-white/10">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-silver">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="text-[10px] font-bold uppercase">Services</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-silver">
+<span class="material-symbols-outlined">photo_library</span>
+<span class="text-[10px] font-bold uppercase">Gallery</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-silver">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-bold uppercase">Find Us</span>
+</button>
+</div>
+</body></html>

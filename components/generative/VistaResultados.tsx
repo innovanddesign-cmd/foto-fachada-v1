@@ -5,6 +5,8 @@ import { AdnMarca } from "@/lib/estado/tipos-estado";
 import { useTiendaEstado } from "@/store/useTiendaEstado";
 import { PieChart, Palette as PaletteIcon, Type, Target, Info, Sparkles, Building2, Printer } from "lucide-react";
 import { MotorEscaparate } from "./MotorEscaparate";
+import { SelectorPlanVisual } from './SelectorPlanVisual';
+import {RemoteSyncPanel} from '@/components/dashboard/RemoteSyncPanel';
 import { SmartphoneMockup } from "@/components/ui/SmartphoneMockup";
 
 interface Props {
@@ -34,6 +36,7 @@ export const VistaResultados = ({ adn, onContinuar, onReiniciar }: Props) => {
                 </p>
             </div>
 
+            <SelectorPlanVisual /><RemoteSyncPanel />
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
 
                 {/* Panel Izquierdo: Análisis Strategico (7 Cols) */}
@@ -213,3 +216,4 @@ export const VistaResultados = ({ adn, onContinuar, onReiniciar }: Props) => {
         </motion.div>
     );
 };
+

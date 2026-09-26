@@ -1,46 +1,22 @@
 "use client";
+import { useEffect, useState } from 'react';
+import { buildLandingDocument } from '@/lib/design/render';
 
-import { SmartphoneMockup } from "@/components/ui/SmartphoneMockup";
-import { useState } from "react";
-
-export default function TestMockupPage() {
-    const [isGenerating, setIsGenerating] = useState(false);
-
-    return (
-        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-10">
-            <div className="mb-4 flex gap-4">
-                <button
-                    onClick={() => setIsGenerating(!isGenerating)}
-                    className="px-4 py-2 bg-emerald-500 rounded text-black font-bold"
-                >
-                    Toggle Regenerate ({isGenerating ? 'ON' : 'OFF'})
-                </button>
-            </div>
-
-            <SmartphoneMockup isGenerating={isGenerating}>
-                <div className="p-8 space-y-8 bg-white dark:bg-black min-h-[120vh]">
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-                        Brand Storefront
-                    </h1>
-                    <section className="h-64 bg-slate-100 rounded-2xl p-4 shadow-sm">
-                        <h2 className="text-xl font-bold mb-2">Hero Section</h2>
-                        <p className="text-slate-500">Scroll down to test rubber banding...</p>
-                    </section>
-
-                    <section className="space-y-4">
-                        {[1, 2, 3, 4, 5].map(i => (
-                            <div key={i} className="h-40 bg-slate-50 border border-slate-200 rounded-xl p-4">
-                                Item {i}
-                            </div>
-                        ))}
-                    </section>
-
-                    <footer className="p-8 bg-slate-900 text-white rounded-xl text-center">
-                        Final Footer
-                        <p className="text-xs mt-2 text-slate-400">Keep scrolling for haptic squash!</p>
-                    </footer>
-                </div>
-            </SmartphoneMockup>
-        </div>
-    );
+const examples: Record<string, {name:string;category:string;template:string;plan:string}> = {
+ dining: {name:'Pure Modern Dining',category:'Restaurante mediterráneo',template:'dining',plan:'ESCAPARATE'},
+ sofia: {name:'Sofia Lopardo',category:'Moda y estilo',template:'sofia',plan:'PRO'},
+ salamandra: {name:'La Salamandra',category:'Parrilla y brasas',template:'salamandra',plan:'FREE'},
+ belleza: {name:'Belleza Lux',category:'Belleza y bienestar',template:'belleza',plan:'PRO'},
+ detail: {name:'Elite Detail Pro',category:'Cuidado del automóvil',template:'detail',plan:'ESCAPARATE'},
+};
+export default function DesignDemo() {
+ const [html,setHtml]=useState(''); const [error,setError]=useState(false);
+ useEffect(()=>{
+  let active=true;
+  const selected=examples[new URLSearchParams(window.location.search).get('demo')||'dining']||examples.dining;
+  buildLandingDocument({business:{name:selected.name,category:selected.category,plan:selected.plan},content:{templateId:selected.template,title:selected.name,subtitle:selected.category,sections:[{type:'text',title:'Una experiencia con personalidad',text:'Diseño de referencia para visualizar la identidad de tu negocio.'},{type:'cta',text:'Conocer el negocio',url:'#contacto'}]},preview:true}).then(value=>{if(active)setHtml(value)}).catch(()=>{if(active)setError(true)});
+  return()=>{active=false};
+ },[]);
+ if(error)return <main className="p-8 text-white">No se ha podido cargar el diseño. <button onClick={()=>window.location.reload()}>Reintentar</button></main>;
+ return <main className="min-h-screen bg-slate-950">{html?<iframe title="Ejemplo de escaparate INNOVA" srcDoc={html} sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" className="block h-screen w-full border-0"/>:<p className="p-8 text-white" role="status">Cargando diseño…</p>}</main>;
 }

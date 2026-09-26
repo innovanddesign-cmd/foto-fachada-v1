@@ -70,14 +70,14 @@ export const AIService = {
 
         // Generar ofertas desde servicios detectados
         const ofertas = servicios.length > 0
-            ? servicios.slice(0, 3).map((s, i) => ({
+            ? servicios.slice(0, 3).map((s) => ({
                 titulo: s,
-                precio: i === 0 ? "Consultar" : `Desde €${(15 + i * 10).toFixed(0)}`,
+                precio: "Consultar",
                 descripcion: `${s} profesional con los mejores estándares.`
             }))
             : [
                 { titulo: "Servicio Destacado", precio: "Consultar", descripcion: "Nuestro servicio más solicitado." },
-                { titulo: "Pack Premium", precio: "Desde €49", descripcion: "La experiencia completa." }
+                { titulo: "Pack Premium", precio: "Consultar", descripcion: "La experiencia completa." }
             ];
 
         // Generar secciones dinámicas

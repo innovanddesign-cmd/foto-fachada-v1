@@ -1,0 +1,19 @@
+        .sl-container { position: relative; width: 100%; height: 100%; min-height: 100%; display: flex; flex-direction: column; font-family: 'DM Sans', sans-serif; overflow: hidden; }
+        .sl-bg { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0; }
+        .sl-overlay { position: absolute; inset: 0; z-index: 1; }
+        .sl-grad-top { position: absolute; top: 0; left: 0; right: 0; height: 42%; background: linear-gradient(to bottom, rgba(0,0,0,0.44) 0%, transparent 100%); z-index: 1; pointer-events: none; }
+        .sl-grad-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 52%; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.65) 100%); z-index: 1; pointer-events: none; }
+        .sl-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 22%, rgba(0,0,0,0.5) 100%); z-index: 2; pointer-events: none; }
+        .sl-content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; padding: 0 16px; height: 100%; }
+        .sl-logo-area { padding-top: 50px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .sl-biz-name { font-family: 'Playfair Display', serif; font-weight: 700; color: #fff; letter-spacing: 3px; text-align: center; line-height: 1.05; text-shadow: 0 3px 20px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.5); white-space: pre-line; }
+        .sl-biz-subtitle { font-family: 'Cormorant Garamond', serif; font-weight: 500; margin-top: 8px; letter-spacing: 2px; text-align: center; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5); font-size: 10px; color: #fff; }
+        .sl-biz-subtitle.big { font-size: 13px; font-weight: 400; letter-spacing: 4px; }
+        .sl-spacer { flex: 1; }
+        .sl-buttons-area { width: 100%; padding-bottom: 24px; }
+        .sl-btn-primary { display: block; width: 100%; padding: 14px 16px; border: none; border-radius: 6px; text-align: center; text-decoration: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: #1a1000; letter-spacing: 2px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .sl-btn-primary:hover { transform: translateY(-2px); }
+        .sl-btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+        .sl-btn-secondary { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 12px 4px; background: rgba(255,255,255,0.07); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; text-decoration: none; min-height: 80px; transition: all 0.2s; }
+        .sl-btn-secondary:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .sl-btn-label { font-family: 'DM Sans', sans-serif; font-size: 8px; font-weight: 700; color: #fff; letter-spacing: 1px; text-align: center; line-height: 1.2; white-space: pre-line; text-transform: uppercase; }

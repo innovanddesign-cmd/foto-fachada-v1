@@ -1,0 +1,10 @@
+.work
+OPENCODE-*
+conversaciones
+_legacy_v1
+src-backup-v3
+*.docx
+*.bak
+*.log
+.env*
+tsconfig.tsbuildinfo

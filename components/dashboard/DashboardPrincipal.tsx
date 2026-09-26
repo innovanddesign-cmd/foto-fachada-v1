@@ -1,12 +1,15 @@
 "use client";
+import {saveCampaignRemote,publishCampaign,unpublishCampaign} from '@/lib/supabase/persistence';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTiendaEstado } from '@/store/useTiendaEstado';
 import { calcularResumenGlobal } from '@/lib/campañas/GestionCampañas';
 import { AnillosActividad } from './AnillosActividad';
 import { TarjetaCampaña } from './TarjetaCampaña';
 import { PanelOptimizadorIA } from './PanelOptimizadorIA';
+import { RemoteSyncPanel } from './RemoteSyncPanel';
 import { BotonMagnetico } from '@/components/ui/BotonMagnetico';
 import { Plus, Sparkles, BarChart3, ArrowLeft } from 'lucide-react';
 import type { CampañaUsuario } from '@/lib/estado/tipos-estado';
@@ -17,6 +20,7 @@ import type { CampañaUsuario } from '@/lib/estado/tipos-estado';
  * Campañas persisten en el store entre sesiones del flujo de creación.
  */
 export const DashboardPrincipal = () => {
+    const router = useRouter();
     const establecerPaso = useTiendaEstado((s) => s.establecerPaso);
     const campañas = useTiendaEstado((s) => s.campañas);
     const eliminarCampaña = useTiendaEstado((s) => s.eliminarCampaña);
@@ -33,6 +37,7 @@ export const DashboardPrincipal = () => {
 
     const handleNuevaCampaña = () => {
         establecerPaso('CAPTURA');
+        router.push('/create');
     };
 
     const handleConfirmarEliminar = () => {
@@ -121,6 +126,11 @@ export const DashboardPrincipal = () => {
                     </section>
                 )}
 
+                {/* Sync en la Nube */}
+                <section>
+                    <RemoteSyncPanel />
+                </section>
+
                 {/* Grid de Campañas */}
                 <section className="space-y-6">
                     <div className="flex items-center justify-between">
@@ -147,10 +157,54 @@ export const DashboardPrincipal = () => {
                                         <TarjetaCampaña
                                             campaña={campaña}
                                             onVerWeb={() => campaña.urlPublica && window.open(campaña.urlPublica, '_blank')}
-                                            onEditar={() => establecerPaso('CONFIGURACION')}
+                                            onDescargarCartel={() => {
+                                                // Cargar snapshot y navegar a cartelería
+                                                const snapshot = (campaña as any).snapshot;
+                                                if (snapshot) {
+                                                    useTiendaEstado.setState({
+                                                        adnMarca: snapshot.adnMarca || null,
+                                                        datosEscaparate: snapshot.datosEscaparate || null,
+                                                        imagenSubida: snapshot.imagenSubida || null,
+                                                        slug: campaña.idEscaparate || snapshot.slug || null,
+                                                        galeriaActivos: snapshot.galeriaActivos || [],
+                                                        redesSociales: snapshot.redesSociales || {},
+                                                        pasoActual: 'CARTELERIA',
+                                                    });
+                                                } else {
+                                                    establecerPaso('CARTELERIA');
+                                                }
+                                                router.push('/create');
+                                            }}
+                                            onEditar={() => {
+                                                // Cargar snapshot de la campaña en el store y navegar al editor
+                                                const snapshot = (campaña as any).snapshot;
+                                                if (snapshot) {
+                                                    useTiendaEstado.setState({
+                                                        adnMarca: snapshot.adnMarca || null,
+                                                        datosEscaparate: snapshot.datosEscaparate || null,
+                                                        imagenSubida: snapshot.imagenSubida || null,
+                                                        slug: campaña.idEscaparate || snapshot.slug || null,
+                                                        galeriaActivos: snapshot.galeriaActivos || [],
+                                                        redesSociales: snapshot.redesSociales || {},
+                                                        pasoActual: 'CONFIGURACION',
+                                                    });
+                                                } else {
+                                                    // Sin snapshot, solo navegar al editor
+                                                    establecerPaso('CONFIGURACION');
+                                                }
+                                                router.push('/create');
+                                            }}
                                             onEliminar={() => setModalEliminar(campaña)}
                                             onDuplicar={() => handleAbrirDuplicar(campaña)}
-                                            onCambiarEstado={(estado) => cambiarEstadoCampaña(campaña.id, estado)}
+                                            onCambiarEstado={async (estado) => {
+ const snapshot=campaña.snapshot;
+ if(!snapshot?.datosEscaparate){alert('Abre y guarda el escaparate antes de publicarlo.');return;}
+ const saved=await saveCampaignRemote({id:campaña.id,localId:campaña.id,name:campaña.nombreCampaña,slug:campaña.idEscaparate,status:'draft',snapshot,plan:snapshot.datosEscaparate.planVisual||'PRO'});
+ if(!saved.success){alert(saved.error);return;}
+ const result=estado==='EN_LINEA'?await publishCampaign(saved.data.id,campaña.idEscaparate):await unpublishCampaign(saved.data.id);
+ if(!result.success){alert(result.error);return;}
+ cambiarEstadoCampaña(campaña.id,estado);window.location.reload();
+}}
                                         />
                                     </motion.div>
                                 ))}
@@ -289,3 +343,4 @@ const Modal = ({ children, onCerrar }: { children: React.ReactNode; onCerrar: ()
         </motion.div>
     </motion.div>
 );
+

@@ -1,0 +1,3 @@
+"use client";
+import {useTiendaEstado} from '@/store/useTiendaEstado';
+export function SelectorPlanVisual(){const datos=useTiendaEstado(s=>s.datosEscaparate);const actualizar=useTiendaEstado(s=>s.regenerarEscaparate);if(!datos)return null;return <fieldset className="flex flex-wrap justify-center gap-2 rounded-2xl border border-white/10 p-4"><legend className="px-2 text-sm text-white/70">Diseño del escaparate</legend>{(['FREE','PRO','ESCAPARATE'] as const).map(plan=><button key={plan} type="button" aria-pressed={(datos.planVisual||'PRO')===plan} onClick={()=>actualizar({...datos,planVisual:plan})} className={((datos.planVisual||'PRO')===plan?'bg-white text-black':'bg-white/10 text-white')+' rounded-xl px-5 py-3 text-sm font-bold'}>{plan}</button>)}</fieldset>}

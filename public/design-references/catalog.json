@@ -1,0 +1,185 @@
+{
+  "premium": {
+    "detail": {
+      "source": "Lavadero - elite_detail_pro_v1_code.html",
+      "images": [
+        "detail-0.jpg",
+        "detail-1.jpg",
+        "detail-2.jpg"
+      ]
+    },
+    "clinic": {
+      "source": "Estetica - dermascience_clinic_v2_code.html",
+      "images": [
+        "clinic-0.jpg",
+        "clinic-1.jpg",
+        "clinic-2.jpg"
+      ]
+    },
+    "dining": {
+      "source": "Restaurante - pure_modern_dining_v4_code.html",
+      "images": [
+        "dining-0.jpg",
+        "dining-1.jpg",
+        "dining-2.jpg",
+        "dining-3.jpg",
+        "dining-4.jpg",
+        "dining-5.jpg",
+        "dining-6.jpg",
+        "dining-7.jpg"
+      ]
+    }
+  },
+  "simple": {
+    "salamandra": {
+      "id": "salamandra",
+      "name": "LA\nSALAMANDRA",
+      "subtitle": "PARRILLA & BRASAS",
+      "subtitleBig": false,
+      "bgImage": "salamandra.jpg",
+      "accent": "#c9a45c",
+      "overlay": "rgba(12,6,0,0.55)",
+      "primary": {
+        "label": "VER MENÚ",
+        "url": "#"
+      },
+      "buttons": [
+        {
+          "label": "RESERVAS",
+          "icon": "phone",
+          "url": "tel:+34696460494"
+        },
+        {
+          "label": "DÓNDE\nESTAMOS",
+          "icon": "pin",
+          "url": "#"
+        },
+        {
+          "label": "TU\nRESEÑA",
+          "icon": "star",
+          "url": "#"
+        }
+      ]
+    },
+    "sofia": {
+      "id": "sofia",
+      "name": "SOFIA\nLOPARDO",
+      "subtitle": "MODA & ESTILO",
+      "subtitleBig": false,
+      "bgImage": "sofia.jpg",
+      "accent": "#c9a45c",
+      "overlay": "rgba(18,10,6,0.55)",
+      "primary": {
+        "label": "NUESTRA TIENDA",
+        "url": "#"
+      },
+      "buttons": [
+        {
+          "label": "INSTAGRAM",
+          "icon": "camera",
+          "url": "#"
+        },
+        {
+          "label": "LLÁMANOS",
+          "icon": "phone",
+          "url": "#"
+        },
+        {
+          "label": "EMAIL",
+          "icon": "mail",
+          "url": "#"
+        }
+      ]
+    },
+    "mango": {
+      "id": "mango",
+      "name": "MANGO\nMANÍA",
+      "subtitle": "FRUTAS TROPICALES · BENIDORM",
+      "subtitleBig": false,
+      "bgImage": "mango.jpg",
+      "accent": "#e8a832",
+      "overlay": "rgba(4,14,4,0.55)",
+      "primary": {
+        "label": "HAZ TU PEDIDO",
+        "url": "#"
+      },
+      "buttons": [
+        {
+          "label": "INSTAGRAM",
+          "icon": "camera",
+          "url": "#"
+        },
+        {
+          "label": "DÓNDE\nESTAMOS",
+          "icon": "pin",
+          "url": "#"
+        },
+        {
+          "label": "WHATSAPP",
+          "icon": "phone",
+          "url": "#"
+        }
+      ]
+    },
+    "quinchuqui": {
+      "id": "quinchuqui",
+      "name": "QUINCHUQUI",
+      "subtitle": "SABORES DE ECUADOR",
+      "subtitleBig": false,
+      "bgImage": "quinchuqui.jpg",
+      "accent": "#c9a45c",
+      "overlay": "rgba(8,4,16,0.55)",
+      "primary": {
+        "label": "DÓNDE ESTAMOS",
+        "url": "#"
+      },
+      "buttons": [
+        {
+          "label": "LLÁMANOS",
+          "icon": "phone",
+          "url": "#"
+        },
+        {
+          "label": "TU\nRESEÑA",
+          "icon": "star",
+          "url": "#"
+        },
+        {
+          "label": "EMAIL",
+          "icon": "mail",
+          "url": "#"
+        }
+      ]
+    },
+    "belleza": {
+      "id": "bellezalux",
+      "name": "BELLEZA\nLUX",
+      "subtitle": "CENTRO DE BELLEZA & BIENESTAR",
+      "subtitleBig": false,
+      "bgImage": "belleza.jpg",
+      "accent": "#c9a45c",
+      "overlay": "rgba(12,6,10,0.55)",
+      "primary": {
+        "label": "NUESTROS SERVICIOS",
+        "url": "#"
+      },
+      "buttons": [
+        {
+          "label": "DÓNDE\nESTAMOS",
+          "icon": "pin",
+          "url": "#"
+        },
+        {
+          "label": "GALERÍA",
+          "icon": "camera",
+          "url": "#"
+        },
+        {
+          "label": "NUESTRA\nWEB",
+          "icon": "globe",
+          "url": "#"
+        }
+      ]
+    }
+  }
+}

@@ -124,17 +124,25 @@ export function crearCampañaDesdeEstadoActual(nombrePersonalizado?: string): Ca
     const nombreFinal = nombrePersonalizado
         || `${nombreNegocio} — ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`;
 
-    const nuevaCampaña: CampañaUsuario = {
+    const nuevaCampaña: CampañaUsuario & { snapshot?: any } = {
         id: `camp_${Date.now()}`,
         nombreCampaña: nombreFinal,
         idEscaparate: slug || `esc_${Date.now()}`,
         idCartel: cartelesGenerados.length > 0 ? cartelesGenerados[0].id : null,
         estado: 'BORRADOR',
-        metricas: generarMetricasSimuladas(categoria),
+        metricas: { visitas: 0, conversiones: 0, escaneos: 0, ratioConversion: 0, puntajeSaludMarca: 0, tendencia: 'ESTABLE' },
         fechaCreacion: ahora,
         ultimaActualizacion: ahora,
         urlPublica: slug ? `/v/${slug}` : undefined,
-        thumbnailUrl: undefined
+        thumbnailUrl: undefined,
+        snapshot: {
+            adnMarca,
+            datosEscaparate,
+            imagenSubida: store.imagenSubida,
+            slug,
+            galeriaActivos: store.galeriaActivos,
+            redesSociales: store.redesSociales,
+        },
     };
 
     return nuevaCampaña;
@@ -201,3 +209,4 @@ export function useDatosDashboard(): DatosDashboard {
         resumenGlobal: calcularResumenGlobal(campañas)
     };
 }
+

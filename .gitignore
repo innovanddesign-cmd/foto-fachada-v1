@@ -46,3 +46,9 @@ dist/
 
 # Production
 build/.next/
+
+# Local development sessions and deployment metadata
+.work/
+.vercel/
+OPENCODE-*.txt
+OPENCODE-*.md

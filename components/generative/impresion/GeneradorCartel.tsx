@@ -16,6 +16,8 @@ interface Props {
         mostrarIconos: boolean;
         filtroPapel: boolean;
     };
+    /** ID único del contenedor del cartel (para evitar colisiones) */
+    containerId?: string;
 }
 
 /**
@@ -25,7 +27,8 @@ interface Props {
 export const GeneradorCartel = ({
     formato = 'A4',
     campana,
-    configVisual
+    configVisual,
+    containerId = 'poster-container'
 }: Props) => {
     const adn = useTiendaEstado((s) => s.adnMarca);
     const imagenSubida = useTiendaEstado((s) => s.imagenSubida);
@@ -60,12 +63,13 @@ export const GeneradorCartel = ({
     };
 
     // URL de tracking QR: redirige a /t/[slug] que registra el escaneo y luego redirige a /v/[slug]
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://foto-fachada.app';
-    const urlLanzamiento = `${baseUrl}/t/${slug || 'demo'}`;
+    const urlLanzamiento = `${baseUrl}${basePath}/t/${slug || 'demo'}`;
 
     return (
         <div
-            id="poster-container"
+            id={containerId}
             style={posterStyle}
             className={`select-none transition-all duration-500 ${configVisual?.filtroPapel ? 'paper-texture' : ''}`}
         >

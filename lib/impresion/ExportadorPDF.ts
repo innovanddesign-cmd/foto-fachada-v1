@@ -20,8 +20,13 @@ interface ExportConfig {
 export const exportarCartel = async (elementId: string, config: ExportConfig) => {
     const elemento = document.getElementById(elementId);
     if (!elemento) {
-        console.error(`[Exportador] Elemento ${elementId} no encontrado.`);
-        return;
+        throw new Error('No se encuentra el cartel que quieres exportar.');
+    }
+
+    // Open during the user's click, before canvas rendering yields to the browser.
+    const ventana = config.formato === 'PDF' ? window.open('', '_blank') : null;
+    if (config.formato === 'PDF' && !ventana) {
+        throw new Error('Permite ventanas emergentes para imprimir o guardar el PDF.');
     }
 
     try {
@@ -48,7 +53,7 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
         if (config.formato === 'PDF') {
             // Nota: Integración con jsPDF se realizaría aquí. 
             // Como fallback profesional, abrimos el diálogo de impresión con el canvas.
-            imprimirCanvas(dataUrl, config.nombreArchivo);
+            imprimirCanvas(dataUrl, config.nombreArchivo, ventana!);
         } else {
             const link = document.createElement('a');
             link.download = `${config.nombreArchivo}.${config.formato.toLowerCase()}`;
@@ -58,6 +63,7 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
 
         return dataUrl;
     } catch (err) {
+        ventana?.close();
         console.error("[Exportador] Error fatal en la generación:", err);
         throw err;
     }
@@ -65,15 +71,15 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
 
 /**
  * Fallback de impresión profesional.
+ * Abre ventana antes de operación asíncrona para evitar popup blocker.
  */
-const imprimirCanvas = (dataUrl: string, titulo: string) => {
-    const win = window.open('', '_blank');
-    if (!win) return;
+const imprimirCanvas = (dataUrl: string, titulo: string, win: Window) => {
+    const tituloSeguro = titulo.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 
     win.document.write(`
         <html>
             <head>
-                <title>Imprimir - ${titulo}</title>
+                <title>Imprimir - ${tituloSeguro}</title>
                 <style>
                     body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; background: #333; }
                     img { max-width: 100%; height: auto; box-shadow: 0 0 50px rgba(0,0,0,0.5); }

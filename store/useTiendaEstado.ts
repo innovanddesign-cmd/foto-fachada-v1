@@ -390,7 +390,7 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
             if (!original) return;
 
             const ahora = new Date().toISOString();
-            const copia: CampañaUsuario = {
+            const copia: CampañaUsuario & { snapshot?: any } = {
                 ...original,
                 id: `camp_${Date.now()}`,
                 nombreCampaña: nuevoNombre,
@@ -398,6 +398,7 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
                 fechaCreacion: ahora,
                 ultimaActualizacion: ahora,
                 metricas: { ...original.metricas, visitas: 0, conversiones: 0, escaneos: 0 },
+                snapshot: (original as any).snapshot ? { ...((original as any).snapshot || {}) } : undefined,
             };
 
             const nuevasCampañas = [...anterior.campañas, copia];
@@ -474,68 +475,46 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
         },
 
         cargarPorSlug: async (slug: string) => {
-            // Simulación de carga desde base de datos / localStorage
             console.log(`[Store] Intentando cargar negocio: ${slug}`);
 
-            // 1. Intentar cargar desde localStorage primero (persistencia actual)
+            // 1. Cargar desde localStorage
             const estadoGuardado = cargarEstadoInicial();
 
-            // 2. Lógica de Fallback / Demo
-            if (slug === 'mi-negocio-test' || !estadoGuardado) {
-                // Si es el slug de test o no hay nada guardado, cargamos una semilla de demo
-                const demoAdn: AdnMarca = {
-                    paletaColores: {
-                        primario: "#0ea5e9", // Sky 500
-                        secundario: "#6366f1", // Indigo 500
-                        acento: "#f43f5e", // Rose 500
-                        fondo: "#050505",
-                        superficieGlass: "rgba(255, 255, 255, 0.05)"
-                    },
-                    estiloTipografico: "SANS_GEOMETRICA",
-                    ambiente: "Minimalista, Tecnológico, Acogedor",
-                    analisisMarketing: "Enfoque en tecnología Aero-Glass.",
-                    logoExtraido: null,
-                    publicoObjetivo: "Jóvenes profesionales",
-                    contextoMercado: "Cafetería de especialidad",
-                    confianza: 95
-                };
-
-                const demoEscaparate: DatosEscaparate = {
-                    titularPrincipal: "Experiencia Gourmet en cada Sorbo",
-                    subtitulo: "Cafetería de especialidad con tecnología Aero-Glass.",
-                    disenoSeleccionado: "heroe-dividido",
-                    ofertas: [
-                        { titulo: "Café Especial", precio: "$5.00", descripcion: "Grano seleccionado" }
-                    ],
-                    secciones: [
-                        {
-                            id: "galeria-1",
-                            tipo: "Bento",
-                            variante: "Glass",
-                            contenido: {
-                                titulo: "Nuestras Especialidades",
-                                elementos: []
-                            }
-                        }
-                    ]
-                };
-
+            // 2. Si hay estado guardado Y su slug coincide, cargarlo
+            if (estadoGuardado && estadoGuardado.slug === slug) {
                 set({
-                    adnMarca: demoAdn,
-                    datosEscaparate: demoEscaparate,
-                    pasoActual: 'ESCAPARATE',
+                    ...estadoGuardado,
+                    pasoActual: 'DESPLIEGUE',
                     ultimaModificacion: obtenerMarcaTiempo()
                 });
                 return;
             }
 
-            // 3. Si hay estado guardado, lo aplicamos
-            if (estadoGuardado) {
-                set({
-                    ...estadoGuardado,
-                    ultimaModificacion: obtenerMarcaTiempo()
-                });
+            // 3. Buscar en campañas guardadas por slug
+            const campañasGuardadas = estadoGuardado?.campañas || [];
+            const campañaEncontrada = campañasGuardadas.find(c => c.idEscaparate === slug);
+
+            if (campañaEncontrada) {
+                // Cargar snapshot de la campaña si existe
+                const snapshot = (campañaEncontrada as any).snapshot;
+                if (snapshot) {
+                    set({
+                        adnMarca: snapshot.adnMarca || null,
+                        datosEscaparate: snapshot.datosEscaparate || null,
+                        imagenSubida: snapshot.imagenSubida || null,
+                        slug: slug,
+                        galeriaActivos: snapshot.galeriaActivos || [],
+                        redesSociales: snapshot.redesSociales || {},
+                        pasoActual: 'DESPLIEGUE',
+                        ultimaModificacion: obtenerMarcaTiempo()
+                    });
+                    return;
+                }
             }
+
+            // 4. Si no hay nada para este slug, no cargar datos ficticios
+            // Dejar el estado vacío para que la página muestre "no encontrado"
+            console.log(`[Store] No se encontró negocio para slug: ${slug}`);
         }
     };
 });
