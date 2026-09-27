@@ -24,8 +24,8 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  <link rel="stylesheet" href="./detail-demo.css"></head>
-<body class="bg-background-light dark:bg-background-dark font-display text-white selection:bg-primary/30">
+  <link rel="stylesheet" href="./detail-demo.css"><link rel="stylesheet" href="./legacy-responsive.css"></head>
+<body class="legacy-page legacy-detail bg-background-light dark:bg-background-dark font-display text-white selection:bg-primary/30"><p class="legacy-note">Ejemplo de diseño · Contenido ilustrativo · Las acciones no envían reservas.</p>
 <nav class="sticky top-0 z-50 glass-nav">
 <div class="flex items-center p-4 justify-between max-w-md mx-auto">
 <div class="text-white flex size-10 items-center justify-center">
@@ -67,7 +67,7 @@
 <h2 class="text-white text-2xl font-extrabold tracking-tight">Menú de Servicios</h2>
 <p class="text-silver text-sm mt-1">Paquetes diseñados para cada nivel de cuidado.</p>
 </div>
-<div class="flex flex-col gap-6 px-6 py-3">
+<div class="legacy-services flex flex-col gap-6 px-6 py-3">
 <div class="flex flex-col gap-4 rounded-xl border border-white/5 bg-[#1c1f27] p-5 shadow-xl">
 <div class="flex justify-between items-start">
 <div class="flex flex-col">
@@ -256,4 +256,4 @@
 </button>
 </div>
 
-</body></html>
+<dialog id="legacy-demo-notice" class="legacy-dialog" aria-labelledby="legacy-demo-title"><h2 id="legacy-demo-title">Estás explorando una demo</h2><p>Esta acción se conectará al servicio del negocio en su web final. No se ha enviado ninguna reserva ni consulta.</p><form method="dialog"><button>Cerrar y seguir explorando</button></form></dialog><script src="./legacy-demo.js"></script></body></html>

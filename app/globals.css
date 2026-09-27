@@ -208,7 +208,7 @@ body {
 /* Phone silhouettes and cyan/green neon from the original INNOVA gallery. */
 .innova-phone-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:48px 28px;padding:24px 8px;background:radial-gradient(ellipse at 50% 40%,#15203455,transparent 70%)}
 .innova-phone-example{min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center}
-.innova-phone-heading{min-height:106px;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:24px;width:100%}
+.innova-phone-heading{min-height:136px;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:24px;width:100%}
 .innova-phone-heading h3{margin:0;font-size:clamp(17px,1.7vw,25px);font-weight:700;line-height:1.2;text-transform:uppercase;letter-spacing:-.025em;color:#f5f6ff}
 .innova-phone-heading p{margin:8px 0 0;color:#398bff;font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:700}
 .innova-phone{display:block;position:relative;width:100%;max-width:300px;aspect-ratio:900/1900;border-radius:16%/7.58%;background:#000;box-shadow:0 25px 45px #0008;isolation:isolate}
@@ -227,8 +227,8 @@ body {
 .innova-phone-hero .innova-phone-heading{min-height:85px}
 @keyframes innova-neon-orbit{to{stroke-dashoffset:-100}}
 @keyframes innova-neon-orbit-green{to{stroke-dashoffset:-50}}
-@media(min-width:1440px){.innova-phone-gallery{grid-template-columns:repeat(5,minmax(0,1fr))}#ejemplos.studio-container{max-width:1700px}}
-@media(max-width:1023px){.innova-phone-gallery{grid-template-columns:repeat(3,minmax(0,1fr))}.innova-phone-hero{max-width:620px;width:100%;margin:auto}}
+@media(min-width:1440px){#ejemplos.studio-container{max-width:1440px}}
+@media(max-width:1023px){.innova-phone-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.innova-phone-hero{max-width:620px;width:100%;margin:auto}}
 @media(max-width:700px){.innova-phone-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 24px}.innova-phone-heading{min-height:100px}.innova-phone-heading h3{font-size:18px}.innova-phone-hero{gap:22px}.innova-phone-hero .innova-phone-heading h3{font-size:16px}}
 @media(max-width:440px){.innova-phone-gallery{grid-template-columns:1fr}.innova-phone-gallery .innova-phone-example{max-width:300px;width:100%;margin:auto}}
 @media(prefers-reduced-motion:reduce){.innova-phone-blue,.innova-phone-green{animation:none}}

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PureZen - Escaparate de ejemplo</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass-effect {
+            background: rgba(20, 33, 17, 0.85);
+        }
+        .organic-shadow {
+            box-shadow: 0 10px 30px -5px rgba(57, 201, 29, 0.08);
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .demo-dialog {
+            max-width: 340px;
+            border: 1px solid rgba(57, 201, 29, 0.35);
+            border-radius: 18px;
+            padding: 24px;
+            background: #f6f8f6;
+            color: #121711;
+            font-family: 'Manrope', sans-serif;
+        }
+        .demo-dialog::backdrop { background: rgba(18, 23, 17, 0.7); }
+        .demo-dialog h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .demo-dialog p { font-size: 14px; color: #5b6a58; margin-bottom: 18px; line-height: 1.6; }
+        .demo-dialog button {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 14px;
+            background: #39c91d;
+            color: #121711;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .demo-dialog button:focus-visible { outline: 3px solid #121711; outline-offset: 3px; }
+    </style>
+  <link rel="stylesheet" href="./purezen.css"><link rel="stylesheet" href="./demo-polish.css"></head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#121711] dark:text-white transition-colors duration-300">
+<nav class="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-black/5 dark:border-white/5" aria-label="Cabecera del escaparate">
+<div class="flex items-center p-4 justify-between mx-auto w-full max-w-md sm:max-w-xl lg:max-w-4xl">
+<div class="text-[#121711] dark:text-white flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+<span class="material-symbols-outlined" aria-hidden="true">menu</span>
+</div>
+<h2 class="text-[#121711] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">PureZen</h2>
+<div class="flex w-10 items-center justify-end">
+<button type="button" aria-haspopup="dialog" aria-label="Abrir cuenta" class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-[#121711] dark:text-white cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="pt-20 pb-32 mx-auto w-full max-w-md sm:max-w-xl lg:max-w-4xl">
+<section class="px-5 mb-12">
+<div class="relative flex items-end justify-center bg-[#121711] rounded-2xl overflow-hidden aspect-[4/5] sm:aspect-[3/2] lg:aspect-[2/1] organic-shadow" style="background-image: url('./purezen-0.png'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+<div class="relative z-10 p-6 w-full">
+<span class="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-full uppercase tracking-widest">Vive la Calma</span>
+<h1 class="text-white text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mt-2">Un Santuario para tu Piel</h1>
+</div>
+</div>
+</section>
+<section class="mb-14 text-center px-6">
+<h2 class="text-[#121711] dark:text-white tracking-tight text-[30px] lg:text-5xl font-extrabold leading-tight">Donde la Naturaleza se une a la Ciencia</h2>
+<p class="text-sage dark:text-primary/70 text-base lg:text-lg font-medium leading-relaxed mt-4">
+                Experimenta un enfoque holístico de la belleza con nuestros tratamientos de inspiración Zen, combinando sabiduría botánica y precisión moderna.
+            </p>
+</section>
+<section class="px-5 mb-16 space-y-12 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
+<div class="flex flex-col gap-4">
+<div class="w-full aspect-video rounded-2xl overflow-hidden organic-shadow" style="background-image: url('./purezen-1.png'); background-size: cover; background-position: center;"></div>
+<div>
+<h3 class="text-xl font-bold dark:text-white mb-2">Botánica Pura</h3>
+<p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Utilizamos extractos naturales cuidadosamente seleccionados por sus propiedades regenerativas y calmantes, respetando el equilibrio natural de tu piel.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="w-full aspect-video rounded-2xl overflow-hidden organic-shadow" style="background-image: url('./purezen-2.png'); background-size: cover; background-position: center;"></div>
+<div>
+<h3 class="text-xl font-bold dark:text-white mb-2">Precisión Clínica</h3>
+<p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Respaldamos nuestra filosofía con tecnología de vanguardia y activos moleculares de alta eficacia para resultados visibles y duraderos.</p>
+</div>
+</div>
+</section>
+<section class="mb-16 px-5">
+<div class="flex items-center justify-between mb-6 gap-3">
+<h2 class="text-2xl font-bold dark:text-white">Tratamientos Zen</h2>
+<button type="button" aria-haspopup="dialog" class="text-primary font-bold text-sm cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">Ver todos</button>
+</div>
+<div class="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+<div class="bg-white dark:bg-background-dark/50 p-4 rounded-2xl organic-shadow flex gap-4 border border-primary/5">
+<div class="size-20 shrink-0 rounded-xl overflow-hidden" style="background-image: url('./purezen-3.png'); background-size: cover;"></div>
+<div class="flex flex-col justify-center">
+<h4 class="font-bold text-base dark:text-white leading-tight">Rejuvenecimiento Orgánico</h4>
+<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">90 Min • Peeling Botánico</p>
+<span class="text-primary font-bold mt-1">120€</span>
+</div>
+</div>
+<div class="bg-white dark:bg-background-dark/50 p-4 rounded-2xl organic-shadow flex gap-4 border border-primary/5">
+<div class="size-20 shrink-0 rounded-xl overflow-hidden" style="background-image: url('./purezen-4.png'); background-size: cover;"></div>
+<div class="flex flex-col justify-center">
+<h4 class="font-bold text-base dark:text-white leading-tight">Hidratación Molecular</h4>
+<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">60 Min • Infusión de Hialurónico</p>
+<span class="text-primary font-bold mt-1">95€</span>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-8 px-5">
+<h2 class="text-2xl font-bold dark:text-white mb-6">Diario de Bienestar</h2>
+<div class="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+<div class="flex items-center gap-4 bg-warm-wood/10 dark:bg-primary/5 p-3 rounded-xl">
+<div class="size-16 rounded-lg shrink-0" style="background-image: url('./purezen-0.png'); background-size: cover;"></div>
+<div>
+<span class="text-[10px] font-bold text-sage dark:text-primary uppercase tracking-widest">Mindfulness</span>
+<h3 class="font-bold text-sm leading-snug dark:text-white">Rituales para una piel radiante</h3>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-warm-wood/10 dark:bg-primary/5 p-3 rounded-xl">
+<div class="size-16 rounded-lg shrink-0" style="background-image: url('./purezen-1.png'); background-size: cover;"></div>
+<div>
+<span class="text-[10px] font-bold text-sage dark:text-primary uppercase tracking-widest">Botánica</span>
+<h3 class="font-bold text-sm leading-snug dark:text-white">5 plantas que sanan tu piel</h3>
+</div>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed bottom-0 left-0 right-0 p-5 glass-effect border-t border-black/5 dark:border-white/5 z-50">
+<div class="mx-auto w-full max-w-md sm:max-w-xl lg:max-w-4xl flex gap-3">
+<button type="button" aria-haspopup="dialog" class="flex-1 cursor-pointer items-center justify-center rounded-2xl h-[56px] px-6 bg-primary text-[#121711] text-base font-bold leading-normal tracking-[0.015em] organic-shadow active:scale-95 transition-transform" onclick="document.getElementById('demo-notice').showModal()">
+<span class="truncate">Agendar Consulta</span>
+</button>
+<button type="button" aria-haspopup="dialog" aria-label="Abrir chat" class="flex size-[56px] shrink-0 items-center justify-center rounded-2xl bg-background-light dark:bg-background-dark border-2 border-primary/20 text-primary active:scale-95 transition-transform cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">chat_bubble</span>
+</button>
+</div>
+</div>
+<dialog id="demo-notice" class="demo-dialog" aria-labelledby="demo-notice-title">
+<h2 id="demo-notice-title">Ejemplo de diseño</h2>
+<p>Escaparate de demostración: la cita no se envía a ningún destino. En tu web, esta acción abrirá tu canal real de reservas.</p>
+<form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+</dialog>
+
+</body></html>

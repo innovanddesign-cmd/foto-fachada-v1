@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HogarFamiliar - Escaparate de ejemplo</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100dvh;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        .demo-dialog {
+            max-width: 340px;
+            border: 1px solid rgba(238, 124, 43, 0.45);
+            border-radius: 20px;
+            padding: 24px;
+            background: #fffdfb;
+            color: #221810;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .demo-dialog::backdrop { background: rgba(34, 24, 16, 0.68); }
+        .demo-dialog h2 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .demo-dialog p { font-size: 14px; color: #897261; margin-bottom: 18px; line-height: 1.6; }
+        .demo-dialog button {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 9999px;
+            background: #ee7c2b;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .demo-dialog button:focus-visible { outline: 3px solid #221810; outline-offset: 3px; }
+    </style>
+  <link rel="stylesheet" href="./familyfirst.css"><link rel="stylesheet" href="./demo-polish.css"></head>
+<body class="bg-background-light dark:bg-background-dark text-[#181411] dark:text-white transition-colors duration-300">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<nav class="sticky top-0 z-50 flex bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-[#e6e0db]/30 dark:border-white/10" aria-label="Cabecera del escaparate">
+<div class="mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-5xl flex items-center px-4 py-3 justify-between gap-3">
+<div class="text-primary flex size-10 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined text-3xl" aria-hidden="true">home</span>
+</div>
+<h2 class="text-[#181411] dark:text-white text-lg font-extrabold leading-tight tracking-[-0.015em] flex-1 text-center font-display uppercase tracking-widest">HogarFamiliar</h2>
+<div class="flex w-10 items-center justify-end">
+<button type="button" aria-haspopup="dialog" aria-label="Abrir perfil" class="flex items-center justify-center rounded-full h-10 w-10 bg-primary/10 text-primary cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<div class="mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-5xl">
+<div class="px-0 sm:px-4 pt-0 sm:pt-4">
+<div class="flex min-h-[380px] lg:min-h-[470px] flex-col gap-6 bg-cover bg-center bg-no-repeat sm:rounded-2xl items-center justify-center p-6 text-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.6) 100%), url('./familyfirst-0.png');">
+<div class="flex flex-col gap-3 max-w-lg">
+<h1 class="text-white text-3xl font-extrabold leading-tight tracking-[-0.033em] sm:text-4xl lg:text-5xl">
+                        Encuentra tu hogar familiar
+                    </h1>
+<p class="text-white/90 text-sm font-medium leading-normal sm:text-base px-4 lg:px-0">
+                        La forma más inteligente de buscar colegios y zonas seguras para tus hijos.
+                    </p>
+</div>
+<label class="flex flex-col w-full max-w-[480px]">
+<span class="sr-only">Barrio o distrito escolar</span>
+<div class="flex w-full h-14 items-stretch rounded-full bg-white shadow-xl overflow-hidden">
+<div class="text-[#897261] flex items-center justify-center pl-5">
+<span class="material-symbols-outlined" aria-hidden="true">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-0 bg-white focus:ring-0 h-full placeholder:text-[#897261] px-3 text-sm font-medium" placeholder="Barrio o distrito escolar"/>
+<div class="flex items-center justify-center pr-2">
+<button type="button" aria-haspopup="dialog" class="flex min-w-[84px] h-10 px-5 items-center justify-center rounded-full bg-primary text-white text-sm font-bold tracking-wide hover:brightness-110 transition-all cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span>Buscar</span>
+</button>
+</div>
+</div>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between px-4 pb-2 pt-8">
+<h2 class="text-[#181411] dark:text-white text-xl font-bold tracking-tight">Filtros familiares</h2>
+<button type="button" aria-haspopup="dialog" class="text-primary text-xs font-bold uppercase tracking-wider cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">Limpiar</button>
+</div>
+<div class="flex gap-3 p-4 overflow-x-auto no-scrollbar lg:flex-wrap lg:overflow-visible">
+<button type="button" aria-haspopup="dialog" class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary text-white px-5 shadow-sm cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-lg" aria-hidden="true">school</span>
+<p class="text-sm font-semibold whitespace-nowrap">Colegios cercanos</p>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#322820] border border-[#e6e0db] dark:border-white/10 px-5 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-lg text-primary" aria-hidden="true">security</span>
+<p class="text-[#181411] dark:text-white text-sm font-semibold whitespace-nowrap">Zonas seguras</p>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#322820] border border-[#e6e0db] dark:border-white/10 px-5 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-lg text-primary" aria-hidden="true">park</span>
+<p class="text-[#181411] dark:text-white text-sm font-semibold whitespace-nowrap">Parques</p>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-[#322820] border border-[#e6e0db] dark:border-white/10 px-5 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-lg text-primary" aria-hidden="true">yard</span>
+<p class="text-[#181411] dark:text-white text-sm font-semibold whitespace-nowrap">Patio grande</p>
+</button>
+</div>
+<div class="px-4 pb-3 pt-4">
+<h2 class="text-[#181411] dark:text-white text-xl font-bold tracking-tight">Recomendado para ti</h2>
+<p class="text-[#897261] dark:text-gray-400 text-sm">Seleccionado por tamaño y necesidades</p>
+</div>
+<div class="px-4 mb-8">
+<div class="bg-white dark:bg-[#322820] rounded-2xl overflow-hidden shadow-sm border border-[#e6e0db]/50 dark:border-white/5 lg:flex lg:items-stretch">
+<div class="relative h-64 w-full lg:h-auto lg:w-1/2 lg:min-h-[360px]">
+<img alt="Finca familiar con jardín" class="h-full w-full object-cover" src="./familyfirst-1.png"/>
+<div class="absolute top-3 left-3 bg-white/95 dark:bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-primary text-base font-bold" aria-hidden="true">school</span>
+<span class="text-xs font-bold text-[#181411] dark:text-white">Calificación escolar: 9.8/10</span>
+</div>
+<button type="button" aria-haspopup="dialog" aria-label="Guardar en favoritos" class="absolute top-3 right-3 bg-white/95 dark:bg-black/80 h-9 w-9 rounded-full flex items-center justify-center text-primary shadow-sm cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined" aria-hidden="true">favorite</span>
+</button>
+</div>
+<div class="p-5 lg:w-1/2 lg:flex lg:flex-col lg:justify-center">
+<div class="flex justify-between items-start mb-3 gap-3">
+<div class="flex-1 pr-2">
+<h3 class="text-lg font-bold text-[#181411] dark:text-white leading-tight">Finca Familiar Maplewood</h3>
+<p class="text-[#897261] dark:text-gray-400 text-sm mt-1">452 Oak Lane, Sunnyvale</p>
+</div>
+<div class="text-right">
+<p class="text-primary text-xl font-extrabold leading-none">$849,000</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4 py-4 border-y border-[#e6e0db]/30 dark:border-white/10">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-xl" aria-hidden="true">bed</span>
+<span class="text-sm font-semibold">4 Hab.</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-xl" aria-hidden="true">bathtub</span>
+<span class="text-sm font-semibold">3 Baños</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-xl" aria-hidden="true">straighten</span>
+<span class="text-sm font-semibold">260 m²</span>
+</div>
+</div>
+<div class="mt-5 grid grid-cols-2 gap-3">
+<div class="bg-[#fcfaf8] dark:bg-[#221810] p-3 rounded-xl border border-[#e6e0db]/20">
+<p class="text-[10px] uppercase font-bold text-[#897261] mb-1.5">Puntos de seguridad</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-500 text-lg" aria-hidden="true">verified</span>
+<span class="font-bold text-sm">Excelente</span>
+</div>
+</div>
+<div class="bg-[#fcfaf8] dark:bg-[#221810] p-3 rounded-xl border border-[#e6e0db]/20">
+<p class="text-[10px] uppercase font-bold text-[#897261] mb-1.5">Zonas Verdes</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" aria-hidden="true">potted_plant</span>
+<span class="font-bold text-sm">3 Parques</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[#f4f2f0] dark:bg-[#1a140f] py-8 px-4 sm:rounded-3xl sm:mx-4">
+<h2 class="text-[#181411] dark:text-white text-xl font-bold tracking-tight mb-5">Guías del barrio</h2>
+<div class="flex gap-4 overflow-x-auto no-scrollbar pb-2 lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0">
+<div class="min-w-[280px] flex-1 bg-white dark:bg-[#322820] p-5 rounded-2xl shadow-sm border border-[#e6e0db]/50 dark:border-white/5 lg:min-w-0">
+<div class="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">calendar_month</span>
+</div>
+<h4 class="font-bold text-[#181411] dark:text-white mb-2 leading-tight">Calendario de eventos</h4>
+<p class="text-xs text-[#897261] dark:text-gray-400 leading-relaxed mb-5">Lista actualizada de mercadillos, ferias y actividades en los parques locales.</p>
+<button type="button" aria-haspopup="dialog" class="text-primary text-sm font-bold flex items-center gap-1.5 hover:underline cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+                        Ver actividades <span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span>
+</button>
+</div>
+<div class="min-w-[280px] flex-1 bg-white dark:bg-[#322820] p-5 rounded-2xl shadow-sm border border-[#e6e0db]/50 dark:border-white/5 lg:min-w-0">
+<div class="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">local_library</span>
+</div>
+<h4 class="font-bold text-[#181411] dark:text-white mb-2 leading-tight">Información de colegios</h4>
+<p class="text-xs text-[#897261] dark:text-gray-400 leading-relaxed mb-5">Artículos sobre los mejores centros educativos, extraescolares y valoraciones.</p>
+<button type="button" aria-haspopup="dialog" class="text-primary text-sm font-bold flex items-center gap-1.5 hover:underline cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+                        Leer guía <span class="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="px-4 py-8">
+<div class="flex justify-between items-end mb-5 gap-3">
+<div>
+<h2 class="text-[#181411] dark:text-white text-xl font-bold tracking-tight">Mapa del barrio</h2>
+<p class="text-[#897261] dark:text-gray-400 text-sm">Distrito escolar de Sunnyvale</p>
+</div>
+<button type="button" aria-haspopup="dialog" class="h-10 px-5 rounded-full bg-white dark:bg-[#322820] border border-[#e6e0db] dark:border-white/10 text-xs font-bold uppercase tracking-wider cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">Ampliar</button>
+</div>
+<div class="relative h-56 lg:h-80 w-full rounded-2xl overflow-hidden shadow-inner bg-gray-100 dark:bg-gray-800">
+<div class="absolute inset-0 bg-cover bg-center opacity-80" style="background-image: url('./familyfirst-2.png');"></div>
+<div class="absolute top-1/2 left-1/3 bg-primary text-white p-1.5 rounded-full shadow-lg ring-2 ring-white">
+<span class="material-symbols-outlined text-base" aria-hidden="true">school</span>
+</div>
+<div class="absolute bottom-1/3 right-1/4 bg-green-500 text-white p-1.5 rounded-full shadow-lg ring-2 ring-white">
+<span class="material-symbols-outlined text-base" aria-hidden="true">park</span>
+</div>
+<div class="absolute top-1/4 right-1/2 bg-blue-500 text-white p-1.5 rounded-full shadow-lg ring-2 ring-white">
+<span class="material-symbols-outlined text-base" aria-hidden="true">home</span>
+</div>
+</div>
+</div>
+<div class="mx-4 mb-28 p-5 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/20 flex items-center gap-5">
+<div class="relative h-16 w-16 shrink-0">
+<img alt="Agente inmobiliario" class="h-full w-full object-cover rounded-full border-2 border-white shadow-sm" src="./familyfirst-3.png"/>
+<div class="absolute -bottom-0.5 -right-0.5 bg-green-500 border-2 border-white dark:border-[#221810] h-4 w-4 rounded-full"></div>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-[#181411] dark:text-white">Daniel Martínez</h4>
+<p class="text-xs text-[#897261] dark:text-gray-400 mb-2.5">Experto en zonas familiares</p>
+<button type="button" aria-haspopup="dialog" class="bg-primary text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-sm active:scale-95 transition-transform cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">Hablar con experto</button>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-[#e6e0db]/40 dark:border-white/10 pt-3 pb-8 z-50" aria-label="Navegación principal del escaparate">
+<div class="mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-5xl px-6 flex justify-between items-center">
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1 text-primary cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">explore</span>
+<span class="text-[10px] font-bold">Descubrir</span>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1 text-[#897261] dark:text-gray-400 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">favorite</span>
+<span class="text-[10px] font-bold">Guardados</span>
+</button>
+<div class="relative -top-10">
+<button type="button" aria-haspopup="dialog" aria-label="Crear" class="bg-primary text-white h-14 w-14 rounded-full shadow-xl shadow-primary/40 flex items-center justify-center border-4 border-background-light dark:border-background-dark cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-3xl" aria-hidden="true">add</span>
+</button>
+</div>
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1 text-[#897261] dark:text-gray-400 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">forum</span>
+<span class="text-[10px] font-bold">Mensajes</span>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1 text-[#897261] dark:text-gray-400 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined text-2xl" aria-hidden="true">person</span>
+<span class="text-[10px] font-bold">Perfil</span>
+</button>
+</div>
+</div>
+</div>
+<dialog id="demo-notice" class="demo-dialog" aria-labelledby="demo-notice-title">
+<h2 id="demo-notice-title">Ejemplo de diseño</h2>
+<p>Escaparate de demostración: ningún botón envía datos ni realiza reservas. En tu web, esta acción abrirá el enlace real de tu negocio.</p>
+<form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+</dialog>
+
+</body></html>

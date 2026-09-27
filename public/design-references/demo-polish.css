@@ -1,0 +1,5 @@
+html{scroll-behavior:smooth}h2[id]{scroll-margin-top:100px}button{min-width:44px;min-height:44px;touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid currentColor;outline-offset:4px}img{max-width:100%}.demo-dialog{width:calc(100% - 32px);max-width:400px}.demo-dialog p{line-height:1.6}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.text-sage{color:#526b4e}
+
+[data-demo="elite"] .text-primary{color:#7faaff}

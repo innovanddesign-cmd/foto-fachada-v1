@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aura Luxe - Escaparate de ejemplo</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Newsreader', serif;
+            min-height: max(884px, 100dvh);
+        }
+        .sans-text {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .demo-dialog {
+            max-width: 340px;
+            border: 1px solid rgba(228, 63, 88, 0.4);
+            border-radius: 16px;
+            padding: 24px;
+            background: #fffafa;
+            color: #171112;
+            font-family: ui-sans-serif, system-ui, sans-serif;
+        }
+        .demo-dialog::backdrop { background: rgba(26, 13, 15, 0.7); }
+        .demo-dialog h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .demo-dialog p { font-size: 14px; color: #6d5b5e; margin-bottom: 18px; line-height: 1.6; }
+        .demo-dialog button {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 9999px;
+            background: #e43f58;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            cursor: pointer;
+        }
+        .demo-dialog button:focus-visible { outline: 3px solid #171112; outline-offset: 3px; }
+    </style>
+  <link rel="stylesheet" href="./aura-luxe.css"><link rel="stylesheet" href="./demo-polish.css"></head>
+<body class="bg-background-light dark:bg-background-dark text-[#171112] dark:text-white">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<header class="sticky top-0 z-50 flex bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md px-4 sm:px-6 py-4 border-b border-primary/10" aria-label="Cabecera del escaparate">
+<div class="mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-5xl flex items-center justify-between gap-3">
+<div class="text-[#171112] dark:text-white flex size-10 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined" aria-hidden="true">menu</span>
+</div>
+<h2 class="text-[#171112] dark:text-white text-xl font-bold leading-tight flex-1 text-center font-display uppercase tracking-widest">Aura Luxe</h2>
+<div class="flex w-10 items-center justify-end">
+<button type="button" aria-haspopup="dialog" aria-label="Abrir cuenta" class="flex cursor-pointer items-center justify-center rounded-lg h-10 bg-transparent text-[#171112] dark:text-white p-0" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<div class="mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-5xl">
+<div class="@container">
+<div class="px-4 sm:px-6 py-4">
+<div class="flex min-h-[520px] lg:min-h-[600px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-2xl items-center justify-center p-6 lg:p-12 relative overflow-hidden text-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.75) 100%), url('./aura-luxe-0.png');">
+<div class="flex flex-col gap-4 max-w-2xl relative z-10">
+<h1 class="text-white text-4xl sm:text-5xl lg:text-6xl font-display italic leading-[1.1]">
+                        Belleza Atemporal, <br/>Perfección Clínica
+                    </h1>
+<p class="text-white/95 text-base font-normal leading-relaxed sans-text tracking-wide px-2 lg:px-0">
+                        Descubre el máximo exponente en medicina estética dentro de un santuario de exclusividad y bienestar.
+                    </p>
+</div>
+<button type="button" class="relative z-10 flex min-w-[220px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-primary text-white text-sm font-bold leading-normal tracking-[0.1em] uppercase sans-text shadow-xl active:scale-95 transition-transform" onclick="document.getElementById('cita').scrollIntoView({behavior:'smooth',block:'start'})">
+<span class="truncate">Reservar Consulta</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col px-4 sm:px-6 pt-10 pb-4">
+<h2 class="text-[#171112] dark:text-white text-2xl sm:text-3xl font-display italic leading-tight tracking-tight">Tratamientos de Autor</h2>
+<div class="h-[2px] w-14 bg-primary mt-3"></div>
+</div>
+<div class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-visible md:snap-none">
+<div class="flex items-stretch px-4 sm:px-6 gap-5 pb-6 md:grid md:grid-cols-3 md:pb-0 w-full">
+<div class="snap-center flex h-full flex-col gap-4 rounded-2xl min-w-[280px] bg-white dark:bg-zinc-900 shadow-sm overflow-hidden border border-primary/5 md:min-w-0">
+<div class="w-full bg-center bg-no-repeat aspect-[4/5] bg-cover" style="background-image: url('./aura-luxe-1.png');"></div>
+<div class="p-5 pt-0">
+<p class="text-[#171112] dark:text-white text-xl font-display font-semibold">Facial Aura</p>
+<p class="text-primary text-sm font-normal sans-text italic">Hidratación profunda y luminosidad</p>
+</div>
+</div>
+<div class="snap-center flex h-full flex-col gap-4 rounded-2xl min-w-[280px] bg-white dark:bg-zinc-900 shadow-sm overflow-hidden border border-primary/5 md:min-w-0">
+<div class="w-full bg-center bg-no-repeat aspect-[4/5] bg-cover" style="background-image: url('./aura-luxe-2.png');"></div>
+<div class="p-5 pt-0">
+<p class="text-[#171112] dark:text-white text-xl font-display font-semibold">Rejuvenecimiento de Oro</p>
+<p class="text-primary text-sm font-normal sans-text italic">Terapia con láminas de oro 24k</p>
+</div>
+</div>
+<div class="snap-center flex h-full flex-col gap-4 rounded-2xl min-w-[280px] bg-white dark:bg-zinc-900 shadow-sm overflow-hidden border border-primary/5 md:min-w-0">
+<div class="w-full bg-center bg-no-repeat aspect-[4/5] bg-cover" style="background-image: url('./aura-luxe-3.png');"></div>
+<div class="p-5 pt-0">
+<p class="text-[#171112] dark:text-white text-xl font-display font-semibold">Sculpt &amp; Glow</p>
+<p class="text-primary text-sm font-normal sans-text italic">Contorno facial avanzado</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col px-4 sm:px-6 pt-12 pb-4">
+<h2 class="text-[#171112] dark:text-white text-2xl sm:text-3xl font-display italic leading-tight tracking-tight">La Experiencia Luxe</h2>
+<div class="h-[2px] w-14 bg-primary mt-3"></div>
+</div>
+<div class="px-4 sm:px-6 pb-12 space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+<div class="bg-primary/5 dark:bg-primary/10 p-6 lg:p-7 rounded-2xl border border-primary/10">
+<span class="material-symbols-outlined text-primary mb-4 text-3xl" aria-hidden="true">spa</span>
+<h3 class="font-display text-xl lg:text-2xl mb-2 italic">Santuario Holístico</h3>
+<p class="sans-text text-sm text-[#171112]/80 dark:text-white/80 leading-relaxed">Nuestra clínica está diseñada como un escape de la rutina urbana, combinando tecnología médica con serenidad absoluta.</p>
+</div>
+<div class="bg-primary/5 dark:bg-primary/10 p-6 lg:p-7 rounded-2xl border border-primary/10">
+<span class="material-symbols-outlined text-primary mb-4 text-3xl" aria-hidden="true">medical_services</span>
+<h3 class="font-display text-xl lg:text-2xl mb-2 italic">Precisión Experta</h3>
+<p class="sans-text text-sm text-[#171112]/80 dark:text-white/80 leading-relaxed">Dirigido por especialistas en estética certificados, nos enfocamos en resultados naturales que realzan tus rasgos únicos.</p>
+</div>
+</div>
+<div class="bg-primary/10 dark:bg-primary/5 mx-4 sm:mx-6 mb-12 p-6 sm:p-8 rounded-3xl border border-primary/20">
+<h2 id="cita" class="text-[#171112] dark:text-white text-xl sm:text-2xl font-display italic mb-8 text-center">Agenda tu cita</h2>
+<div class="space-y-6 sans-text lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
+<div class="flex flex-col gap-2">
+<label class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold" for="aura-servicio">Servicio</label>
+<select id="aura-servicio" class="w-full bg-white dark:bg-background-dark border border-primary/20 rounded-xl p-4 text-sm focus:ring-primary focus:border-primary outline-none appearance-none">
+<option>Facial Aura (60 min)</option>
+<option>Rejuvenecimiento Oro (90 min)</option>
+<option>Sculpt &amp; Glow (75 min)</option>
+<option>Consulta Inicial (30 min)</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold" for="aura-fecha">Fecha deseada</label>
+<input id="aura-fecha" class="w-full bg-white dark:bg-background-dark border border-primary/20 rounded-xl p-4 text-sm focus:ring-primary focus:border-primary outline-none" type="date"/>
+</div>
+<button type="button" aria-haspopup="dialog" class="w-full bg-primary text-white py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-sm mt-4 lg:mt-0 lg:col-span-2 shadow-lg active:scale-95 transition-transform cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+                Confirmar Reserva
+            </button>
+</div>
+</div>
+<div class="px-6 py-16 lg:py-20 text-center italic bg-white/30 dark:bg-zinc-900/30">
+<span class="material-symbols-outlined text-primary/40 text-6xl mb-6" aria-hidden="true">format_quote</span>
+<p class="text-xl sm:text-2xl lg:text-3xl font-display text-[#171112] dark:text-white leading-snug px-4">
+            "La experiencia más transformadora que he tenido. Mi piel nunca se ha visto tan luminosa ni se ha sentido tan saludable."
+        </p>
+<p class="mt-8 sans-text text-[10px] uppercase tracking-[0.4em] text-primary font-bold">— ELENA VÁSQUEZ</p>
+</div>
+<div class="px-4 sm:px-6 py-12 pb-32">
+<div class="w-full h-72 lg:h-96 rounded-3xl overflow-hidden border border-primary/10 relative shadow-inner" style="background-image: url('./aura-luxe-4.png'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-black/40"></div>
+<div class="relative w-full h-full flex items-center justify-center p-6">
+<div class="bg-white/95 dark:bg-background-dark/95 p-6 rounded-2xl text-center shadow-2xl border border-primary/10">
+<p class="text-primary font-bold text-xs sans-text uppercase tracking-widest mb-1">Visítanos</p>
+<p class="font-display italic text-xl text-[#171112] dark:text-white">Ubicación ilustrativa · Tu dirección aparecerá aquí</p>
+</div>
+</div>
+</div>
+</div>
+<div class="h-12"></div>
+</div>
+<div class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light/80 dark:via-background-dark/80 to-transparent pt-12 pointer-events-none">
+<button type="button" aria-haspopup="dialog" class="pointer-events-auto w-full max-w-sm mx-auto flex items-center justify-center h-16 bg-[#171112] dark:bg-white text-white dark:text-black rounded-full shadow-2xl active:scale-95 transition-transform cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined mr-3" aria-hidden="true">calendar_today</span>
+<span class="sans-text font-bold uppercase tracking-[0.15em] text-xs">Agendar tu cita</span>
+</button>
+</div>
+</div>
+<dialog id="demo-notice" class="demo-dialog" aria-labelledby="demo-notice-title">
+<h2 id="demo-notice-title">Ejemplo de diseño</h2>
+<p>Escaparate de demostración: la reserva no se envía a ningún destino. En tu web, esta acción abrirá tu canal real de citas.</p>
+<form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+</dialog>
+
+</body></html>

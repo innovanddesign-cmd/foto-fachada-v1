@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Elite Estates - Escaparate de ejemplo</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,200..800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100dvh;
+        }
+        .font-display {
+            font-family: 'Newsreader', serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        h1, h2, h3 {
+            line-height: 1.25;
+        }
+        p {
+            line-height: 1.6;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        .demo-dialog {
+            max-width: 340px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 16px;
+            padding: 24px;
+            background: #0b1024;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+        .demo-dialog::backdrop { background: rgba(2, 5, 14, 0.72); }
+        .demo-dialog h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .demo-dialog p { font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-bottom: 18px; }
+        .demo-dialog button {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 9999px;
+            background: #0f49bd;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .demo-dialog button:focus-visible { outline: 2px solid #d4af37; outline-offset: 3px; }
+    </style>
+  <link rel="stylesheet" href="./elite-estates.css"><link rel="stylesheet" href="./demo-polish.css"></head>
+<body data-demo="elite" class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300">
+<header class="fixed top-0 z-50 w-full bg-background-dark/80 backdrop-blur-md border-b border-white/5">
+<div class="flex items-center px-4 sm:px-6 py-4 justify-between mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-6xl">
+<div class="text-white flex size-10 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined" aria-hidden="true">menu</span>
+</div>
+<h2 class="text-white text-xl font-display font-bold leading-tight tracking-[-0.015em] flex-1 text-center">ELITE ESTATES</h2>
+<div class="text-white flex size-10 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+</div>
+</div>
+</header>
+<main class="pt-16 pb-28 mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-6xl overflow-x-hidden">
+<section class="relative">
+<div class="@container">
+<div class="p-0">
+<div class="flex min-h-[480px] lg:min-h-[620px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 sm:px-8 py-12 lg:py-20 text-center" style="background-image: linear-gradient(rgba(5, 10, 26, 0.4) 0%, rgba(5, 10, 26, 0.9) 100%), url('./elite-estates-0.png');">
+<div class="flex flex-col gap-4">
+<span class="text-accent-gold text-xs font-bold tracking-[0.25em] uppercase">Colección Privada</span>
+<h1 class="text-white text-4xl sm:text-5xl lg:text-6xl font-display font-medium tracking-tight">
+                            Viviendas Exclusivas
+                        </h1>
+<p class="text-slate-300 text-base font-normal max-w-[300px] lg:max-w-md mx-auto">
+                            Descubre las villas más lujosas del mundo, seleccionadas para los más exigentes.
+                        </p>
+</div>
+<button type="button" class="mt-2 flex min-w-[180px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-sm font-semibold tracking-wider uppercase transition-transform active:scale-95 shadow-lg shadow-primary/20" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth',block:'start'})">
+<span class="truncate">Ver Catálogo</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<section class="px-4 sm:px-6 -mt-8 relative z-10">
+<div class="bg-background-dark border border-white/10 rounded-xl shadow-2xl p-2">
+<label class="flex flex-col w-full">
+<span class="sr-only">Buscar vivienda</span>
+<div class="flex w-full items-stretch rounded-lg h-14 bg-white/5">
+<div class="text-slate-400 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined" aria-hidden="true">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 text-white placeholder:text-slate-500 px-4 text-base font-normal" placeholder="Ubicación, ciudad o nombre..."/>
+</div>
+</label>
+</div>
+</section>
+<section class="mt-6">
+<div class="flex gap-3 px-4 sm:px-6 overflow-x-auto no-scrollbar pb-2 lg:flex-wrap lg:overflow-visible">
+<button type="button" aria-haspopup="dialog" class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/5 border border-white/10 px-5" onclick="document.getElementById('demo-notice').showModal()">
+<p class="text-white text-xs font-medium uppercase tracking-wider">Precio</p>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/5 border border-white/10 px-5" onclick="document.getElementById('demo-notice').showModal()">
+<p class="text-white text-xs font-medium uppercase tracking-wider">Tipo</p>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/5 border border-white/10 px-5" onclick="document.getElementById('demo-notice').showModal()">
+<p class="text-white text-xs font-medium uppercase tracking-wider">Tamaño</p>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/5 border border-white/10 px-5" onclick="document.getElementById('demo-notice').showModal()">
+<p class="text-white text-xs font-medium uppercase tracking-wider">Piscina</p>
+</button>
+</div>
+</section>
+<section class="mt-10 px-4 sm:px-6 flex justify-between items-end gap-4">
+<div>
+<p class="text-accent-gold text-[10px] font-bold tracking-[0.3em] uppercase mb-1">Selección de Autor</p>
+<h2 id="catalogo" class="text-white text-2xl sm:text-3xl font-display font-light">Propiedades Destacadas</h2>
+</div>
+<button type="button" aria-haspopup="dialog" class="text-primary text-sm font-bold uppercase tracking-widest pb-1 border-b border-primary/30" onclick="document.getElementById('demo-notice').showModal()">Todo</button>
+</section>
+<section class="mt-6">
+<div class="flex gap-6 px-4 sm:px-6 overflow-x-auto no-scrollbar snap-x snap-mandatory lg:grid lg:grid-cols-2 lg:overflow-visible lg:snap-none">
+<div class="min-w-[280px] w-[80vw] max-w-[460px] snap-center lg:w-auto lg:max-w-none">
+<div class="relative rounded-xl overflow-hidden aspect-[4/5] bg-slate-800">
+<img alt="Villa Azure Horizon con piscina" class="w-full h-full object-cover" src="./elite-estates-1.png"/>
+<div class="absolute top-4 left-4 bg-background-dark/60 backdrop-blur-sm px-3 py-1 rounded-md border border-white/10">
+<p class="text-white text-xs font-bold">12.450.000 €</p>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent">
+<h3 class="text-white text-xl font-display font-medium">Azure Horizon Villa</h3>
+<div class="flex items-center gap-4 mt-3 text-slate-300 text-xs">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-accent-gold">bed</span> 6</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-accent-gold">bathtub</span> 5</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-accent-gold">square_foot</span> 840m²</span>
+</div>
+<p class="text-slate-400 text-[10px] mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span> MALIBU, CA
+                        </p>
+</div>
+</div>
+</div>
+<div class="min-w-[280px] w-[80vw] max-w-[460px] snap-center lg:w-auto lg:max-w-none">
+<div class="relative rounded-xl overflow-hidden aspect-[4/5] bg-slate-800">
+<img alt="The Obsidian Retreat" class="w-full h-full object-cover" src="./elite-estates-2.png"/>
+<div class="absolute top-4 left-4 bg-background-dark/60 backdrop-blur-sm px-3 py-1 rounded-md border border-white/10">
+<p class="text-white text-xs font-bold">8.900.000 €</p>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent">
+<h3 class="text-white text-xl font-display font-medium">The Obsidian Retreat</h3>
+<div class="flex items-center gap-4 mt-3 text-slate-300 text-xs">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-accent-gold">bed</span> 4</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-accent-gold">bathtub</span> 4</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-accent-gold">square_foot</span> 620m²</span>
+</div>
+<p class="text-slate-400 text-[10px] mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span> ASPEN, CO
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-12 px-4 sm:px-6">
+<h2 class="text-white text-xl sm:text-2xl font-display font-light mb-6">Nuevos Ingresos</h2>
+<div class="flex flex-col gap-5 lg:grid lg:grid-cols-2">
+<div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
+<div class="w-24 h-24 lg:w-28 lg:h-28 rounded-lg overflow-hidden shrink-0">
+<img alt="Penthouse Luminara" class="w-full h-full object-cover" src="./elite-estates-3.png"/>
+</div>
+<div class="flex-1">
+<h4 class="text-white font-display text-lg">Penthouse Luminara</h4>
+<p class="text-slate-400 text-xs mb-3">Manhattan, NY</p>
+<div class="flex justify-between items-center gap-3">
+<span class="text-accent-gold font-bold text-sm">4.250.000 €</span>
+<button type="button" aria-haspopup="dialog" class="text-primary text-[10px] font-bold bg-primary/10 px-3 py-1 rounded-full uppercase" onclick="document.getElementById('demo-notice').showModal()">Detalles</button>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
+<div class="w-24 h-24 lg:w-28 lg:h-28 rounded-lg overflow-hidden shrink-0">
+<img alt="Villa Serenity" class="w-full h-full object-cover" src="./elite-estates-4.png"/>
+</div>
+<div class="flex-1">
+<h4 class="text-white font-display text-lg">Villa Serenity</h4>
+<p class="text-slate-400 text-xs mb-3">Ibiza, España</p>
+<div class="flex justify-between items-center gap-3">
+<span class="text-accent-gold font-bold text-sm">6.100.000 €</span>
+<button type="button" aria-haspopup="dialog" class="text-primary text-[10px] font-bold bg-primary/10 px-3 py-1 rounded-full uppercase" onclick="document.getElementById('demo-notice').showModal()">Detalles</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-16 px-4 sm:px-6 mb-12">
+<div class="bg-primary/10 border border-primary/20 rounded-2xl p-8 sm:p-10 text-center lg:max-w-3xl">
+<span class="material-symbols-outlined text-4xl text-accent-gold mb-4">diamond</span>
+<h2 class="text-white text-xl sm:text-2xl font-display font-medium mb-3">Consultoría Privada</h2>
+<p class="text-slate-400 text-sm mb-8">Nuestros expertos ofrecen asesoramiento personalizado para inversiones inmobiliarias de alto nivel.</p>
+<button type="button" aria-haspopup="dialog" class="w-full bg-white text-background-dark font-bold text-xs uppercase tracking-widest py-4 rounded-lg cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">Hablar con un Agente</button>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 z-50 w-full bg-background-dark/95 backdrop-blur-xl border-t border-white/10 pb-8 pt-3 px-4 sm:px-8" aria-label="Navegación principal del escaparate">
+<div class="flex justify-between items-center mx-auto w-full max-w-md sm:max-w-3xl lg:max-w-6xl">
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1.5 text-primary cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined" aria-hidden="true">home</span>
+<span class="text-[9px] font-bold uppercase tracking-wider">Explorar</span>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1.5 text-slate-500 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined" aria-hidden="true">favorite</span>
+<span class="text-[9px] font-bold uppercase tracking-wider">Guardados</span>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1.5 text-slate-500 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined" aria-hidden="true">map</span>
+<span class="text-[9px] font-bold uppercase tracking-wider">Mapa</span>
+</button>
+<button type="button" aria-haspopup="dialog" class="flex flex-col items-center gap-1.5 text-slate-500 cursor-pointer" onclick="document.getElementById('demo-notice').showModal()">
+<span class="material-symbols-outlined" aria-hidden="true">chat_bubble</span>
+<span class="text-[9px] font-bold uppercase tracking-wider">Mensajes</span>
+</button>
+</div>
+</nav>
+<dialog id="demo-notice" class="demo-dialog" aria-labelledby="demo-notice-title">
+<h2 id="demo-notice-title">Ejemplo de diseño</h2>
+<p>Escaparate de demostración: ningún botón realiza reservas, envíos ni envía datos. En tu web, esta acción abrirá el enlace real de tu negocio.</p>
+<form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+</dialog>
+
+</body></html>

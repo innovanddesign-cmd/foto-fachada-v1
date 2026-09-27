@@ -1,5 +1,6 @@
 "use client";
 import Link from 'next/link';
+import { featuredDemos } from '@/lib/marketing/demos';
 import { InnovaFooter } from '@/components/marketing/InnovaFooter';
 import { NeonPhone } from '@/components/marketing/NeonPhone';
 import { useRouter } from 'next/navigation';
@@ -11,19 +12,10 @@ export default function Home() {
  return <main className="studio-shell">
  <section className="studio-container grid lg:grid-cols-2 gap-10 items-center py-16 lg:py-24">
  <div><p className="studio-eyebrow">INNOVA AND DESIGN · ESCAPARATES DIGITALES</p><h1 className="text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.08] mt-5">Tu negocio merece<br/><span className="text-[#00ff9d]">que entren a conocerlo.</span></h1><p className="studio-muted text-lg mt-6 max-w-xl">Convierte tu fachada en una invitación: una web con tu identidad, un motivo para interactuar y un cartel que conecta ambos mundos.</p><div className="flex flex-wrap gap-3 mt-8"><button className="studio-primary" onClick={manejarInicio}>Crear mi escaparate <ArrowRight size={18}/></button><Link className="studio-button" href="/dashboard">Entrar a mi panel</Link></div><p className="studio-muted text-sm mt-4">Prueba el creador. Inicia sesión cuando quieras guardar en tu cuenta y publicar.</p></div>
- <div className="innova-phone-hero"><NeonPhone id="salamandra" name="La Salamandra" sector="Parrilla y brasas" priority/><NeonPhone id="sofia" name="Sofia Lopardo" sector="Moda y estilo" priority/></div>
+ <div className="innova-phone-hero"><NeonPhone id="elite-estates" name="Elite Estates" sector="Inmobiliarias" priority/><NeonPhone id="aura-luxe" name="Aura Luxe" sector="Centros de estética" priority/></div>
  </section>
  <section className="studio-container"><div className="flex flex-wrap justify-between gap-4 mb-8"><h2 className="text-3xl font-semibold">De tu fachada a la pantalla</h2><Link className="studio-button" href="/dashboard?seccion=ayuda">Ver cómo funciona</Link></div><div className="grid md:grid-cols-3 gap-5">{[{Icon:Camera,title:'1. Presenta tu negocio',text:'Sube una foto y confirma tu identidad. Puedes completar los datos manualmente.'},{Icon:Pencil,title:'2. Dale tu voz',text:'Elige el diseño y edita los textos, servicios y formas de contacto.'},{Icon:QrCode,title:'3. Conecta y comparte',text:'Publica tu web, descarga el cartel y comprueba el QR antes de imprimir.'}].map(({Icon,title,text})=><article key={title} className="studio-panel"><Icon className="text-[#00ff9d] mb-5" size={28}/><h3 className="font-semibold text-lg">{title}</h3><p className="studio-muted mt-3">{text}</p></article>)}</div></section>
- <section id="ejemplos" className="studio-container scroll-mt-24"><h2 className="text-3xl font-semibold mb-3">Los escaparates de INNOVA</h2><p className="studio-muted mb-8">Explora los diseños de nuestra galería. FREE y PRO comparten la misma calidad visual; ESCAPARATE ofrece páginas completas por sector.</p><div className="innova-phone-gallery">{[
- {id:'salamandra',name:'La Salamandra',sector:'Parrilla y brasas'},
- {id:'sofia',name:'Sofia Lopardo',sector:'Moda y estilo'},
- {id:'mango',name:'Mango Manía',sector:'Frutas tropicales'},
- {id:'quinchuqui',name:'Quinchuqui',sector:'Sabores de Ecuador'},
- {id:'belleza',name:'Belleza Lux',sector:'Belleza y bienestar'},
- {id:'detail',name:'Elite Detail Pro',sector:'Cuidado del automóvil'},
- {id:'clinic',name:'Dermascience Clinic',sector:'Estética avanzada'},
- {id:'dining',name:'Pure Modern Dining',sector:'Restauración'}
- ].map(demo=><NeonPhone key={demo.id} id={demo.id} name={demo.name} sector={demo.sector}/>)}</div></section>
+ <section id="ejemplos" className="studio-container scroll-mt-24"><p className="studio-eyebrow mb-3">UNA SELECCIÓN PARA TU SECTOR</p><h2 className="text-3xl font-semibold mb-3">Inmobiliarias y centros de estética</h2><p className="studio-muted mb-8 max-w-3xl">Cuatro formas de dar la bienvenida a tus próximos clientes. Explora las webs completas y descubre cómo presentan sus propiedades, tratamientos y formas de contacto en móvil, tablet y ordenador.</p><div className="innova-phone-gallery">{featuredDemos.map(demo=><NeonPhone key={demo.id} id={demo.id} name={demo.name} sector={demo.sector}/>)}</div><p className="studio-muted text-sm mt-8">Ejemplos de diseño con contenido ilustrativo. Las reservas y consultas de estas demos no se envían a ningún negocio.</p></section>
  <div className="studio-legacy">            <section id="precios" className="px-6 py-24 max-w-6xl mx-auto scroll-mt-24">
                 <div className="text-center mb-16">
                     <span className="text-[#00ff9d] text-xs font-bold uppercase tracking-widest">Precios</span>
