@@ -1,0 +1,95 @@
+/* INNVEEX · landing QR 390px */
+:root{
+  --white:#fff;--silver:#f3f4f5;--line:#dbdee1;--ink:#17181a;
+  --charcoal:#26262a;--muted:#5f6368;--steel:#8b9096;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;background:#e9ebec;color:var(--ink);
+  font-family:'Jost','Segoe UI','Helvetica Neue',Arial,sans-serif;
+  font-weight:300;font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--charcoal);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--charcoal);color:#fff;padding:12px 18px;z-index:99}
+.skip:focus{left:8px;top:8px}
+.phone{
+  max-width:430px;margin:0 auto;background:var(--white);min-height:100dvh;
+  display:flex;flex-direction:column;position:relative;
+}
+@media (min-width:768px){
+  body{padding:40px 20px}
+  .phone{box-shadow:0 40px 90px -50px rgba(23,24,26,.6);border:1px solid var(--line);min-height:auto}
+}
+.pad{padding:0 22px}
+.brandbar{display:flex;align-items:center;justify-content:center;padding:22px 22px 18px;border-bottom:1px solid var(--line);background:#fff}
+.brandbar img{height:34px;width:auto}
+.hero{position:relative;background:var(--silver);padding:34px 22px 0;overflow:hidden}
+.hero .eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 14px}
+.hero h1{font-size:clamp(2.1rem,11vw,2.9rem);font-weight:200;letter-spacing:-.035em;line-height:1.03;margin:0}
+.hero p{color:var(--muted);font-size:16px;margin:16px 0 0;max-width:34ch}
+.hero .shot{margin:26px -22px 0;padding:22px 22px 26px;background:linear-gradient(180deg,#eceef0,#e2e5e7);border-top:1px solid var(--line)}
+.hero .shot img{width:100%;height:auto;filter:drop-shadow(0 24px 34px rgba(23,24,26,.22))}
+.hero .cap{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--steel);padding-top:14px}
+
+.links{display:grid;gap:10px;padding:24px 22px 8px}
+.links a{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:58px;
+  padding:14px 18px;text-decoration:none;background:#fff;border:1px solid var(--line);
+  font-size:15.5px;letter-spacing:.02em;transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+.links a:hover{background:var(--silver);transform:translateY(-2px)}
+.links a .t{display:block}
+.links a .s{display:block;font-size:12.5px;color:var(--muted);letter-spacing:.04em}
+.links a .ar{font-size:20px;color:var(--steel);line-height:1}
+.links a.primary{background:var(--charcoal);border-color:var(--charcoal);color:#fff}
+.links a.primary .s{color:#c9ced3}
+.links a.primary:hover{background:#000}
+.links a.primary .ar{color:#fff}
+
+.block{padding:26px 22px;border-top:1px solid var(--line)}
+.block .eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 14px}
+.block h2{font-size:1.6rem;font-weight:200;letter-spacing:-.03em;margin:0 0 14px}
+.svc{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.svc li{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.svc li:last-child{border-bottom:0}
+.svc .n{font-size:11px;letter-spacing:.24em;color:var(--steel);padding-top:4px;flex:0 0 auto}
+.svc b{display:block;font-weight:400;font-size:16.5px}
+.svc span{display:block;color:var(--muted);font-size:14.5px;line-height:1.55}
+
+.contact{background:var(--silver);border-top:1px solid var(--line);padding:28px 22px 32px}
+.contact p{color:var(--muted);font-size:15.5px;margin:0 0 18px}
+.btn{
+  display:flex;align-items:center;justify-content:center;min-height:54px;width:100%;padding:0 22px;
+  background:var(--charcoal);color:#fff;border:1px solid var(--charcoal);cursor:pointer;
+  font-family:inherit;font-size:14.5px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;
+  transition:background .2s ease,transform .2s ease;
+}
+.btn:hover{background:#000;transform:translateY(-2px)}
+.fine{font-size:13px;color:var(--steel);margin-top:14px;text-align:center}
+
+.foot{padding:24px 22px 34px;border-top:1px solid var(--line);margin-top:auto}
+.foot img{height:26px;margin-bottom:16px}
+.foot nav{display:flex;flex-wrap:wrap;gap:2px}
+.foot nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px 0 0;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.foot nav a:hover{color:var(--ink);text-decoration:underline}
+.propuesta{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.55}
+.propuesta b{font-weight:500;letter-spacing:.2em;text-transform:uppercase;font-size:11px;border:1px solid var(--line);padding:6px 11px;color:var(--charcoal)}
+
+dialog.demo{
+  max-width:400px;width:calc(100% - 32px);border:1px solid var(--line);border-radius:4px;padding:26px;
+  background:#fff;color:var(--ink);font-family:inherit;box-shadow:0 40px 80px -40px rgba(0,0,0,.5);
+}
+dialog.demo::backdrop{background:rgba(23,24,26,.72)}
+dialog.demo h2{font-size:1.4rem;font-weight:200;margin:0 0 12px;letter-spacing:-.02em}
+dialog.demo p{color:var(--muted);font-size:15px;margin:0 0 12px}
+dialog.demo .tag{display:inline-block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--line);padding:6px 11px;margin-bottom:14px}
+dialog.demo .btn{margin-top:8px}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:.001ms !important;animation-duration:.001ms !important}
+  .btn:hover,.links a:hover{transform:none}
+}
