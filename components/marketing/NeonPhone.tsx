@@ -18,11 +18,11 @@ export function NeonPhone({ id, name, sector, priority = false }: { id: string; 
  const file = demo.landingFile || demo.file;
  return <article className="innova-phone-example">
   <div className="innova-phone-heading"><h3>{sector}</h3><p>{name}</p></div>
-  <Link href={'/test-mockup?demo=' + id} aria-label={'Explorar diseño de ' + name} className="innova-phone">
+  <Link href={'/test-mockup?demo=' + id + (demo.landingFile ? '&format=landing' : '')} aria-label={'Explorar diseño de ' + name} className="innova-phone">
    <svg className="innova-phone-neon" viewBox="0 0 900 1900" preserveAspectRatio="none" aria-hidden="true"><path d={outline} className="innova-phone-base"/><path d={outline} pathLength="100" className="innova-phone-blue"/><path d={outline} pathLength="100" className="innova-phone-green"/></svg>
    <div ref={screen} className="innova-phone-screen"><iframe title={'Vista previa de ' + name} src={'/design-references/' + file} loading={priority ? 'eager' : 'lazy'} tabIndex={-1} aria-hidden="true" scrolling="no" sandbox="" style={{width:390,height:Math.round(390 * 1900 / 900 * .92),top:width * 1900 / 900 * .08,transform:`scale(${width / 390})`}}/></div>
    <span className="innova-phone-camera" aria-hidden="true"/>
   </Link>
-  <Link href={'/test-mockup?demo=' + id} className="innova-phone-open">Explorar diseño <span aria-hidden="true">↗</span></Link>
+  <Link href={'/test-mockup?demo=' + id + (demo.landingFile ? '&format=landing' : '')} className="innova-phone-open">Explorar diseño <span aria-hidden="true">↗</span></Link>
  </article>;
 }

@@ -39,3 +39,9 @@ UI/UX Pro Max: jerarquía editorial, legibilidad, áreas táctiles de 44 px, est
 - Cinco páginas comprobadas en navegador a 390×844, 768×1024, 1024×768 y 1440×900: sin imágenes rotas ni desbordamiento horizontal; anclas internas comprobadas.
 - Alternancia web/landing, retorno a galería y cierre de diálogo dentro del iframe comprobados. Se corrigió el cierre de los diálogos sin habilitar el envío de formularios en el sandbox.
 - TypeScript y compilación Next.js de producción superados. No se modifican autenticación, base de datos, precios ni sitios externos de las marcas.
+
+## Ajuste de tarjetas y caso de exito (28/09/2026)
+
+- Distrito Homes muestra la landing QR original adaptada a assets locales y CSS compilado, sin enlaces al administrador. El proyecto completo se cuenta debajo de la galeria en su propio caso de exito, basado en los hechos aportados por el usuario.
+- INNVEEX y DERMOOK abren por defecto su landing; desde ella se accede a la web completa. Instagram, WhatsApp y presupuesto son acciones provisionales de demostracion hasta recibir los enlaces oficiales. No se usan contactos aleatorios de terceros.
+- OpenCode genero el componente inicial del caso, posteriormente revisado e integrado.
