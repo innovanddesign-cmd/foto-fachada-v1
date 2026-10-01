@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import styles from './HeroPhone3D.module.css';
 
-type SceneKind = 'elite' | 'dermook';
+type SceneKind = 'elite' | 'distrito';
 
 /** Each example owns its scroll target and moves its phone and element independently. */
 function PhoneScene({ kind }: { kind: SceneKind }) {
@@ -22,18 +22,18 @@ function PhoneScene({ kind }: { kind: SceneKind }) {
   const elementRotate = useTransform(scrollYProgress, [0, .65, 1], isElite ? [9, 0, -2] : [-12, -4, 2]);
   const elementScale = useTransform(scrollYProgress, [0, .65, 1], [.91, 1, 1.02]);
   const auraOpacity = useTransform(scrollYProgress, [0, .65, 1], [.55, 1, .8]);
-  const name = isElite ? 'Elite Estates' : 'DERMOOK';
-  const phoneAsset = isElite ? 'phone-elite-green' : 'phone-dermook-green';
+  const name = isElite ? 'Elite Estates' : 'Distrito Homes';
+  const phoneAsset = isElite ? 'phone-elite-green' : 'phone-distrito-green';
   const elementAsset = isElite ? 'arrow-glass-green' : 'appointment-glass-green';
-  const href = isElite ? '/test-mockup?demo=elite-estates' : '/test-mockup?demo=dermook&format=landing';
+  const href = isElite ? '/test-mockup?demo=elite-estates' : '/test-mockup?demo=distrito-homes';
 
   return (
-    <figure className={`${styles.scene} ${isElite ? styles.estate : styles.beauty}`} data-hero-device={kind}>
+    <figure className={`${styles.scene} ${isElite ? styles.estate : styles.agency}`} data-hero-device={kind}>
       <div className={styles.heading}>
-        <p>{isElite ? 'Inmobiliarias' : 'Centros de estética'}</p>
+        <p>{isElite ? 'Inmobiliarias' : 'Caso real · Inmobiliaria'}</p>
         <span>{name}</span>
       </div>
-      <div ref={stage} className={styles.stage} role="img" aria-label={isElite ? 'Elite Estates en un smartphone con botón verde en relieve y flecha de cristal animada al hacer scroll.' : 'DERMOOK en un smartphone con una tarjeta de calendario de cristal verde que flota al hacer scroll.'}>
+      <div ref={stage} className={styles.stage} role="img" aria-label={isElite ? 'Elite Estates en un smartphone con botón verde en relieve y flecha de cristal animada al hacer scroll.' : 'Distrito Homes en un smartphone con una tarjeta de calendario de visitas de cristal verde que flota al hacer scroll.'}>
         <motion.div className={styles.aura} aria-hidden="true" style={reducedMotion ? undefined : { opacity: auraOpacity }} />
         <motion.div className={styles.phone} data-hero-layer="phone" aria-hidden="true" style={reducedMotion ? undefined : { y: phoneY, rotateY: phoneRotateY, rotateZ: phoneRotateZ }}>
           <Image src={`/marketing/${phoneAsset}.webp`} alt="" width={1024} height={1536} sizes="(max-width: 640px) 40vw, (max-width: 1023px) 260px, 250px" priority />
@@ -51,5 +51,5 @@ function PhoneScene({ kind }: { kind: SceneKind }) {
 }
 
 export function HeroPhone3D() {
-  return <div className={styles.duo} aria-label="Dos ejemplos de escaparates digitales"><PhoneScene kind="elite" /><PhoneScene kind="dermook" /></div>;
+  return <div className={styles.duo} aria-label="Dos ejemplos de escaparates digitales"><PhoneScene kind="elite" /><PhoneScene kind="distrito" /></div>;
 }

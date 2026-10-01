@@ -84,14 +84,7 @@ export const AnalizadorADN = () => {
             // Generar escaparate basado en el ADN analizado
             const escaparate = await AIService.generarEscaparate(adnActual);
 
-            // Deducir estrategia de conversión
-            const cat = (adnActual.analisisVision?.categoriaSugerida || "").toLowerCase();
-            let estrategia: AdnMarca['estrategiaPrincipal'] = 'LEAD_MAGNET';
-            if (cat.includes('restaurante') || cat.includes('gastro') || cat.includes('café') || cat.includes('bar')) {
-                estrategia = 'OFERTA_FLASH';
-            } else if (cat.includes('peluquer') || cat.includes('salud') || cat.includes('clínica')) {
-                estrategia = 'CITA_PREVIA';
-            }
+            const estrategia: AdnMarca['estrategiaPrincipal'] = 'CITA_PREVIA';
 
             // Enriquecer ADN con estrategia y keywords
             const adnEnriquecido: AdnMarca = {

@@ -6,7 +6,7 @@ import type { DatosEscaparateBase } from '@/lib/estado/tipos-estado';
 export function EditorNegocio() {
   const s = useTiendaEstado();
   const datos = s.datosEscaparate;
-  if (!datos || !s.adnMarca) return <p>Completa primero la información del negocio.</p>;
+  if (!datos || !s.adnMarca) return <p>Completa primero la información de la agencia.</p>;
   function update(key: keyof DatosEscaparateBase, value: string) {
     const current = useTiendaEstado.getState().datosEscaparate;
     if (!current) return;
@@ -14,22 +14,22 @@ export function EditorNegocio() {
   }
   return <div className="studio-panel space-y-6">
     <div><h2 className="text-xl font-semibold">Contenido de tu web</h2><p className="studio-muted mt-2">Edita cualquier campo. La vista previa se actualiza mientras escribes.</p></div>
-    <label className="studio-field">Nombre del negocio<input value={s.adnMarca.analisisVision?.nombreSugerido || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, nombreSugerido: e.target.value } })} /></label>
-    <label className="studio-field">Sector<input value={s.adnMarca.analisisVision?.categoriaSugerida || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, categoriaSugerida: e.target.value } })} /><span className="studio-muted text-sm">El sector determina la plantilla visual.</span></label>
+    <label className="studio-field">Nombre de la agencia<input value={s.adnMarca.analisisVision?.nombreSugerido || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, nombreSugerido: e.target.value } })} /></label>
+    <label className="studio-field">Especialidad<input value={s.adnMarca.analisisVision?.categoriaSugerida || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, categoriaSugerida: e.target.value } })} /><span className="studio-muted text-sm">Por ejemplo: residencial, alquileres o propiedades de lujo.</span></label>
     {([
-      ['titularPrincipal', 'Titular de presentación'], ['subtitulo', 'Subtítulo'], ['descripcionValor', 'Descripción del negocio'],
+      ['titularPrincipal', 'Titular de presentación'], ['subtitulo', 'Subtítulo'], ['descripcionValor', 'Descripción de la agencia'],
       ['ctaPrincipal', 'Texto del botón principal'], ['telefono', 'Teléfono / WhatsApp con prefijo de país'], ['horario', 'Horario de atención']
     ] as [keyof DatosEscaparateBase, string][]).map(([key, label]) => <label key={key} className="studio-field">{label}
       {key === 'descripcionValor' || key === 'horario' ? <textarea rows={3} value={datos.datosReales?.[key] ?? datos.datosSugeridos?.[key] ?? ''} onChange={e => update(key, e.target.value)} /> :
         <input type={key === 'telefono' ? 'tel' : 'text'} value={datos.datosReales?.[key] ?? (key === 'titularPrincipal' || key === 'subtitulo' ? datos[key] : datos.datosSugeridos?.[key]) ?? ''} onChange={e => update(key, e.target.value)} />}
     </label>)}
-    <fieldset className="space-y-4"><legend className="font-semibold mb-3">Servicios y productos</legend>
-      <p className="studio-muted text-sm">Añade solo servicios reales. Puedes quitar las propuestas que no correspondan a tu negocio.</p>
+    <fieldset className="space-y-4"><legend className="font-semibold mb-3">Servicios inmobiliarios</legend>
+      <p className="studio-muted text-sm">Añade solo servicios reales. Puedes quitar las propuestas que no correspondan a tu agencia.</p>
       {datos.ofertas.map((offer, i) => <div key={i} className="border border-emerald-900 p-4 rounded-xl space-y-3">
         {(['titulo', 'descripcion', 'precio'] as const).map(key => <label className="studio-field" key={key}>{key === 'titulo' ? 'Nombre del servicio' : key === 'precio' ? 'Precio o información de precio' : 'Descripción'}<input value={offer[key] || ''} onChange={e => s.regenerarEscaparate({ ...datos, ofertas: datos.ofertas.map((o, j) => j === i ? { ...o, [key]: e.target.value } : o) })} /></label>)}
         <button className="studio-button" onClick={() => s.regenerarEscaparate({ ...datos, ofertas: datos.ofertas.filter((_, j) => j !== i) })}>Quitar servicio {i + 1}</button>
       </div>)}
-      <button className="studio-button" onClick={() => s.regenerarEscaparate({ ...datos, ofertas: [...datos.ofertas, { titulo: '', descripcion: '', precio: '' }] })}>Añadir servicio o producto</button>
+      <button className="studio-button" onClick={() => s.regenerarEscaparate({ ...datos, ofertas: [...datos.ofertas, { titulo: '', descripcion: '', precio: '' }] })}>Añadir servicio inmobiliario</button>
     </fieldset>
     <fieldset className="space-y-4"><legend className="font-semibold mb-3">Enlaces de contacto</legend>
       {(['instagram', 'web'] as const).map(key => <label key={key} className="studio-field">{key === 'web' ? 'Web externa (https://…) ' : 'Instagram (URL o usuario)'}<input type="text" value={s.redesSociales[key] || ''} onChange={e => s.actualizarRedes({ [key]: e.target.value })} /></label>)}

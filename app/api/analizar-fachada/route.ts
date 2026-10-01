@@ -72,13 +72,13 @@ export async function POST(req: Request) {
         console.log(`[analizar-fachada] Iniciando análisis. MimeType: ${mimeType}, Tamaño base64: ${base64Data.length} chars`);
 
         const prompt = `Actúa como un Ingeniero OSINT y Estratega de Marketing de Élite.
-Analiza esta imagen de fachada/local comercial y extrae el ADN semántico y estratégico del negocio.
+Analiza esta imagen para crear un escaparate de una agencia inmobiliaria. Describe solo datos visibles. No inventes propiedades, precios, disponibilidad, servicios ni trayectoria. Si un dato no se ve, déjalo vacío o indícalo como pendiente de confirmar; serviciosDetectados debe incluir solo servicios escritos en la imagen.
 
 Responde ÚNICAMENTE con un objeto JSON válido, sin bloques markdown, sin texto adicional:
 
 {
-  "nombreSugerido": "nombre del negocio detectado por OCR o inferido",
-  "categoriaSugerida": "categoría específica del negocio (ej: Cafetería, Peluquería, Farmacia...)",
+  "nombreSugerido": "nombre de la agencia legible en la imagen; vacío si no es legible",
+  "categoriaSugerida": "especialidad inmobiliaria visible (residencial, lujo, alquileres); Inmobiliaria si no consta",
   "paletaColores": {
     "primario": "#RRGGBB",
     "secundario": "#RRGGBB",

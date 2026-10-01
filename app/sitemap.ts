@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://fotofachada.app';
+    const baseUrl = 'https://escaparates.innovandesign.com';
 
     return [
         {
@@ -21,19 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
             lastModified: new Date(),
             changeFrequency: 'daily',
             priority: 0.9,
-        },
-        // Rutas de ejemplo (en producción se generarían desde DB)
-        {
-            url: `${baseUrl}/v/cafeteria-central`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.7,
-        },
-        {
-            url: `${baseUrl}/v/boutique-moda`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.7,
         },
     ];
 }
