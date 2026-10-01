@@ -10,6 +10,7 @@
 .arrow { position:absolute; left:49%; top:40%; width:63%; z-index:3; transform-origin:18% 8%; filter:drop-shadow(0 9px 12px #00ff9d20); pointer-events:none; }
 .appointment { position:absolute; left:52%; top:64%; width:46%; z-index:3; transform-origin:50% 50%; filter:drop-shadow(0 12px 16px #0009); pointer-events:none; }
 .phone img,.arrow img,.appointment img { display:block; width:100%; height:auto; }
+.appointment img { transform:scaleX(-1); }
 .aura { position:absolute; inset:9% 1% 10%; z-index:0; background:radial-gradient(ellipse,#00ff9d20,transparent 65%); filter:blur(20px); }
 .floor { position:absolute; left:4%; right:4%; bottom:2%; height:8%; z-index:1; border-radius:50%; background:radial-gradient(ellipse,#00ff9d3b,transparent 70%); filter:blur(10px); }
 .caption { position:relative; z-index:4; display:flex; justify-content:center; align-items:center; color:#a9b8af; font-size:12px; }
