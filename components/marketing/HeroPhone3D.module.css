@@ -1,0 +1,14 @@
+.scene { width:100%; max-width:620px; margin:0 auto; min-width:0; }
+.stage { position:relative; width:100%; aspect-ratio:1/1.06; isolation:isolate; perspective:1100px; overflow:clip; }
+.phone { position:absolute; left:8%; top:0; width:63%; z-index:2; transform-origin:50% 60%; filter:drop-shadow(0 22px 22px #000b); }
+.arrow { position:absolute; left:45%; top:40%; width:53%; z-index:3; transform-origin:18% 8%; filter:drop-shadow(0 9px 12px #00ff9d20); pointer-events:none; }
+.phone img,.arrow img { display:block; width:100%; height:auto; }
+.aura { position:absolute; inset:9% 10% 10%; z-index:0; background:radial-gradient(ellipse,#00ff9d20,transparent 65%); filter:blur(24px); }
+.floor { position:absolute; left:12%; right:5%; bottom:2%; height:8%; z-index:1; border-radius:50%; background:radial-gradient(ellipse,#00ff9d3b,transparent 70%); filter:blur(12px); }
+.caption { position:relative; z-index:4; display:flex; justify-content:center; align-items:center; gap:9px; margin-top:8px; color:#a9b8af; font-size:12px; }
+.caption a { display:inline-flex; align-items:center; gap:7px; min-height:44px; text-decoration:none; }
+.caption a:hover { color:#00ff9d; }
+.dot { width:6px; height:6px; border-radius:50%; background:#00ff9d; box-shadow:0 0 12px #00ff9d; flex:none; }
+@media(max-width:1023px) { .scene { max-width:530px; } }
+@media(max-width:640px) { .scene { max-width:420px; } .stage { aspect-ratio:1/1.08; } .caption { font-size:11px; gap:7px; } }
+@media(prefers-reduced-motion:reduce) { .phone,.arrow { transform:none!important; } .aura { opacity:.8!important; } }
