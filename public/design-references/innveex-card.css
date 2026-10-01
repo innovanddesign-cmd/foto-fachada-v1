@@ -1,0 +1,16 @@
+/* INNVEEX QR card: isolated from the other gallery brands. */
+.innveex{background:#fff;color:#202223}
+.innveex:before,.innveex:after{display:none}
+.innveex .qr-brand{padding:10px 0 0}
+.innveex .qr-brand img{width:250px;max-width:90%}
+.innveex-device{position:relative;display:flex;align-items:center;justify-content:center;flex:1 0 auto;height:clamp(190px,calc(100dvh - 475px),340px);margin:16px 0 20px;background:radial-gradient(ellipse at 50% 60%,#f0f1f1 0%,#fff 70%)}
+.innveex-device img{display:block;width:100%;height:100%;max-height:320px;object-fit:contain;filter:drop-shadow(0 12px 12px #17202014)}
+.innveex .qr-actions{padding-top:0;margin-top:auto}
+.innveex .qr-copy{margin-bottom:20px}
+.innveex .qr-copy h1{font-size:30px}
+.innveex .qr-copy p{color:#626667}
+.innveex .qr-primary{background:#202425;color:#fff}
+.innveex .qr-grid button{background:#f6f7f7;color:#323738;border-color:#e1e4e4;backdrop-filter:none}
+.innveex .qr-disclosure{color:#6c7374;font-size:10px}
+.innveex button:focus-visible,.innveex a:focus-visible{outline-color:#222}
+@media(max-height:650px){.innveex-device{height:180px;margin:10px 0 16px}.innveex .qr-copy h1{font-size:26px}.innveex .qr-grid button{min-height:70px}}
