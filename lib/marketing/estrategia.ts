@@ -15,8 +15,8 @@ export function sugerirEstrategia(adn: AdnMarca, telefono = ''): EstrategiaConve
   const citas = /est[eé]t|belleza|peluq|cl[ií]nic|salud/i.test(adn.analisisVision?.categoriaSugerida || '');
   return {
     objetivo: citas ? 'CITAS' : 'CONSULTAS',
-    publico: 'Personas que pasan por el local y quieren conocer nuestros servicios antes de contactar.',
-    motivoEscaneo: 'Conocer nuestros servicios y contactar directamente, sin dejar datos para consultar.',
+    publico: 'Personas que pasan por delante de mi local.',
+    motivoEscaneo: 'Ver mis servicios y escribirme por WhatsApp.',
     textoCartel: citas ? 'Descubre nuestros servicios y consulta tu cita. Escanea aquí.' : 'Descubre lo que ofrecemos y consúltanos. Escanea aquí.',
     cta: citas ? 'Consultar cita por WhatsApp' : 'Consultar por WhatsApp',
     mensajeWhatsApp: citas ? 'Hola, he visto vuestro escaparate y quisiera consultar disponibilidad para una cita.' : 'Hola, he visto vuestro escaparate y quisiera más información.',

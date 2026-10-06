@@ -9,7 +9,12 @@ export function ConfirmarEstrategia() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   if (!s.adnMarca) return null;
-  const plan = s.adnMarca.estrategiaConversion || sugerirEstrategia(s.adnMarca, s.datosEscaparate?.datosReales?.telefono);
+  const savedPlan = s.adnMarca.estrategiaConversion || sugerirEstrategia(s.adnMarca, s.datosEscaparate?.datosReales?.telefono);
+  // Shorten only our original stock suggestions; retain all customer-written text.
+  const plan = {...savedPlan,
+    publico: savedPlan.publico === 'Personas que pasan por el local y quieren conocer nuestros servicios antes de contactar.' ? 'Personas que pasan por delante de mi local.' : savedPlan.publico,
+    motivoEscaneo: savedPlan.motivoEscaneo === 'Conocer nuestros servicios y contactar directamente, sin dejar datos para consultar.' ? 'Ver mis servicios y escribirme por WhatsApp.' : savedPlan.motivoEscaneo,
+  };
   function update(key: keyof EstrategiaConversion, value: string) {
     s.actualizarAdn({ estrategiaConversion: {...plan, [key]: value, confirmadaEn: undefined} });
     setError('');
@@ -36,22 +41,37 @@ export function ConfirmarEstrategia() {
     finally { setBusy(false); }
   }
   const fields: {key: 'publico'|'motivoEscaneo'|'textoCartel'|'cta'|'mensajeWhatsApp'; label:string; max:number}[] = [
-    {key:'publico',label:'¿A quién te diriges?',max:400},
-    {key:'motivoEscaneo',label:'¿Qué obtiene al escanear?',max:400},
-    {key:'textoCartel',label:'Texto del cartel',max:160},
-    {key:'cta',label:'Texto del botón principal',max:70},
-    {key:'mensajeWhatsApp',label:'Mensaje que se prepara en WhatsApp',max:500},
+    {key:'publico',label:'¿A quién quieres atraer?',max:400},
+    {key:'motivoEscaneo',label:'¿Para qué van a escanear el QR?',max:400},
+    {key:'textoCartel',label:'¿Qué pondrá en el cartel?',max:160},
+    {key:'cta',label:'¿Qué pondrá en el botón de WhatsApp?',max:70},
+    {key:'mensajeWhatsApp',label:'¿Qué mensaje le dejamos preparado al cliente?',max:500},
   ];
+  const citas = plan.objetivo === 'CITAS';
+  const inmobiliaria = /inmob|alquiler|residencial|real estate/i.test(s.adnMarca.analisisVision?.categoriaSugerida || '');
+  const alternatives = {
+    publico: inmobiliaria ? ['Personas que buscan comprar una vivienda.', 'Personas que buscan alquilar.', 'Propietarios que quieren vender.', 'Personas que pasan por delante de mi agencia.'] : ['Personas que pasan por delante de mi local.', 'Vecinos del barrio.', 'Personas que buscan mis servicios.', 'Clientes que ya me conocen.'],
+    motivoEscaneo: ['Ver mis servicios.', 'Escribirme por WhatsApp.', 'Consultar horarios y contacto.', citas ? 'Preguntar por una cita.' : 'Pedir más información.'],
+    textoCartel: ['Escanea y descubre cómo podemos ayudarte.', '¿Tienes una pregunta? Escanea y escríbenos.', 'Conócenos mejor. Escanea aquí.', citas ? '¿Quieres una cita? Escanea y consúltanos.' : '¿Quieres más información? Escanea aquí.'],
+    cta: citas ? ['Consultar una cita', 'Pedir cita por WhatsApp', 'Preguntar por disponibilidad', 'Hablar por WhatsApp'] : ['Escribir por WhatsApp', 'Pedir información', 'Hacer una consulta', 'Hablar con nosotros'],
+    mensajeWhatsApp: citas ? ['Hola, me gustaría pedir una cita.', 'Hola, ¿qué horarios tenéis disponibles?', 'Hola, quiero información antes de pedir cita.', 'Hola, he visto vuestro cartel. ¿Podemos hablar?'] : ['Hola, me gustaría recibir más información.', 'Hola, tengo una pregunta sobre vuestros servicios.', 'Hola, he visto vuestro cartel. ¿Podemos hablar?', 'Hola, ¿me podéis ayudar con una consulta?'],
+  };
   return <form onSubmit={confirm} className="studio-panel max-w-2xl mx-auto space-y-6">
-    <div><h2 className="text-2xl font-semibold">Del escaneo a una conversación</h2><p className="studio-muted mt-2">Esta es una propuesta editable. Confirma que representa lo que ofreces antes de preparar el diseño.</p></div>
+    <div><h2 className="text-2xl font-semibold">Prepara tu cartel y tu WhatsApp</h2><p className="studio-muted mt-2">Te dejamos los textos preparados. Cambia lo que quieras y continúa.</p></div>
     <fieldset disabled={busy} className="space-y-5">
       <legend className="sr-only">Propuesta de tu escaparate</legend>
-      <label className="studio-field">¿Qué quieres conseguir?<select value={plan.objetivo} onChange={e=>update('objetivo',e.target.value)}><option value="CITAS">Solicitudes de cita por WhatsApp</option><option value="CONSULTAS">Consultas por WhatsApp</option></select></label>
-      {fields.map(({key,label,max})=><label key={key} className="studio-field">{label}<textarea required rows={key==='cta'?2:3} maxLength={max} value={plan[key]} onChange={e=>update(key,e.target.value)} /></label>)}
-      <label className="studio-field">WhatsApp del negocio, con prefijo de país<input required type="tel" autoComplete="tel" value={plan.telefono} placeholder="+34 600 123 456" onChange={e=>update('telefono',e.target.value)} /></label>
+      <label className="studio-field">¿Qué quieres conseguir?<select value={plan.objetivo} onChange={e=>update('objetivo',e.target.value)}><option value="CITAS">Que me pidan cita por WhatsApp</option><option value="CONSULTAS">Que me escriban por WhatsApp</option></select></label>
+      {fields.map(({key,label,max})=><div key={key} className="space-y-2">
+        <label className="studio-field">{label}<textarea required rows={key==='cta'?2:3} maxLength={max} value={plan[key]} onChange={e=>update(key,e.target.value)} /></label>
+        <p className="studio-muted text-sm">O elige una opción y cámbiala a tu gusto:</p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={`Opciones: ${label}`}>
+          {alternatives[key].map(text=><button key={text} type="button" className="studio-button text-left whitespace-normal" aria-pressed={plan[key]===text} onClick={()=>update(key,text)}>{text}</button>)}
+        </div>
+      </div>)}
+      <label className="studio-field">Tu número de WhatsApp<input required type="tel" autoComplete="tel" value={plan.telefono} placeholder="+34 600 123 456" onChange={e=>update('telefono',e.target.value)} /></label>
     </fieldset>
-    <p className="studio-notice">El visitante decide si envía el mensaje. Una solicitud no confirma una cita: la disponibilidad la confirma el negocio. Incluye solo servicios e incentivos reales.</p>
+    <p className="studio-notice">El cliente podrá cambiar el mensaje antes de enviarlo. Las citas las confirmas tú por WhatsApp.</p>
     {error && <p role="alert" className="text-red-300">{error}</p>}
-    <button type="submit" className="studio-primary w-full" disabled={busy}>{busy?'Preparando el diseño…':'Confirmar propuesta y ver diseño'}</button>
+    <button type="submit" className="studio-primary w-full" disabled={busy}>{busy?'Preparando el diseño…':'Guardar y ver diseño'}</button>
   </form>;
 }
