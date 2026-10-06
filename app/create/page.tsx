@@ -17,8 +17,8 @@ import { estrategiaConfirmada } from '@/lib/marketing/estrategia';
 import { RemoteSyncPanel } from '@/components/dashboard/RemoteSyncPanel';
 
 const steps: { id: PasoAplicacion; label: string; title: string; description: string }[] = [
- { id: 'CAPTURA', label: 'Foto', title: 'Empecemos por tu negocio', description: 'Sube una foto de tu fachada para preparar tu escaparate.' },
- { id: 'ANALISIS', label: 'Identidad', title: 'Revisa la identidad de tu negocio', description: 'Confirma el nombre y el sector antes de continuar.' },
+ { id: 'CAPTURA', label: 'Foto', title: 'Empecemos por tu agencia', description: 'Sube una foto de tu fachada para preparar tu escaparate.' },
+ { id: 'ANALISIS', label: 'Identidad', title: 'Revisa la identidad de tu agencia', description: 'Confirma el nombre y el sector antes de continuar.' },
  { id: 'ESTRATEGIA', label: 'Objetivo', title: '¿Qué quieres conseguir con tu escaparate?', description: 'Confirma el público, el motivo para escanear y la acción principal.' },
  { id: 'ESCAPARATE', label: 'Diseño', title: 'Elige cómo quieres presentarte', description: 'Revisa la propuesta y elige el diseño de tu web.' },
  { id: 'CONFIGURACION', label: 'Contenido', title: 'Hazlo tuyo', description: 'Revisa tus textos, tus horarios y las formas de contacto.' },
@@ -74,7 +74,7 @@ export default function PaginaCrear() {
  if (!hydrated) return <main className="studio-shell min-h-screen"><p role="status" className="studio-container">Abriendo tu borrador…</p></main>;
  function save() {
    const result = guardarCampañaEnStore();
-   setMessage(result ? 'Borrador guardado en este dispositivo. Usa Publicar para guardarlo en tu cuenta.' : 'Completa la identidad de tu negocio antes de guardar.');
+   setMessage(result ? 'Borrador guardado en este dispositivo. Usa Publicar para guardarlo en tu cuenta.' : 'Completa la identidad de tu agencia antes de guardar.');
  }
  function go(next: PasoAplicacion) { if (ready) guardarCampañaEnStore(); s.establecerPaso(next); }
  return <main className="studio-shell min-h-screen">

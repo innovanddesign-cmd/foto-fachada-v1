@@ -6,6 +6,7 @@ insert into public.escaparates_campaigns(id,owner_id,name) values
 (current_setting('test.a')::uuid,current_setting('test.owner')::uuid,'QR test A'),
 (current_setting('test.b')::uuid,current_setting('test.owner')::uuid,'QR test B'),
 (current_setting('test.c')::uuid,current_setting('test.other')::uuid,'QR test C');
+insert into public.escaparates_published(campaign_id,owner_id,slug,plan) values(current_setting('test.c')::uuid,current_setting('test.other')::uuid,current_setting('test.slug')||'-c','FREE');
 select set_config('request.jwt.claim.sub',current_setting('test.owner'),true);
 set local role authenticated;
 insert into public.escaparates_published(campaign_id,owner_id,slug,plan) values
@@ -40,6 +41,16 @@ select set_config('request.jwt.claim.sub',current_setting('test.owner'),true);
 do $$ begin
 if (select count(*) from public.escaparates_qr_scans where qr_slug=current_setting('test.slug'))<>2 then raise exception 'history not preserved'; end if;
 end $$;
+update public.escaparates_published set slug=current_setting('test.slug') where campaign_id=current_setting('test.a')::uuid;
+do $$ begin
+if not exists(select 1 from public.escaparates_qr where slug=current_setting('test.slug') and target_campaign_id=current_setting('test.b')::uuid and version=2) then raise exception 'republish resets QR'; end if;
+end $$;
+delete from public.escaparates_published where campaign_id=current_setting('test.b')::uuid;
+delete from public.escaparates_campaigns where id=current_setting('test.b')::uuid;
+do $$ begin
+if not exists(select 1 from public.escaparates_qr where slug=current_setting('test.slug') and target_campaign_id is null and version=3) then raise exception 'deleted destination not cleared'; end if;
+if (select count(*) from public.escaparates_qr_scans where qr_slug=current_setting('test.slug'))<>2 then raise exception 'deletion erased history'; end if;
+end $$;
 reset role;
-select 'PASS: publication creates QR; anon resolves/inserts but cannot edit or read owner; owner changes target; other user denied; two destinations retained; stale events denied. Fixtures rolled back.' as result;
+select 'PASS: republish preserves destination; deletion clears target and preserves history; publication creates QR; anon resolves/inserts but cannot edit or read owner; owner changes target; other user denied; two destinations retained; stale events denied. Fixtures rolled back.' as result;
 rollback;

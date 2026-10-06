@@ -180,6 +180,24 @@
           "url": "#"
         }
       ]
+    },
+    "elite-estates": {
+      "id": "elite-estates",
+      "bgImage": "elite-estates-0.png",
+      "accent": "#00ff9d",
+      "overlay": "rgba(3,12,18,.55)"
+    },
+    "distrito-homes": {
+      "id": "distrito-homes",
+      "bgImage": "brands/distrito/distrito-skyline.jpg",
+      "accent": "#e8c547",
+      "overlay": "rgba(3,12,18,.55)"
+    },
+    "familyfirst": {
+      "id": "familyfirst",
+      "bgImage": "familyfirst-0.png",
+      "accent": "#59b38a",
+      "overlay": "rgba(3,12,18,.55)"
     }
   }
 }

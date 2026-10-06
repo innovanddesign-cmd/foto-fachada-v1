@@ -33,46 +33,27 @@ export const AIService = {
                 logoExtraido: null,
                 publicoObjetivo: "Desconocido",
                 contextoMercado: "Sin datos",
-                analisisVision: {nombreSugerido:'Mi negocio',categoriaSugerida:'Comercio local',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true},
+                analisisVision: {nombreSugerido:'Mi inmobiliaria',categoriaSugerida:'Inmobiliaria',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true},
                 confianza: 0
             };
         }
     },
 
     generarEscaparate: async (adn: AdnMarca): Promise<DatosEscaparate> => {
-        const nombre = adn.analisisVision?.nombreSugerido || "Tu Negocio";
+        const nombre = adn.analisisVision?.nombreSugerido || "Tu Inmobiliaria";
         const categoria = adn.analisisVision?.categoriaSugerida || "Servicios";
         const servicios = adn.inteligenciaMarketing?.serviciosDetectados || [];
         const gap = adn.inteligenciaMarketing?.gapDeMercado || "";
         const arquetipoRaw = adn.inteligenciaMarketing?.arquetipoMarca || "El Explorador";
 
-        // Legacy fallback only; confirmed intent takes precedence.
-        // Determinar estrategia de conversión basada en categoría
-        const categoriaLower = categoria.toLowerCase();
-        let estrategia: AdnMarca['estrategiaPrincipal'] = 'LEAD_MAGNET';
-        if (categoriaLower.includes('restaurante') || categoriaLower.includes('gastro') || categoriaLower.includes('café') || categoriaLower.includes('bar')) {
-            estrategia = 'OFERTA_FLASH';
-        } else if (categoriaLower.includes('peluquer') || categoriaLower.includes('salud') || categoriaLower.includes('clínica') || categoriaLower.includes('dentista')) {
-            estrategia = 'CITA_PREVIA';
-        }
+        let estrategia: AdnMarca['estrategiaPrincipal'] = 'CITA_PREVIA';
 
         if (adn.estrategiaConversion?.confirmadaEn) {
             estrategia = adn.estrategiaConversion.objetivo === 'CITAS' ? 'CITA_PREVIA' : 'LEAD_MAGNET';
         }
 
         // Generar titulares basados en el arquetipo
-        const titulares: Record<string, { principal: string; sub: string }> = {
-            'El Rebelde': { principal: `${nombre}: Rompemos las Reglas`, sub: "La experiencia que otros no se atreven a ofrecer." },
-            'El Cuidador': { principal: `${nombre} Cuida de Ti`, sub: "Tu bienestar es nuestra razón de ser." },
-            'El Sabio': { principal: `Confía en la Experiencia de ${nombre}`, sub: "Conocimiento que marca la diferencia." },
-            'El Mago': { principal: `${nombre}: Donde Ocurre la Magia`, sub: "Transformamos lo ordinario en extraordinario." },
-            'El Héroe': { principal: `${nombre}: Supera Tus Límites`, sub: "Aquí empieza tu transformación." },
-            'El Explorador': { principal: `Descubre ${nombre}`, sub: "Una nueva forma de vivir la experiencia." },
-            'El Creador': { principal: `${nombre}: Arte en Cada Detalle`, sub: "Diseñado para quienes aprecian lo diferente." },
-            'El Inocente': { principal: `${nombre}: Sencillamente Perfecto`, sub: "La pureza en su máxima expresión." },
-        };
-
-        const titular = titulares[arquetipoRaw] || { principal: `Bienvenido a ${nombre}`, sub: `${categoria} de excelencia en tu zona.` };
+        const titular = { principal: nombre, sub: `${categoria} · Conoce nuestra agencia y contacta con nuestro equipo.` };
 
         // Generar ofertas desde servicios detectados
         const ofertas = servicios.length > 0
@@ -101,7 +82,7 @@ export const AIService = {
                 variante: "Glass" as const,
                 contenido: {
                     titulo: "Propuesta de Valor",
-                    elementos: servicios.map((s, i) => ({ id: `sv-${i}`, titulo: s, descripcion: gap || "Excelencia garantizada." }))
+                    elementos: servicios.map((s, i) => ({ id: `sv-${i}`, titulo: s, descripcion: gap || "Consulta los detalles con nuestro equipo." }))
                 }
             },
             {
@@ -111,7 +92,7 @@ export const AIService = {
                 contenido: {
                     titulo: "Contacta con Nosotros",
                     cta: {
-                        texto: estrategia === 'CITA_PREVIA' ? 'Reservar Cita' : estrategia === 'OFERTA_FLASH' ? 'Ver Oferta' : 'Contactar',
+                        texto: adn.estrategiaConversion?.cta || 'Contactar con la agencia',
                         accion: "#contacto"
                     }
                 }
@@ -131,7 +112,7 @@ export const AIService = {
                 titularPrincipal: titular.principal,
                 subtitulo: titular.sub,
                 descripcionValor: adn.analisisMarketing || gap || "",
-                ctaPrincipal: adn.estrategiaConversion?.cta || (estrategia === 'CITA_PREVIA' ? 'Consultar cita' : estrategia === 'OFERTA_FLASH' ? 'Ver oferta' : 'Contactar'),
+                ctaPrincipal: adn.estrategiaConversion?.cta || 'Contactar con la agencia',
                 horario: "",
                 telefono: "",
             }

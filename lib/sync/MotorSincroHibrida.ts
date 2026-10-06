@@ -141,36 +141,12 @@ export function generarPlaceholderIA(campo: keyof DatosEscaparateBase, config: P
 
     const PLACEHOLDERS: Record<keyof DatosEscaparateBase, Record<string, string>> = {
         mensajeWhatsApp: { default: '' },
-        titularPrincipal: {
-            gimnasio: "Transforma tu cuerpo, eleva tu mente",
-            restaurante: "Sabor artesanal en cada bocado",
-            peluqueria: "El arte del estilo, hecho para ti",
-            tienda: "Calidad premium, precios honestos",
-            default: `Bienvenido a ${nombreNegocio}`
-        },
-        subtitulo: {
-            gimnasio: "Más de 10 años transformando vidas",
-            restaurante: "Cocina de mercado con alma mediterránea",
-            peluqueria: "Expertos en colorimetría y diseño capilar",
-            tienda: "Todo lo que necesitas, en un solo lugar",
-            default: "Tu destino de confianza en la ciudad"
-        },
-        descripcionValor: {
-            default: "Descubre por qué miles de clientes nos eligen cada día. Ofrecemos una experiencia única diseñada para superar tus expectativas."
-        },
-        ctaPrincipal: {
-            gimnasio: "Reservar Clase de Prueba",
-            restaurante: "Ver Menú del Día",
-            peluqueria: "Pedir Cita Online",
-            tienda: "Ver Catálogo Completo",
-            default: "Descubrir Más"
-        },
-        horario: {
-            default: "L-V: 9:00-20:00 | S: 10:00-14:00"
-        },
-        telefono: {
-            default: "+34 600 000 000"
-        }
+        titularPrincipal: {default: `Conoce ${nombreNegocio}`},
+        subtitulo: {default: 'Servicios inmobiliarios y contacto con nuestra agencia'},
+        descripcionValor: {default: 'Completa aquí los servicios y la zona en la que trabaja tu agencia.'},
+        ctaPrincipal: {default: 'Contactar con la agencia'},
+        horario: {default: ''},
+        telefono: {default: ''}
     };
 
     const campoPlaceholders = PLACEHOLDERS[campo];

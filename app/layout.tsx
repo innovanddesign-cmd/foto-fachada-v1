@@ -7,8 +7,8 @@ import { NavbarGlobal } from "@/components/layout/NavbarGlobal";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Foto Fachada AI — Escaparates digitales para tu negocio",
-    description: "Sube una foto de tu fachada y obtén en segundos: escaparate digital, cartelería imprimible y QR de seguimiento. Impulsado por IA Gemini.",
+    title: "INNOVA — Escaparates digitales para inmobiliarias",
+    description: "Conecta el escaparate de tu inmobiliaria con el móvil: web de tu agencia, servicios, propiedades, cartelería y QR de contacto.",
 };
 
 export default function RootLayout({

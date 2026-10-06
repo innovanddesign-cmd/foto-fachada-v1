@@ -17,11 +17,11 @@ export function VistaReferencia({snapshot}:{snapshot:Snapshot}){
  const [html,setHTML]=useState('');const [error,setError]=useState(false);const [retry,setRetry]=useState(0);
  const options=useMemo(()=>{
   const category=adn?.analisisVision?.categoriaSugerida||'';
-  const name=adn?.analisisVision?.nombreSugerido||datos?.titularPrincipal||'Mi negocio';
+  const name=adn?.analisisVision?.nombreSugerido||datos?.titularPrincipal||'Mi inmobiliaria';
   const desc=resolverDatoHibrido(datos,'descripcionValor');
   const services=datos?.ofertas?.map(x=>({title:x.titulo,text:x.descripcion,price:x.precio}))||[];
   const sections=[{type:'text',title:resolverDatoHibrido(datos,'titularPrincipal')||datos?.titularPrincipal||name,text:desc},
-   ...(services.length?[{type:'services',title:/gastro|restaur|caf/i.test(category)?'Nuestra carta':'Nuestros servicios',items:services}]:[]),
+   ...(services.length?[{type:'services',title:'Servicios inmobiliarios',items:services}]:[]),
    ...(datos?.secciones||[]).filter(s=>s.tipo==='Info'||s.tipo==='Promo').map(s=>({type:'text',title:s.contenido.titulo,text:s.contenido.descripcion})),
    ...(datos?.datosReales?.horario?[{type:'hours',title:'Horario',text:datos.datosReales.horario}]:[]),
    {type:'cta',text:resolverDatoHibrido(datos,'ctaPrincipal')||'Descubrir',action:datos?.datosReales?.telefono?'whatsapp':'link'}];
