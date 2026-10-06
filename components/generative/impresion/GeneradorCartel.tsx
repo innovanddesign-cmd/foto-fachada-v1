@@ -9,7 +9,7 @@ export function GeneradorCartel({formato='A4',configVisual,containerId='poster-c
  if(!adn||!s.imagenSubida)return null;
  const dims=obtenerConfigLayout(formato); const unit=dims.anchoPx/794; const square=formato==='SQUARE';
  const name=adn.analisisVision?.nombreSugerido||'Mi negocio';
- const headline=configVisual?.fraseImpacto||'Descubre todo lo que tenemos para ti';
+ const headline=configVisual?.fraseImpacto||adn.estrategiaConversion?.textoCartel||'Descubre todo lo que tenemos para ti';
  const origin=typeof window!=='undefined'?window.location.origin:'';
  const url=`${origin}${process.env.NEXT_PUBLIC_BASE_PATH||''}/t/${s.slug||'demo'}`;
  const contact=[s.datosEscaparate?.datosReales?.telefono,s.redesSociales.instagram].filter(Boolean).join(' · ');

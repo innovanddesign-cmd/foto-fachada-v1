@@ -10,7 +10,10 @@
 // ESTADOS DE LA APLICACIÓN (MÁQUINA DE ESTADOS LINEAL)
 // ═══════════════════════════════════════════════════════════════
 
+import type { EstrategiaConversion } from '@/lib/marketing/estrategia';
+
 export type PasoAplicacion =
+    | 'ESTRATEGIA'
     | 'CAPTURA'      // Fase 1: Ingesta de imagen
     | 'ANALISIS'     // Fase 2: Procesamiento con IA (futuro)
     | 'ESCAPARATE'   // Fase 3: Generación de tienda
@@ -135,6 +138,7 @@ export interface MetadatosExif {
 // ═══════════════════════════════════════════════════════════════
 
 export interface AdnMarca {
+    estrategiaConversion?: EstrategiaConversion;
     /** Paleta de colores extraída de la fachada (5 niveles) */
     paletaColores: {
         primario: string;
@@ -271,6 +275,7 @@ export interface DatosEscaparate {
 
 /** Campos base editables (usados en datosReales y datosSugeridos) */
 export interface DatosEscaparateBase {
+    mensajeWhatsApp?: string;
     titularPrincipal: string;
     subtitulo: string;
     descripcionValor: string;

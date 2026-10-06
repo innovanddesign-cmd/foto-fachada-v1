@@ -1,7 +1,7 @@
 /** Public rendering contract: only customer-facing content, never private analysis. */
 const text=(v:unknown)=>typeof v==='string'?v:'';
 const url=(v:unknown)=>typeof v==='string'&&(/^(https?:\/\/)/i.test(v)||/^\/(?!\/)/.test(v))&&!v.includes('/object/sign/')?v:'';
-const fields=(v:any)=>Object.fromEntries(['titularPrincipal','subtitulo','descripcionValor','ctaPrincipal','telefono','horario','direccion'].map(k=>[k,text(v?.[k])]));
+const fields=(v:any)=>Object.fromEntries(['titularPrincipal','subtitulo','descripcionValor','ctaPrincipal','mensajeWhatsApp','telefono','horario','direccion'].map(k=>[k,text(v?.[k])]));
 export function sanearPayloadPublico(snapshot:Record<string,any>){
  const d=snapshot.datosEscaparate||{},a=snapshot.adnMarca||{};
  return {adnMarca:{logoExtraido:url(a.logoExtraido),analisisVision:{nombreSugerido:text(a.analisisVision?.nombreSugerido),categoriaSugerida:text(a.analisisVision?.categoriaSugerida)}},

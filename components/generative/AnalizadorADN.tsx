@@ -60,7 +60,7 @@ export const AnalizadorADN = () => {
                 }
 
                 if (isMounted) {
-                    useTiendaEstado.setState({adnMarca:adn});
+                    useTiendaEstado.setState({adnMarca:adn, analizando:false});
                     setResultadoAdn(adn);
                     setAnalizado(true);
                 }
@@ -78,34 +78,7 @@ export const AnalizadorADN = () => {
 
     const manejarContinuar = async () => {
         if (!resultadoAdn) return;
-        const adnActual=useTiendaEstado.getState().adnMarca || resultadoAdn;
-
-        try {
-            // Generar escaparate basado en el ADN analizado
-            const escaparate = await AIService.generarEscaparate(adnActual);
-
-            // Deducir estrategia de conversión
-            const cat = (adnActual.analisisVision?.categoriaSugerida || "").toLowerCase();
-            let estrategia: AdnMarca['estrategiaPrincipal'] = 'LEAD_MAGNET';
-            if (cat.includes('restaurante') || cat.includes('gastro') || cat.includes('café') || cat.includes('bar')) {
-                estrategia = 'OFERTA_FLASH';
-            } else if (cat.includes('peluquer') || cat.includes('salud') || cat.includes('clínica')) {
-                estrategia = 'CITA_PREVIA';
-            }
-
-            // Enriquecer ADN con estrategia y keywords
-            const adnEnriquecido: AdnMarca = {
-                ...adnActual,
-                estrategiaPrincipal: estrategia,
-                keywords: adnActual.analisisVision?.objetosDetectados || [adnActual.ambiente || "negocio"],
-            };
-
-            // Completar en Store Global (esto genera slug y avanza a ESCAPARATE)
-            completarAnalisis(adnEnriquecido, escaparate);
-        } catch (err) {
-            console.error("Error al generar escaparate:", err);
-            setError("Error al preparar la siguiente fase.");
-        }
+        useTiendaEstado.getState().establecerPaso('ESTRATEGIA');
     };
 
     if (error) {

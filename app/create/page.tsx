@@ -11,11 +11,15 @@ import { VistaResultados } from '@/components/generative/VistaResultados';
 import { BibliotecaCarteles } from '@/components/generative/impresion/BibliotecaCarteles';
 import { EditorNegocio } from '@/components/generative/EditorNegocio';
 import { EscaparateReferencia } from '@/components/generative/escaparate/EscaparateReferencia';
+import { ConfirmarEstrategia } from '@/components/generative/ConfirmarEstrategia';
+import InformeIdentidad from '@/components/generative/InformeIdentidad';
+import { estrategiaConfirmada } from '@/lib/marketing/estrategia';
 import { RemoteSyncPanel } from '@/components/dashboard/RemoteSyncPanel';
 
 const steps: { id: PasoAplicacion; label: string; title: string; description: string }[] = [
  { id: 'CAPTURA', label: 'Foto', title: 'Empecemos por tu negocio', description: 'Sube una foto de tu fachada para preparar tu escaparate.' },
  { id: 'ANALISIS', label: 'Identidad', title: 'Revisa la identidad de tu negocio', description: 'Confirma el nombre y el sector antes de continuar.' },
+ { id: 'ESTRATEGIA', label: 'Objetivo', title: '¿Qué quieres conseguir con tu escaparate?', description: 'Confirma el público, el motivo para escanear y la acción principal.' },
  { id: 'ESCAPARATE', label: 'Diseño', title: 'Elige cómo quieres presentarte', description: 'Revisa la propuesta y elige el diseño de tu web.' },
  { id: 'CONFIGURACION', label: 'Contenido', title: 'Hazlo tuyo', description: 'Revisa tus textos, tus horarios y las formas de contacto.' },
  { id: 'CARTELERIA', label: 'Cartel', title: 'Del escaparate a tu web', description: 'Prepara el cartel y su QR. Puedes volver a editar en cualquier momento.' },
@@ -24,8 +28,12 @@ const steps: { id: PasoAplicacion; label: string; title: string; description: st
 function normalized(step: PasoAplicacion) { return step === 'BIBLIOTECA_CARTELERIA' ? 'CARTELERIA' : step === 'DASHBOARD' ? 'DESPLIEGUE' : step; }
 export default function PaginaCrear() {
  const s = useTiendaEstado();
+ const [hydrated, setHydrated] = useState(false);
+ useEffect(() => setHydrated(true), []);
  const ready = Boolean(s.adnMarca && s.datosEscaparate);
- const step = normalized(s.pasoActual);
+ const confirmed = estrategiaConfirmada(s.adnMarca?.estrategiaConversion);
+ const requestedStep = normalized(s.pasoActual);
+ const step = s.adnMarca && !confirmed && !['CAPTURA','ANALISIS','ESTRATEGIA'].includes(requestedStep) ? 'ESTRATEGIA' : requestedStep;
  const index = Math.max(0, steps.findIndex(x => x.id === step));
  const info = steps[index];
  const [message, setMessage] = useState('');
@@ -38,7 +46,7 @@ export default function PaginaCrear() {
    function restore() {
      const requested = new URLSearchParams(location.search).get('paso') as PasoAplicacion;
      const state = useTiendaEstado.getState();
-     if (steps.some(x => x.id === requested) && (requested === 'CAPTURA' || (requested === 'ANALISIS' ? state.imagenSubida : state.adnMarca && state.datosEscaparate))) {
+     if (steps.some(x => x.id === requested) && (requested === 'CAPTURA' || (requested === 'ANALISIS' ? state.imagenSubida : requested === 'ESTRATEGIA' ? state.adnMarca : state.adnMarca && state.datosEscaparate))) {
        if (!initialized.current && normalized(state.pasoActual) !== requested) skipInitialSync.current = true;
        fromHistory.current = true;
        state.establecerPaso(requested);
@@ -63,6 +71,7 @@ export default function PaginaCrear() {
    window.scrollTo({ top: 0, behavior: 'instant' });
    title.current?.focus({ preventScroll: true });
  }, [step]);
+ if (!hydrated) return <main className="studio-shell min-h-screen"><p role="status" className="studio-container">Abriendo tu borrador…</p></main>;
  function save() {
    const result = guardarCampañaEnStore();
    setMessage(result ? 'Borrador guardado en este dispositivo. Usa Publicar para guardarlo en tu cuenta.' : 'Completa la identidad de tu negocio antes de guardar.');
@@ -75,18 +84,19 @@ export default function PaginaCrear() {
        {ready && <button className="studio-button" onClick={save}><Save size={18} /> Guardar borrador local</button>}
      </div>
      <header className="mb-8"><p className="studio-eyebrow">CREADOR DE ESCAPARATES · PASO {index + 1} DE {steps.length}</p><h1 ref={title} tabIndex={-1} className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 outline-none">{info.title}</h1><p className="studio-muted mt-3 max-w-2xl">{info.description}</p></header>
-     <nav aria-label="Pasos de creación" className="studio-steps mb-8">{steps.map((item, i) => <button key={item.id} aria-current={item.id === step ? 'step' : undefined} disabled={i > 0 && (i === 1 ? !s.imagenSubida : !ready)} onClick={() => go(item.id)}><span>{i + 1}</span>{item.label}</button>)}</nav>
+     <nav aria-label="Pasos de creación" className="studio-steps mb-8">{steps.map((item, i) => <button key={item.id} aria-current={item.id === step ? 'step' : undefined} disabled={i > 0 && (i === 1 ? !s.imagenSubida : i === 2 ? !s.adnMarca : !ready || !confirmed)} onClick={() => go(item.id)}><span>{i + 1}</span>{item.label}</button>)}</nav>
      {message && <p role="status" className="studio-notice mb-6">{message}</p>}
      {step === 'CAPTURA' && <div className="studio-legacy rounded-3xl p-4 sm:p-8"><CapturaFachada /></div>}
-     {step === 'ANALISIS' && (ready ? <EditorNegocio /> : s.imagenSubida ? <div className="studio-legacy rounded-3xl p-4 sm:p-8"><AnalizadorADN /></div> : <p className="studio-notice">Necesitas una foto. Vuelve al paso Foto para comenzar.</p>)}
+     {step === 'ANALISIS' && (s.adnMarca && !s.analizando ? <InformeIdentidad adn={s.adnMarca} onConfirmar={() => go('ESTRATEGIA')} /> : s.imagenSubida ? <div className="studio-legacy rounded-3xl p-4 sm:p-8"><AnalizadorADN /></div> : <p className="studio-notice">Necesitas una foto. Vuelve al paso Foto para comenzar.</p>)}
+     {step === 'ESTRATEGIA' && <ConfirmarEstrategia />}
      {step === 'ESCAPARATE' && ready && <div><VistaResultados adn={s.adnMarca!} onContinuar={() => go('CONFIGURACION')} onReiniciar={() => go('CAPTURA')} /></div>}
      {step === 'CONFIGURACION' && ready && <div className="grid lg:grid-cols-2 gap-6 items-start"><EditorNegocio /><section className="studio-panel lg:sticky lg:top-24"><h2 className="font-semibold mb-4">Vista previa de tu web</h2><div className="overflow-hidden rounded-2xl bg-slate-900"><EscaparateReferencia /></div></section></div>}
      {step === 'CARTELERIA' && ready && <BibliotecaCarteles />}
      {step === 'DESPLIEGUE' && ready && <RemoteSyncPanel />}
-     {!ready && !['CAPTURA', 'ANALISIS'].includes(step) && <div className="studio-panel"><h2 className="font-semibold">No hay un borrador abierto</h2><p className="studio-muted my-4">Abre un escaparate desde tu panel o empieza con una foto.</p><button className="studio-primary" onClick={() => go('CAPTURA')}>Empezar con una foto</button></div>}
+     {!ready && !['CAPTURA', 'ANALISIS', 'ESTRATEGIA'].includes(step) && <div className="studio-panel"><h2 className="font-semibold">No hay un borrador abierto</h2><p className="studio-muted my-4">Abre un escaparate desde tu panel o empieza con una foto.</p><button className="studio-primary" onClick={() => go('CAPTURA')}>Empezar con una foto</button></div>}
      <footer className="flex flex-wrap justify-between gap-3 mt-8 pt-6 border-t border-emerald-900">
        {index > 0 ? <button className="studio-button" onClick={() => go(steps[index - 1].id)}><ArrowLeft size={18} /> Volver a {steps[index - 1].label.toLowerCase()}</button> : <Link href="/dashboard" className="studio-button">Volver al panel</Link>}
-       {ready && index >= 1 && index < steps.length - 1 && <button className="studio-primary" onClick={() => go(steps[index + 1].id)}>Continuar a {steps[index + 1].label.toLowerCase()}<ArrowRight size={18} /></button>}
+       {ready && confirmed && index >= 3 && index < steps.length - 1 && <button className="studio-primary" onClick={() => go(steps[index + 1].id)}>Continuar a {steps[index + 1].label.toLowerCase()}<ArrowRight size={18} /></button>}
      </footer>
    </div>
  </main>;

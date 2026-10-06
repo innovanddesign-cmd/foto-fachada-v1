@@ -10,7 +10,7 @@ import type { FormatoPoster, CartelGenerado } from '@/lib/estado/tipos-estado';
 export function BibliotecaCarteles() {
  const s = useTiendaEstado();
  const [format, setFormat] = useState<FormatoPoster>(s.cartelesGenerados[0]?.formato || 'A4');
- const [headline, setHeadline] = useState(s.cartelesGenerados[0]?.configVisual.fraseImpacto || '');
+ const [headline, setHeadline] = useState(s.cartelesGenerados[0]?.configVisual.fraseImpacto || s.adnMarca?.estrategiaConversion?.textoCartel || '');
  const [busy, setBusy] = useState(false);
  const [message, setMessage] = useState('');
  const [error, setError] = useState('');

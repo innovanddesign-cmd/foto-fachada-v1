@@ -18,9 +18,9 @@ export function EditorNegocio() {
     <label className="studio-field">Sector<input value={s.adnMarca.analisisVision?.categoriaSugerida || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, categoriaSugerida: e.target.value } })} /><span className="studio-muted text-sm">El sector determina la plantilla visual.</span></label>
     {([
       ['titularPrincipal', 'Titular de presentación'], ['subtitulo', 'Subtítulo'], ['descripcionValor', 'Descripción del negocio'],
-      ['ctaPrincipal', 'Texto del botón principal'], ['telefono', 'Teléfono / WhatsApp con prefijo de país'], ['horario', 'Horario de atención']
+      ['ctaPrincipal', 'Texto del botón principal'], ['mensajeWhatsApp', 'Mensaje inicial de WhatsApp'], ['telefono', 'Teléfono / WhatsApp con prefijo de país'], ['horario', 'Horario de atención']
     ] as [keyof DatosEscaparateBase, string][]).map(([key, label]) => <label key={key} className="studio-field">{label}
-      {key === 'descripcionValor' || key === 'horario' ? <textarea rows={3} value={datos.datosReales?.[key] ?? datos.datosSugeridos?.[key] ?? ''} onChange={e => update(key, e.target.value)} /> :
+      {key === 'descripcionValor' || key === 'horario' || key === 'mensajeWhatsApp' ? <textarea rows={3} value={datos.datosReales?.[key] ?? datos.datosSugeridos?.[key] ?? ''} onChange={e => update(key, e.target.value)} /> :
         <input type={key === 'telefono' ? 'tel' : 'text'} value={datos.datosReales?.[key] ?? (key === 'titularPrincipal' || key === 'subtitulo' ? datos[key] : datos.datosSugeridos?.[key]) ?? ''} onChange={e => update(key, e.target.value)} />}
     </label>)}
     <fieldset className="space-y-4"><legend className="font-semibold mb-3">Servicios y productos</legend>

@@ -25,7 +25,7 @@ export function VistaReferencia({snapshot}:{snapshot:Snapshot}){
    ...(datos?.secciones||[]).filter(s=>s.tipo==='Info'||s.tipo==='Promo').map(s=>({type:'text',title:s.contenido.titulo,text:s.contenido.descripcion})),
    ...(datos?.datosReales?.horario?[{type:'hours',title:'Horario',text:datos.datosReales.horario}]:[]),
    {type:'cta',text:resolverDatoHibrido(datos,'ctaPrincipal')||'Descubrir',action:datos?.datosReales?.telefono?'whatsapp':'link'}];
-  return {business:{name,category,plan:datos?.planVisual||'PRO',description:desc,phone:datos?.datosReales?.telefono,whatsapp:datos?.datosReales?.telefono,website:redes?.web,instagram:redes?.instagram,logo:adn?.logoExtraido},
+  return {business:{name,category,plan:datos?.planVisual||'PRO',description:desc,phone:datos?.datosReales?.telefono,whatsapp:datos?.datosReales?.telefono,whatsappMessage:datos?.datosReales?.mensajeWhatsApp,website:redes?.web,instagram:redes?.instagram,logo:adn?.logoExtraido},
    content:{title:name,subtitle:resolverDatoHibrido(datos,'subtitulo')||category,heroImage:foto?.urlImagen,sections,gallery:activos.filter(x=>x.tipo==='OTRO').map(x=>({url:x.url,alt:x.nombreArchivo}))}};
  },[adn,datos,activos,foto,redes]);
  useEffect(()=>{let active=true;setError(false);buildLandingDocument(options).then(doc=>{if(active)setHTML(doc)}).catch(()=>{if(active)setError(true)});return()=>{active=false};},[options,retry]);

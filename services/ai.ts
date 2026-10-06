@@ -46,6 +46,7 @@ export const AIService = {
         const gap = adn.inteligenciaMarketing?.gapDeMercado || "";
         const arquetipoRaw = adn.inteligenciaMarketing?.arquetipoMarca || "El Explorador";
 
+        // Legacy fallback only; confirmed intent takes precedence.
         // Determinar estrategia de conversión basada en categoría
         const categoriaLower = categoria.toLowerCase();
         let estrategia: AdnMarca['estrategiaPrincipal'] = 'LEAD_MAGNET';
@@ -53,6 +54,10 @@ export const AIService = {
             estrategia = 'OFERTA_FLASH';
         } else if (categoriaLower.includes('peluquer') || categoriaLower.includes('salud') || categoriaLower.includes('clínica') || categoriaLower.includes('dentista')) {
             estrategia = 'CITA_PREVIA';
+        }
+
+        if (adn.estrategiaConversion?.confirmadaEn) {
+            estrategia = adn.estrategiaConversion.objetivo === 'CITAS' ? 'CITA_PREVIA' : 'LEAD_MAGNET';
         }
 
         // Generar titulares basados en el arquetipo
@@ -126,7 +131,7 @@ export const AIService = {
                 titularPrincipal: titular.principal,
                 subtitulo: titular.sub,
                 descripcionValor: adn.analisisMarketing || gap || "",
-                ctaPrincipal: estrategia === 'CITA_PREVIA' ? 'Reservar Cita' : estrategia === 'OFERTA_FLASH' ? 'Ver Oferta' : 'Contactar Ahora',
+                ctaPrincipal: adn.estrategiaConversion?.cta || (estrategia === 'CITA_PREVIA' ? 'Consultar cita' : estrategia === 'OFERTA_FLASH' ? 'Ver oferta' : 'Contactar'),
                 horario: "",
                 telefono: "",
             }

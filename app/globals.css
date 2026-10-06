@@ -189,9 +189,9 @@ body {
 .studio-shell button:disabled { cursor:not-allowed; opacity:.5; }
 .studio-shell :is(button,a,input,textarea,summary):focus-visible { outline:3px solid #00ff9d; outline-offset:4px; }
 .studio-field { display:flex; flex-direction:column; gap:8px; font-size:14px; font-weight:600; }
-.studio-field input,.studio-field textarea { width:100%; min-height:48px; background:#0b120e; border:1px solid #587060; border-radius:10px; padding:12px; font-size:16px; font-weight:400; color:#edf5ef; }
+.studio-field input,.studio-field textarea,.studio-field select { width:100%; min-height:48px; background:#0b120e; border:1px solid #587060; border-radius:10px; padding:12px; font-size:16px; font-weight:400; color:#edf5ef; }
 .studio-notice { border:1px solid #325b43; background:#13271c; padding:16px; border-radius:12px; color:#bcf6d3; font-size:14px; }
-.studio-steps { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; }
+.studio-steps { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; }
 .studio-steps button { min-height:64px; display:flex; align-items:center; gap:8px; justify-content:center; padding:10px 6px; border:1px solid #3b5043; border-radius:12px; font-size:14px; background:#0b120e; color:#a9b8af; }
 .studio-steps button span { font-weight:700; }
 .studio-steps button[aria-current] { background:#00ff9d; color:#06150d; border-color:#00ff9d; }

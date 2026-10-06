@@ -140,6 +140,7 @@ export function generarPlaceholderIA(campo: keyof DatosEscaparateBase, config: P
     const cat = categoriaSugerida.toLowerCase();
 
     const PLACEHOLDERS: Record<keyof DatosEscaparateBase, Record<string, string>> = {
+        mensajeWhatsApp: { default: '' },
         titularPrincipal: {
             gimnasio: "Transforma tu cuerpo, eleva tu mente",
             restaurante: "Sabor artesanal en cada bocado",
