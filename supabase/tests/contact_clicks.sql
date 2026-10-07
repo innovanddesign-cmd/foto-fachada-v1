@@ -1,0 +1,23 @@
+begin;
+select set_config('test.owner',gen_random_uuid()::text,true),set_config('test.other',gen_random_uuid()::text,true),set_config('test.c',gen_random_uuid()::text,true),set_config('test.slug','click-test-'||gen_random_uuid()::text,true);
+insert into auth.users(id) values(current_setting('test.owner')::uuid),(current_setting('test.other')::uuid);
+insert into public.escaparates_campaigns(id,owner_id,name) values(current_setting('test.c')::uuid,current_setting('test.owner')::uuid,'Contact test');
+insert into public.escaparates_published(campaign_id,owner_id,slug,plan) values(current_setting('test.c')::uuid,current_setting('test.owner')::uuid,current_setting('test.slug'),'FREE');
+set local role anon;
+insert into public.escaparates_contact_clicks(campaign_id,landing_slug,action) values(current_setting('test.c')::uuid,current_setting('test.slug'),'whatsapp');
+do $$ begin
+begin perform * from public.escaparates_contact_clicks; raise exception 'anon read allowed'; exception when insufficient_privilege then null; end;
+begin insert into public.escaparates_contact_clicks(campaign_id,landing_slug,action) values(current_setting('test.c')::uuid,'nonexistent','phone'); raise exception 'invalid publication allowed'; exception when insufficient_privilege then null; end;
+begin insert into public.escaparates_contact_clicks(campaign_id,landing_slug,action) values(current_setting('test.c')::uuid,current_setting('test.slug'),'invalid'); raise exception 'invalid action allowed'; exception when check_violation then null; end;
+end $$;
+select set_config('request.jwt.claim.sub',current_setting('test.other'),true);
+set local role authenticated;
+do $$ begin if exists(select 1 from public.escaparates_contact_clicks where campaign_id=current_setting('test.c')::uuid) then raise exception 'other owner reads history'; end if; end $$;
+select set_config('request.jwt.claim.sub',current_setting('test.owner'),true);
+do $$ begin if (select count(*) from public.escaparates_contact_clicks where campaign_id=current_setting('test.c')::uuid)<>1 then raise exception 'owner count incorrect'; end if;
+begin update public.escaparates_contact_clicks set action='phone'; raise exception 'mutation allowed'; exception when insufficient_privilege then null; end; end $$;
+delete from public.escaparates_published where campaign_id=current_setting('test.c')::uuid;
+do $$ begin if (select count(*) from public.escaparates_contact_clicks where campaign_id=current_setting('test.c')::uuid)<>1 then raise exception 'history lost after unpublishing'; end if; end $$;
+reset role;
+select 'PASS: valid visitor insert, invalid publication/action denied, anonymous read denied, other owner denied, owner reads immutable history after unpublish; fixtures rolled back' as result;
+rollback;

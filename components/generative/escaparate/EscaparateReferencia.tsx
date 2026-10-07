@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useState,useRef} from 'react';
 import {useTiendaEstado} from '@/store/useTiendaEstado';
 import type {EstadoTienda} from '@/lib/estado/tipos-estado';
 type Snapshot = Pick<EstadoTienda,'adnMarca'|'datosEscaparate'|'galeriaActivos'|'imagenSubida'|'redesSociales'>;
@@ -12,7 +12,20 @@ export function EscaparateReferencia(){
  const activos=useTiendaEstado(s=>s.galeriaActivos);const foto=useTiendaEstado(s=>s.imagenSubida);const redes=useTiendaEstado(s=>s.redesSociales);
  return <VistaReferencia snapshot={{adnMarca:adn,datosEscaparate:datos,galeriaActivos:activos,imagenSubida:foto,redesSociales:redes}}/>;
 }
-export function VistaReferencia({snapshot}:{snapshot:Snapshot}){
+export function VistaReferencia({snapshot,onContact}:{snapshot:Snapshot;onContact?:(action:string)=>void}){
+ const frame=useRef<HTMLIFrameElement>(null);
+ useEffect(()=>{
+  if(!onContact)return;
+  let lastAction='',lastAt=0;
+  const listener=(event:MessageEvent)=>{
+   if(event.source!==frame.current?.contentWindow||event.data?.type!=='innova-cta')return;
+   const action=event.data.action;
+   if(!['whatsapp','phone','email','maps','link','instagram'].includes(action))return;
+   if(action===lastAction&&Date.now()-lastAt<500)return;
+   lastAction=action;lastAt=Date.now();onContact(action);
+  };
+  window.addEventListener('message',listener);return()=>window.removeEventListener('message',listener);
+ },[onContact]);
  const {adnMarca:adn,datosEscaparate:datos,imagenSubida:foto,redesSociales:redes}=snapshot;const activos=snapshot.galeriaActivos||[];
  const [html,setHTML]=useState('');const [error,setError]=useState(false);const [retry,setRetry]=useState(0);
  const options=useMemo(()=>{
@@ -31,6 +44,6 @@ export function VistaReferencia({snapshot}:{snapshot:Snapshot}){
  useEffect(()=>{let active=true;setError(false);buildLandingDocument(options).then(doc=>{if(active)setHTML(doc)}).catch(()=>{if(active)setError(true)});return()=>{active=false};},[options,retry]);
  if(error)return <div role="alert" className="p-8 text-center text-white"><p>No se pudo cargar el diseño.</p><button type="button" onClick={()=>setRetry(n=>n+1)} className="mt-4 rounded-lg bg-white px-6 py-3 text-black">Reintentar</button></div>;
  if(!html)return <div role="status" className="p-8 text-center text-white">Preparando tu escaparate…</div>;
- return <iframe title={options.business.name+' — Escaparate digital'} srcDoc={html} sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" className="block w-full border-0" style={{height:'100svh',minHeight:640,background:'#101622'}}/>;
+ return <iframe ref={frame} title={options.business.name+' - Escaparate digital'} srcDoc={html} sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" className="block w-full border-0" style={{height:'100svh',minHeight:640,background:'#101622'}}/>;
 }
 
