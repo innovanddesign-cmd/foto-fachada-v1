@@ -1,14 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { requireAIUser } from '@/lib/ai/access';
+import { requireAIUser, aiRequestId } from '@/lib/ai/access';
 import { recordAIUsage } from '@/lib/ai/usage';
+import { withAIQuota, saveAIAttempt } from '@/lib/ai/quota';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
     const access = await requireAIUser(req);
     if (access.response) return access.response;
-    const requestId = crypto.randomUUID();
+    const requestId = aiRequestId(req);
+    if(!requestId)return NextResponse.json({error:'Identificador de solicitud inválido.'},{status:400});
+    return withAIQuota(access.userId!, requestId, async () => {
+    let attempted = false, recorded = false;
     try {
         const { image } = await req.json();
 
@@ -65,6 +69,7 @@ export async function POST(req: Request) {
       4. STRICTLY RETURN ONLY JSON.
     `;
 
+        attempted = true;
         const result = await model.generateContent([
             prompt,
             {
@@ -77,6 +82,8 @@ export async function POST(req: Request) {
 
         const response = await result.response;
         recordAIUsage(access.userId!, requestId, 'gemini-2.0-flash', response.usageMetadata);
+        await saveAIAttempt(requestId, 1, 'gemini-2.0-flash', 200, response.usageMetadata);
+        recorded = true;
         const text = response.text();
 
         // Clean potential markdown code blocks if the model adds them despite MIME type
@@ -85,10 +92,12 @@ export async function POST(req: Request) {
         return NextResponse.json(JSON.parse(cleanedText));
 
     } catch (error) {
+        if(attempted && !recorded) await saveAIAttempt(requestId, 1, 'gemini-2.0-flash', null, null);
         console.error("Gemini Analysis Error");
         return NextResponse.json(
             { error: "Failed to analyze image" },
             { status: 500 }
         );
     }
+    });
 }

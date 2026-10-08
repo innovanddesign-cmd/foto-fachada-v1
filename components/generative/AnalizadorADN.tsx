@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from 'react';
 import { useTiendaEstado } from '@/store/useTiendaEstado';
-import { AIService, AISignInRequired, identidadManual } from '@/services/ai';
+import { AIService, AISignInRequired, AIQuotaNotice, identidadManual } from '@/services/ai';
 import { LoginForm } from '@/components/auth/LoginForm';
 import type { AdnMarca } from '@/lib/estado/tipos-estado';
 
@@ -34,6 +34,7 @@ export const AnalizadorADN = () => {
             complete(await AIService.analizarImagen(base64));
         } catch (e) {
             if (e instanceof AISignInRequired) setLogin(true);
+            else if (e instanceof AIQuotaNotice) setError(e.message);
             else setError('No se pudo analizar la foto. Puedes continuar manualmente.');
         } finally { pending.current = false; setBusy(false); }
     }

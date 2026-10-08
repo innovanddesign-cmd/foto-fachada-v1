@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { requireAIUser } from '@/lib/ai/access';
+import { requireAIUser, aiRequestId } from '@/lib/ai/access';
 import { recordAIUsage } from '@/lib/ai/usage';
+import { withAIQuota, saveAIAttempt } from '@/lib/ai/quota';
 
 /** Detecta el mimeType real desde el header del data URL */
 function detectarMimeType(base64ConHeader: string): string {
@@ -15,7 +16,7 @@ function detectarMimeType(base64ConHeader: string): string {
 }
 
 /** Llama a Gemini REST API v1 directamente (evita limitaciones del SDK v1beta) */
-async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: string, mimeType: string, prompt: string, userId: string, requestId: string) {
+async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: string, mimeType: string, prompt: string, userId: string, requestId: string, attempt: number) {
     const url = `https://generativelanguage.googleapis.com/v1/models/${modelo}:generateContent?key=${apiKey}`;
 
     const body = {
@@ -31,18 +32,25 @@ async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: stri
         }
     };
 
-    const response = await fetch(url, {
+    let response: Response;
+    try { response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-    });
+        signal: AbortSignal.timeout(45000),
+    }); } catch {
+        await saveAIAttempt(requestId, attempt, modelo, null, null);
+        throw new Error('Proveedor no disponible');
+    }
 
     if (!response.ok) {
+        await saveAIAttempt(requestId, attempt, modelo, response.status, null);
         throw new Error(`[${response.status}] Servicio IA no disponible`);
     }
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     recordAIUsage(userId, requestId, modelo, data.usageMetadata);
+    await saveAIAttempt(requestId, attempt, modelo, response.status, data.usageMetadata);
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) throw new Error("Respuesta vacía del modelo");
     return text;
@@ -51,7 +59,9 @@ async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: stri
 export async function POST(req: Request) {
     const access = await requireAIUser(req);
     if (access.response) return access.response;
-    const requestId = crypto.randomUUID();
+    const requestId = aiRequestId(req);
+    if(!requestId)return NextResponse.json({error:'Identificador de solicitud inválido.'},{status:400});
+    return withAIQuota(access.userId!, requestId, async () => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
         return NextResponse.json(
@@ -120,9 +130,9 @@ Reglas:
         let modeloUsado = "";
         let ultimoError = "";
 
-        for (const modelo of MODELOS_FALLBACK) {
+        for (const [index, modelo] of MODELOS_FALLBACK.entries()) {
             try {
-                text = await llamarGeminiREST(apiKey, modelo, base64Data, mimeType, prompt, access.userId!, requestId);
+                text = await llamarGeminiREST(apiKey, modelo, base64Data, mimeType, prompt, access.userId!, requestId, index + 1);
                 modeloUsado = modelo;
                 break;
             } catch (err: unknown) {
@@ -205,8 +215,7 @@ Reglas:
         return NextResponse.json(adn);
 
     } catch (error: unknown) {
-        const mensaje = error instanceof Error ? error.message : String(error);
-        console.error("[analizar-fachada] Error:", mensaje);
+        console.error("[analizar-fachada] Error de análisis");
 
         return NextResponse.json(
             {
@@ -216,5 +225,6 @@ Reglas:
             { status: 500 }
         );
     }
+    });
 }
 

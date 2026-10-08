@@ -1,6 +1,7 @@
 import type { AdnMarca, DatosEscaparate } from "@/lib/estado/tipos-estado";
 
 export class AISignInRequired extends Error {}
+export class AIQuotaNotice extends Error {}
 export function identidadManual(): AdnMarca {
     return {
         paletaColores: { primario:'#000000', secundario:'#333333', acento:'#c9a45c', fondo:'#FFFFFF', superficieGlass:'rgba(0,0,0,0.1)' },
@@ -16,13 +17,14 @@ export const AIService = {
         try {
             const response = await fetch("/api/analizar-fachada", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID() },
                 body: JSON.stringify({ image: imagenBase64 }),
             });
 
             if (!response.ok) {
                 if (response.status === 401) throw new AISignInRequired('Inicia sesión para usar la IA.');
                 const errorData = await response.json().catch(() => ({}));
+                if (['AI_QUOTA','AI_RETRY'].includes(errorData.code)) throw new AIQuotaNotice(errorData.error);
                 const detalle = errorData.detalle || errorData.error || `HTTP ${response.status}`;
                 throw new Error(`Error de API: ${detalle}`);
             }
@@ -31,6 +33,7 @@ export const AIService = {
 
         } catch (error) {
             if (error instanceof AISignInRequired) throw error;
+            if (error instanceof AIQuotaNotice) throw error;
             console.error("Error en Servicio AI:", error);
             return {
                 paletaColores: {
