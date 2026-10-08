@@ -1,15 +1,21 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { requireAIUser } from '@/lib/ai/access';
+import { recordAIUsage } from '@/lib/ai/usage';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
+    const access = await requireAIUser(req);
+    if (access.response) return access.response;
+    const requestId = crypto.randomUUID();
     try {
         const { image } = await req.json();
 
-        if (!image) {
+        if (typeof image !== 'string' || !image) {
             return NextResponse.json({ error: "No image provided" }, { status: 400 });
         }
+        if (image.length > 14_000_000) return NextResponse.json({ error: 'La imagen es demasiado grande.' }, { status: 413 });
 
         if (!process.env.GEMINI_API_KEY) {
             console.error("GEMINI_API_KEY not set");
@@ -70,6 +76,7 @@ export async function POST(req: Request) {
         ]);
 
         const response = await result.response;
+        recordAIUsage(access.userId!, requestId, 'gemini-2.0-flash', response.usageMetadata);
         const text = response.text();
 
         // Clean potential markdown code blocks if the model adds them despite MIME type
@@ -78,7 +85,7 @@ export async function POST(req: Request) {
         return NextResponse.json(JSON.parse(cleanedText));
 
     } catch (error) {
-        console.error("Gemini Analysis Error:", error);
+        console.error("Gemini Analysis Error");
         return NextResponse.json(
             { error: "Failed to analyze image" },
             { status: 500 }

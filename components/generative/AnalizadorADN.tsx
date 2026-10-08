@@ -1,123 +1,51 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useTiendaEstado } from "@/store/useTiendaEstado";
-import { AIService } from "@/services/ai";
-import { EscaneoProgresivo } from "./EscaneoProgresivo";
-import { VistaResultados } from "./VistaResultados";
-import InformeIdentidad from "./InformeIdentidad";
-import { AdnMarca } from "@/lib/estado/tipos-estado";
+import { useRef, useState } from 'react';
+import { useTiendaEstado } from '@/store/useTiendaEstado';
+import { AIService, AISignInRequired, identidadManual } from '@/services/ai';
+import { LoginForm } from '@/components/auth/LoginForm';
+import type { AdnMarca } from '@/lib/estado/tipos-estado';
 
 export const AnalizadorADN = () => {
-    const imagenSubida = useTiendaEstado((s) => s.imagenSubida);
-    const adnEditado = useTiendaEstado((s) => s.adnMarca);
-    const completarAnalisis = useTiendaEstado((s) => s.completarAnalisis);
-
-    const [error, setError] = useState<string | null>(null);
-    const [mounted, setMounted] = useState(false);
-    const [analizado, setAnalizado] = useState(false);
-    const [resultadoAdn, setResultadoAdn] = useState<AdnMarca | null>(null);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (!mounted) return;
-
-        // Si no hay imagen, no hacemos nada (el Page.tsx redirigirá a captura)
-        if (!imagenSubida || !imagenSubida.urlImagen) {
-            return;
-        }
-
-        let isMounted = true;
-
-        const ejecutarAnalisis = async () => {
-            try {
-                const startTime = Date.now();
-
-                // Convertir blob URL / object URL a base64 para enviar a la API
-                let imagenBase64 = imagenSubida.urlImagen;
-                if (imagenBase64.startsWith('blob:') || imagenBase64.startsWith('http')) {
-                    const resp = await fetch(imagenBase64);
-                    const blob = await resp.blob();
-                    imagenBase64 = await new Promise<string>((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result as string);
-                        reader.readAsDataURL(blob);
-                    });
-                }
-
-                // Ejecutar análisis real con Gemini
-                const adn = await AIService.analizarImagen(imagenBase64);
-
-                const endTime = Date.now();
-                const duration = endTime - startTime;
-                const minDuration = 0;
-
-                if (duration < minDuration) {
-                    await new Promise(resolve => setTimeout(resolve, minDuration - duration));
-                }
-
-                if (isMounted) {
-                    useTiendaEstado.setState({adnMarca:adn, analizando:false});
-                    setResultadoAdn(adn);
-                    setAnalizado(true);
-                }
-
-            } catch (err) {
-                console.error("Error en análisis:", err);
-                if (isMounted) setError("Error al procesar la fachada. Intenta nuevamente.");
+    const image = useTiendaEstado(s => s.imagenSubida);
+    const [busy, setBusy] = useState(false);
+    const pending = useRef(false);
+    const [login, setLogin] = useState(false);
+    const [error, setError] = useState('');
+    function complete(adn: AdnMarca) {
+        useTiendaEstado.setState({ adnMarca: adn, analizando: false });
+    }
+    async function analyze() {
+        if (pending.current || !image?.urlImagen) return;
+        pending.current = true;
+        setBusy(true); setError(''); setLogin(false);
+        try {
+            let base64 = image.urlImagen;
+            if (base64.startsWith('blob:') || base64.startsWith('http')) {
+                const response = await fetch(base64);
+                if (!response.ok) throw new Error('No se pudo abrir la foto.');
+                const blob = await response.blob();
+                base64 = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = () => reject(new Error('No se pudo leer la foto.'));
+                    reader.readAsDataURL(blob);
+                });
             }
-        };
-
-        ejecutarAnalisis();
-
-        return () => { isMounted = false; };
-    }, [imagenSubida, mounted]);
-
-    const manejarContinuar = async () => {
-        if (!resultadoAdn) return;
-        useTiendaEstado.getState().establecerPaso('ESTRATEGIA');
-    };
-
-    if (error) {
-        return (
-            <div className="flex flex-col items-center justify-center p-8 bg-red-900/20 backdrop-blur-xl rounded-3xl border border-red-500/30 text-red-200">
-                <p>⚠️ {error}</p>
-                <button
-                    type="button"
-                    onClick={() => window.location.reload()}
-                    className="mt-4 px-6 py-2 bg-red-500/20 hover:bg-red-500/40 rounded-full transition-colors"
-                >
-                    Reintentar
-                </button>
-            </div>
-        );
+            complete(await AIService.analizarImagen(base64));
+        } catch (e) {
+            if (e instanceof AISignInRequired) setLogin(true);
+            else setError('No se pudo analizar la foto. Puedes continuar manualmente.');
+        } finally { pending.current = false; setBusy(false); }
     }
-
-    if (analizado && resultadoAdn) {
-        return (
-            <InformeIdentidad
-                adn={adnEditado || resultadoAdn}
-                onConfirmar={manejarContinuar}
-            />
-        );
-    }
-
-    return (
-        <div className="flex flex-col items-center justify-center w-full min-h-[60vh] py-12">
-            <div role="status" className="text-slate-200 text-lg">Preparando la identidad del negocio…</div>
-
-            <div className="mt-8 text-center space-y-2">
-                <p className="text-white/50 text-sm animate-pulse">
-                    Analizando la foto de tu negocio…
-                </p>
-                <p className="text-xs text-white/30 font-mono">
-                    Si la IA no está disponible, podrás continuar manualmente.
-                </p>
-            </div>
+    return <section className="space-y-5" aria-busy={busy}>
+        <h2 className="text-xl font-semibold">¿Cómo quieres preparar tu escaparate?</h2>
+        <p className="studio-muted">Puedes completar los datos tú mismo, gratis y sin registrarte. Para analizar la foto con IA necesitas una cuenta.</p>
+        <div className="flex flex-wrap gap-3">
+            <button className="studio-primary" disabled={busy} onClick={() => complete(identidadManual())}>Continuar sin IA</button>
+            <button className="studio-button" disabled={busy} onClick={() => void analyze()}>{busy ? 'Analizando…' : 'Analizar foto con IA'}</button>
         </div>
-    );
+        {busy && <p role="status">Preparando la identidad del negocio…</p>}
+        {error && <p role="alert">{error}</p>}
+        {login && <div className="studio-panel"><p className="mb-5" role="status">Inicia sesión para analizar la foto. Tu borrador se conserva.</p><LoginForm onSuccess={() => void analyze()} /></div>}
+    </section>;
 };
-

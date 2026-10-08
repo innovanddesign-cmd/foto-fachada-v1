@@ -1,5 +1,16 @@
 import type { AdnMarca, DatosEscaparate } from "@/lib/estado/tipos-estado";
 
+export class AISignInRequired extends Error {}
+export function identidadManual(): AdnMarca {
+    return {
+        paletaColores: { primario:'#000000', secundario:'#333333', acento:'#c9a45c', fondo:'#FFFFFF', superficieGlass:'rgba(0,0,0,0.1)' },
+        estiloTipografico:'SANS_GEOMETRICA', ambiente:'Edición manual',
+        analisisMarketing:'Completa el nombre y los datos de tu negocio. Puedes crear tu escaparate sin usar IA.',
+        logoExtraido:null, publicoObjetivo:'', contextoMercado:'', confianza:0,
+        analisisVision: {nombreSugerido:'Mi inmobiliaria',categoriaSugerida:'Inmobiliaria',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true}
+    };
+}
+
 export const AIService = {
     analizarImagen: async (imagenBase64: string): Promise<AdnMarca> => {
         try {
@@ -10,6 +21,7 @@ export const AIService = {
             });
 
             if (!response.ok) {
+                if (response.status === 401) throw new AISignInRequired('Inicia sesión para usar la IA.');
                 const errorData = await response.json().catch(() => ({}));
                 const detalle = errorData.detalle || errorData.error || `HTTP ${response.status}`;
                 throw new Error(`Error de API: ${detalle}`);
@@ -18,6 +30,7 @@ export const AIService = {
             return await response.json();
 
         } catch (error) {
+            if (error instanceof AISignInRequired) throw error;
             console.error("Error en Servicio AI:", error);
             return {
                 paletaColores: {

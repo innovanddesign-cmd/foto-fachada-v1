@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { requireAIUser } from '@/lib/ai/access';
+import { recordAIUsage } from '@/lib/ai/usage';
 
 /** Detecta el mimeType real desde el header del data URL */
 function detectarMimeType(base64ConHeader: string): string {
@@ -13,7 +15,7 @@ function detectarMimeType(base64ConHeader: string): string {
 }
 
 /** Llama a Gemini REST API v1 directamente (evita limitaciones del SDK v1beta) */
-async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: string, mimeType: string, prompt: string) {
+async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: string, mimeType: string, prompt: string, userId: string, requestId: string) {
     const url = `https://generativelanguage.googleapis.com/v1/models/${modelo}:generateContent?key=${apiKey}`;
 
     const body = {
@@ -36,17 +38,20 @@ async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: stri
     });
 
     if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`[${response.status}] ${errorBody}`);
+        throw new Error(`[${response.status}] Servicio IA no disponible`);
     }
 
     const data = await response.json();
+    recordAIUsage(userId, requestId, modelo, data.usageMetadata);
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) throw new Error("Respuesta vacía del modelo");
     return text;
 }
 
 export async function POST(req: Request) {
+    const access = await requireAIUser(req);
+    if (access.response) return access.response;
+    const requestId = crypto.randomUUID();
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
         return NextResponse.json(
@@ -58,9 +63,10 @@ export async function POST(req: Request) {
     try {
         const { image } = await req.json();
 
-        if (!image) {
+        if (typeof image !== 'string' || !image) {
             return NextResponse.json({ error: "No image provided" }, { status: 400 });
         }
+        if (image.length > 14_000_000) return NextResponse.json({ error: 'La imagen es demasiado grande.' }, { status: 413 });
 
         const mimeType = detectarMimeType(image);
         const base64Data = image.includes(",") ? image.split(",")[1] : image;
@@ -116,7 +122,7 @@ Reglas:
 
         for (const modelo of MODELOS_FALLBACK) {
             try {
-                text = await llamarGeminiREST(apiKey, modelo, base64Data, mimeType, prompt);
+                text = await llamarGeminiREST(apiKey, modelo, base64Data, mimeType, prompt, access.userId!, requestId);
                 modeloUsado = modelo;
                 break;
             } catch (err: unknown) {
@@ -142,7 +148,6 @@ Reglas:
         }
 
         console.log(`[analizar-fachada] Usando modelo: ${modeloUsado}`);
-        console.log("[analizar-fachada] Respuesta raw (primeros 200 chars):", text.substring(0, 200));
 
         // Extraer JSON limpio (Gemini a veces añade ```json ... ```)
         let jsonText = text;
@@ -196,7 +201,6 @@ Reglas:
             confianza: Math.round((rawData.confianzaAnalisis || 0.7) * 100),
         };
 
-        console.log(`[analizar-fachada] Análisis completado: ${adn.analisisVision.nombreSugerido} (${adn.analisisVision.categoriaSugerida})`);
 
         return NextResponse.json(adn);
 
@@ -207,7 +211,7 @@ Reglas:
         return NextResponse.json(
             {
                 error: "Error al analizar la imagen",
-                detalle: mensaje.includes("API_KEY") ? "API Key inválida" : mensaje
+                detalle: 'Puedes continuar manualmente o intentarlo más tarde.'
             },
             { status: 500 }
         );
