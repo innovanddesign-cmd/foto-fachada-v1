@@ -31,11 +31,13 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
 }
 $raw=file_get_contents('php://input',false,null,0,500001);
 if(strlen($raw)>500000)core_fail(413,'Documento demasiado grande');
-$b=json_decode($raw,true);if(!is_array($b))core_fail(400,'Datos inválidos');
+$b=json_decode($raw,true);if(!is_array($b)||array_is_list($b))core_fail(400,'Datos inválidos');
 $action=$b['action']??'';
 if(!in_array($action,['create','update','review','sign','send'],true))core_fail(400,'Acción inválida');
 if($action!=='send') {
  if($action==='sign') {
+  if(!is_string($b['signature']??null)||!str_starts_with($b['signature'],'data:image/png;base64,')||strlen($b['signature'])>300000)core_fail(400,'Firma inválida');
+  if(!is_array($b['recipients']??null)||!array_is_list($b['recipients'])||count($b['recipients'])>10)core_fail(400,'Indica una lista de hasta diez destinatarios');
   $image=base64_decode(substr($b['signature']??'',22),true);
   if($image===false||substr($image,0,8)!=="\x89PNG\r\n\x1a\n")core_fail(400,'Firma inválida');
   foreach(($b['recipients']??[]) as $email)if(!is_string($email)||!filter_var($email,FILTER_VALIDATE_EMAIL))core_fail(400,'Correo inválido');
