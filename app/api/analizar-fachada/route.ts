@@ -17,7 +17,7 @@ function detectarMimeType(base64ConHeader: string): string {
 
 /** Llama a Gemini REST API v1 directamente (evita limitaciones del SDK v1beta) */
 async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: string, mimeType: string, prompt: string, userId: string, requestId: string, attempt: number) {
-    const url = `https://generativelanguage.googleapis.com/v1/models/${modelo}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/${modelo}:generateContent`;
 
     const body = {
         contents: [{
@@ -35,7 +35,7 @@ async function llamarGeminiREST(apiKey: string, modelo: string, base64Data: stri
     let response: Response;
     try { response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(45000),
     }); } catch {
@@ -88,13 +88,13 @@ export async function POST(req: Request) {
         console.log(`[analizar-fachada] Iniciando análisis. MimeType: ${mimeType}, Tamaño base64: ${base64Data.length} chars`);
 
         const prompt = `Actúa como un Ingeniero OSINT y Estratega de Marketing de Élite.
-Analiza esta imagen para crear un escaparate de una agencia inmobiliaria. Describe solo datos visibles. No inventes propiedades, precios, disponibilidad, servicios ni trayectoria. Si un dato no se ve, déjalo vacío o indícalo como pendiente de confirmar; serviciosDetectados debe incluir solo servicios escritos en la imagen.
+Analiza esta imagen para crear un escaparate de un negocio local (inmobiliaria, centro de estética, barbería u otro sector). Describe solo datos visibles. No inventes propiedades, precios, disponibilidad, servicios ni trayectoria. Si un dato no se ve, déjalo vacío o indícalo como pendiente de confirmar; serviciosDetectados debe incluir solo servicios escritos en la imagen.
 
 Responde ÚNICAMENTE con un objeto JSON válido, sin bloques markdown, sin texto adicional:
 
 {
-  "nombreSugerido": "nombre de la agencia legible en la imagen; vacío si no es legible",
-  "categoriaSugerida": "especialidad inmobiliaria visible (residencial, lujo, alquileres); Inmobiliaria si no consta",
+  "nombreSugerido": "nombre del negocio legible en la imagen; vacío si no es legible",
+  "categoriaSugerida": "sector visible del negocio; Negocio local si no se puede determinar",
   "paletaColores": {
     "primario": "#RRGGBB",
     "secundario": "#RRGGBB",
@@ -225,6 +225,6 @@ Reglas:
             { status: 500 }
         );
     }
-    });
+    }, Number(req.headers.get('x-ai-expected-cost')));
 }
 

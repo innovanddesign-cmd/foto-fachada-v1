@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-10",
+  "dependencyAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "localTestSuites": {
+    "passed": 11,
+    "failed": 0
+  },
+  "productionBuild": "passed",
+  "typeCheck": "passed within next build",
+  "lint": "passed with nonblocking warnings",
+  "browser": {
+    "home": "verified",
+    "billingToggle": "verified",
+    "creatorEntry": "verified",
+    "photoUpload": "blocked: ChatGPT browser extension lacks Allow access to file URLs permission"
+  },
+  "remoteDeployment": "not performed",
+  "liveAuthenticatedAndPaidProviderFlow": "not verified",
+  "productionCommit": "8c6685676e62f0327e6ca0d7a0c712d02a11f1cb",
+  "commercialMigrationOnProduction": false,
+  "productionCounts": {
+    "campaigns": 1,
+    "publications": 0,
+    "legacyAIAccounts": 0
+  },
+  "vercelConfigurationInspection": "blocked: connector HTTP 403 and CLI scope-not-accessible for correct team",
+  "supabaseSecurityAdvisors": {
+    "warning": "auth_leaked_password_protection",
+    "informationalRlsNoPolicy": 29
+  },
+  "releaseVerdict": "not ready: see aceptacion.html"
+}

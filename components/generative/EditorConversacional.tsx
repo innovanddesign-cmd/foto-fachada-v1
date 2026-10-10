@@ -68,7 +68,7 @@ export const EditorConversacional = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     className="text-center"
                 >
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-linear-to-br from-emerald-500/20 to-green-500/20 flex items-center justify-center">
                         <Sparkles className="w-10 h-10 text-emerald-400" />
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-2">¡Personalización Completa!</h2>
@@ -119,7 +119,7 @@ export const EditorConversacional = () => {
             {/* 1. Barra de Progreso Etérea */}
             <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
                 <motion.div
-                    className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+                    className="h-full bg-linear-to-r from-blue-500 via-purple-500 to-pink-500"
                     initial={{ width: 0 }}
                     animate={{ width: `${progreso}%` }}
                     transition={{ type: 'spring', stiffness: 50 }}
@@ -161,7 +161,7 @@ export const EditorConversacional = () => {
                                 value={inputValue}
                                 onChange={handleInputChange}
                                 placeholder={preguntaActual.placeholder}
-                                className="w-full bg-white/5 border-b-2 border-white/10 focus:border-white/40 outline-none p-4 text-xl text-white placeholder:text-white/10 resize-none min-h-[120px] transition-all rounded-xl"
+                                className="w-full bg-white/5 border-b-2 border-white/10 focus:border-white/40 outline-hidden p-4 text-xl text-white placeholder:text-white/10 resize-none min-h-[120px] transition-all rounded-xl"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && !e.shiftKey) {
                                         e.preventDefault();

@@ -57,3 +57,7 @@ OPENCODE-*.md
 .design-input/
 .vercel
 .env*.local
+
+# Local Supabase CLI metadata
+supabase/.temp/
+*.tsbuildinfo

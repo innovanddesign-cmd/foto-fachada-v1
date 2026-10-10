@@ -33,7 +33,7 @@ export default function LoadingVistaPublica() {
 
                 {/* Texto Inspirador / Técnico */}
                 <p className="text-center text-[11px] font-medium text-white/30 italic">
-                    "Renderizando la identidad visual del negocio..."
+                    &quot;Renderizando la identidad visual del negocio...&quot;
                 </p>
             </div>
         </div>

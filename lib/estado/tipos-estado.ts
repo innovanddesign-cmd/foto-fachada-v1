@@ -224,7 +224,7 @@ export interface OfertaProducto {
 // CARTELERÍA Y CAMPAÑAS (FASE 4 - BLOQUE 1 - PARTE B)
 // ═══════════════════════════════════════════════════════════════
 
-export type FormatoPoster = 'A4' | 'A5' | 'SQUARE';
+export type FormatoPoster = 'A3' | 'A4' | 'A5' | 'SQUARE';
 
 export interface CampanaCartel {
     id: string;
@@ -276,6 +276,8 @@ export interface DatosEscaparate {
 /** Campos base editables (usados en datosReales y datosSugeridos) */
 export interface DatosEscaparateBase {
     mensajeWhatsApp?: string;
+    email?: string;
+    direccion?: string;
     titularPrincipal: string;
     subtitulo: string;
     descripcionValor: string;

@@ -8,23 +8,23 @@ export function identidadManual(): AdnMarca {
         estiloTipografico:'SANS_GEOMETRICA', ambiente:'Edición manual',
         analisisMarketing:'Completa el nombre y los datos de tu negocio. Puedes crear tu escaparate sin usar IA.',
         logoExtraido:null, publicoObjetivo:'', contextoMercado:'', confianza:0,
-        analisisVision: {nombreSugerido:'Mi inmobiliaria',categoriaSugerida:'Inmobiliaria',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true}
+        analisisVision: {nombreSugerido:'Mi negocio',categoriaSugerida:'Negocio local',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true}
     };
 }
 
 export const AIService = {
-    analizarImagen: async (imagenBase64: string): Promise<AdnMarca> => {
+    analizarImagen: async (imagenBase64: string, expectedCost?: number): Promise<AdnMarca> => {
         try {
             const response = await fetch("/api/analizar-fachada", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID() },
+                headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID(), ...(expectedCost ? {'x-ai-expected-cost': String(expectedCost)} : {}) },
                 body: JSON.stringify({ image: imagenBase64 }),
             });
 
             if (!response.ok) {
                 if (response.status === 401) throw new AISignInRequired('Inicia sesión para usar la IA.');
                 const errorData = await response.json().catch(() => ({}));
-                if (['AI_QUOTA','AI_RETRY'].includes(errorData.code)) throw new AIQuotaNotice(errorData.error);
+                if (['AI_QUOTA','AI_RETRY','AI_UNAVAILABLE','AI_PRICE_CONFIRMATION_REQUIRED'].includes(errorData.code)) throw new AIQuotaNotice(errorData.error);
                 const detalle = errorData.detalle || errorData.error || `HTTP ${response.status}`;
                 throw new Error(`Error de API: ${detalle}`);
             }
@@ -49,14 +49,14 @@ export const AIService = {
                 logoExtraido: null,
                 publicoObjetivo: "Desconocido",
                 contextoMercado: "Sin datos",
-                analisisVision: {nombreSugerido:'Mi inmobiliaria',categoriaSugerida:'Inmobiliaria',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true},
+                analisisVision: {nombreSugerido:'Mi negocio',categoriaSugerida:'Negocio local',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true},
                 confianza: 0
             };
         }
     },
 
     generarEscaparate: async (adn: AdnMarca): Promise<DatosEscaparate> => {
-        const nombre = adn.analisisVision?.nombreSugerido || "Tu Inmobiliaria";
+        const nombre = adn.analisisVision?.nombreSugerido || "Tu negocio";
         const categoria = adn.analisisVision?.categoriaSugerida || "Servicios";
         const servicios = adn.inteligenciaMarketing?.serviciosDetectados || [];
         const gap = adn.inteligenciaMarketing?.gapDeMercado || "";
@@ -69,7 +69,7 @@ export const AIService = {
         }
 
         // Generar titulares basados en el arquetipo
-        const titular = { principal: nombre, sub: `${categoria} · Conoce nuestra agencia y contacta con nuestro equipo.` };
+        const titular = { principal: nombre, sub: `${categoria} · Conoce nuestro negocio y contacta con nuestro equipo.` };
 
         // Generar ofertas desde servicios detectados
         const ofertas = servicios.length > 0
@@ -108,7 +108,7 @@ export const AIService = {
                 contenido: {
                     titulo: "Contacta con Nosotros",
                     cta: {
-                        texto: adn.estrategiaConversion?.cta || 'Contactar con la agencia',
+                        texto: adn.estrategiaConversion?.cta || 'Contactar con el negocio',
                         accion: "#contacto"
                     }
                 }
@@ -128,7 +128,7 @@ export const AIService = {
                 titularPrincipal: titular.principal,
                 subtitulo: titular.sub,
                 descripcionValor: adn.analisisMarketing || gap || "",
-                ctaPrincipal: adn.estrategiaConversion?.cta || 'Contactar con la agencia',
+                ctaPrincipal: adn.estrategiaConversion?.cta || 'Contactar con el negocio',
                 horario: "",
                 telefono: "",
             }

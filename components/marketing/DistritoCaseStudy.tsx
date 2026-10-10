@@ -55,7 +55,7 @@ export function DistritoCaseStudy() {
                 />
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-t from-[#070907] via-[#070907]/45 to-transparent"
+                  className="absolute inset-0 bg-linear-to-t from-[#070907] via-[#070907]/45 to-transparent"
                 />
               </div>
 

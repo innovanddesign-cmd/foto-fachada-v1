@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss" source(none);
+@config "../tailwind.config.ts";
+@source "../app";
+@source "../components";
+
+/* Preserve the v3 border default while migrating existing designs. */
+@layer base { *, ::before, ::after { border-color: var(--color-gray-200, currentColor); } }
 
 /**
  * FOTO FACHADA V2 — Sistema de Tokens Aero-Glassmorphism

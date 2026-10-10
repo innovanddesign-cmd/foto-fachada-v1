@@ -80,7 +80,7 @@ export function SignupForm() {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             placeholder="tu@email.com"
-                            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-blue-500 transition-colors text-sm"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-hidden focus:border-blue-500 transition-colors text-sm"
                         />
                     </div>
                 </div>
@@ -96,7 +96,7 @@ export function SignupForm() {
                             required
                             minLength={6}
                             placeholder="Mínimo 6 caracteres"
-                            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-blue-500 transition-colors text-sm"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-hidden focus:border-blue-500 transition-colors text-sm"
                         />
                     </div>
                 </div>
@@ -111,7 +111,7 @@ export function SignupForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-xl bg-linear-to-r from-purple-500 to-pink-500 text-white font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                     {loading ? (
                         <span className="animate-pulse">Creando cuenta...</span>

@@ -4,6 +4,7 @@ import { requireAIUser, aiRequestId } from '@/lib/ai/access';
 import { recordAIUsage } from '@/lib/ai/usage';
 import { withAIQuota, saveAIAttempt } from '@/lib/ai/quota';
 
+const modelName = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
         }
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash",
+            model: modelName,
             generationConfig: {
                 responseMimeType: "application/json",
             }
@@ -81,8 +82,8 @@ export async function POST(req: Request) {
         ]);
 
         const response = await result.response;
-        recordAIUsage(access.userId!, requestId, 'gemini-2.0-flash', response.usageMetadata);
-        await saveAIAttempt(requestId, 1, 'gemini-2.0-flash', 200, response.usageMetadata);
+        recordAIUsage(access.userId!, requestId, modelName, response.usageMetadata);
+        await saveAIAttempt(requestId, 1, modelName, 200, response.usageMetadata);
         recorded = true;
         const text = response.text();
 
@@ -92,12 +93,12 @@ export async function POST(req: Request) {
         return NextResponse.json(JSON.parse(cleanedText));
 
     } catch (error) {
-        if(attempted && !recorded) await saveAIAttempt(requestId, 1, 'gemini-2.0-flash', null, null);
+        if(attempted && !recorded) await saveAIAttempt(requestId, 1, modelName, null, null);
         console.error("Gemini Analysis Error");
         return NextResponse.json(
             { error: "Failed to analyze image" },
             { status: 500 }
         );
     }
-    });
+    }, Number(req.headers.get('x-ai-expected-cost')));
 }

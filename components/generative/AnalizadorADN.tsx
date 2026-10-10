@@ -10,12 +10,19 @@ export const AnalizadorADN = () => {
     const [busy, setBusy] = useState(false);
     const pending = useRef(false);
     const [login, setLogin] = useState(false);
+    const [quote, setQuote] = useState<{mode:string;cost?:number;remaining?:number;balance?:number}|null>(null);
+    async function quoteCost() {
+      setBusy(true); setError('');
+      try { const r=await fetch('/api/ai-quote',{cache:'no-store'}); const a=await r.json(); if(r.status===401){setLogin(true);return;} if(!r.ok)throw Error(a.error); setQuote(a); setLogin(false); }
+      catch(e) {setError(e instanceof Error?e.message:'No se pudo consultar el coste.');}
+      finally {setBusy(false);}
+    }
     const [error, setError] = useState('');
     function complete(adn: AdnMarca) {
         useTiendaEstado.setState({ adnMarca: adn, analizando: false });
     }
     async function analyze() {
-        if (pending.current || !image?.urlImagen) return;
+        if (pending.current || !image?.urlImagen || !quote) return;
         pending.current = true;
         setBusy(true); setError(''); setLogin(false);
         try {
@@ -31,8 +38,9 @@ export const AnalizadorADN = () => {
                     reader.readAsDataURL(blob);
                 });
             }
-            complete(await AIService.analizarImagen(base64));
+            complete(await AIService.analizarImagen(base64, quote.cost));
         } catch (e) {
+            setQuote(null);
             if (e instanceof AISignInRequired) setLogin(true);
             else if (e instanceof AIQuotaNotice) setError(e.message);
             else setError('No se pudo analizar la foto. Puedes continuar manualmente.');
@@ -43,10 +51,11 @@ export const AnalizadorADN = () => {
         <p className="studio-muted">Puedes completar los datos tú mismo, gratis y sin registrarte. Para analizar la foto con IA necesitas una cuenta.</p>
         <div className="flex flex-wrap gap-3">
             <button className="studio-primary" disabled={busy} onClick={() => complete(identidadManual())}>Continuar sin IA</button>
-            <button className="studio-button" disabled={busy} onClick={() => void analyze()}>{busy ? 'Analizando…' : 'Analizar foto con IA'}</button>
+            <button className="studio-button" disabled={busy} onClick={() => void (quote ? analyze() : quoteCost())}>{busy ? 'Preparando…' : quote ? quote.mode==='credits' ? `Analizar foto · ${quote.cost} créditos` : 'Analizar foto · 1 uso de IA' : 'Consultar coste del análisis'}</button>
         </div>
+        {quote && <p className="studio-muted">{quote.mode==='credits' ? `Saldo disponible: ${quote.balance} créditos.` : `Usos disponibles en este periodo: ${quote.remaining}.`} El consumo se realiza al pulsar Analizar.</p>}
         {busy && <p role="status">Preparando la identidad del negocio…</p>}
         {error && <p role="alert">{error}</p>}
-        {login && <div className="studio-panel"><p className="mb-5" role="status">Inicia sesión para analizar la foto. Tu borrador se conserva.</p><LoginForm onSuccess={() => void analyze()} /></div>}
+        {login && <div className="studio-panel"><p className="mb-5" role="status">Inicia sesión para analizar la foto. Tu borrador se conserva.</p><LoginForm onSuccess={() => void quoteCost()} /></div>}
     </section>;
 };

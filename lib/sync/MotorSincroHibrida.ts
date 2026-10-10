@@ -140,6 +140,8 @@ export function generarPlaceholderIA(campo: keyof DatosEscaparateBase, config: P
     const cat = categoriaSugerida.toLowerCase();
 
     const PLACEHOLDERS: Record<keyof DatosEscaparateBase, Record<string, string>> = {
+        email: { default: '' },
+        direccion: { default: '' },
         mensajeWhatsApp: { default: '' },
         titularPrincipal: {default: `Conoce ${nombreNegocio}`},
         subtitulo: {default: 'Servicios inmobiliarios y contacto con nuestra agencia'},
