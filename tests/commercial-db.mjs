@@ -97,6 +97,10 @@ await db.query("insert into innova.organization_memberships values($1,'test@exam
 const action=async(a,b,actor='test@example.test')=>(await db.query('select innova.document_action($1,$2,$3,$4::jsonb) as d',[org,actor,a,JSON.stringify(b)])).rows[0].d;
 await assert.rejects(action('create',{title:'Test',category:'legal',content:'Solo una prueba'},'other@example.test'),/ACCESS_DENIED/);
 let doc=await action('create',{title:'Test',category:'legal',content:'Solo una prueba'});
+const incomplete=await action('create',{title:'Incomplete',category:'legal',content:'Cliente {{CLIENTE_NOMBRE}}'});
+await assert.rejects(action('review',{id:incomplete.id,revision:incomplete.revision}),/FIELDS_INCOMPLETE/);
+const template=await action('create',{title:'Template',category:'legal',entityType:'plantilla',content:'Texto completo'});
+await assert.rejects(action('review',{id:template.id,revision:template.revision}),/TEMPLATE_REQUIRES_COPY/);
 await assert.rejects(action('update',{id:doc.id,revision:99,title:'No',content:'No'}),/CONFLICT/);
 doc=await action('review',{id:doc.id,revision:doc.revision});
 await assert.rejects(action('sign',{id:doc.id,revision:doc.revision,consent:false,signer:'Test'}),/SIGNATURE_NOT_READY/);

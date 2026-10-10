@@ -26,7 +26,11 @@ if ($_SERVER['REQUEST_METHOD']==='GET') {
   echo json_encode($d,JSON_UNESCAPED_UNICODE);exit;
  }
  $query='service_documents?organization_id=eq.'.rawurlencode($org_id).'&select=id,title,category,service_code,entity_type,entity_id,status,revision,updated_at&order=updated_at.desc&limit=500';
- if (!empty($_GET['service'])) $query.='&service_code=eq.'.rawurlencode(substr($_GET['service'],0,80));
+ if (!empty($_GET['service'])) {
+  $service=substr($_GET['service'],0,80);
+  if(!preg_match('/^[A-Za-z0-9_-]+$/',$service))core_fail(400,'Código de servicio inválido');
+  $query.='&or=(service_code.eq.'.rawurlencode($service).',entity_type.eq.plantilla)';
+ }
  echo json_encode(['documents'=>erp_rest('GET',$query)],JSON_UNESCAPED_UNICODE);exit;
 }
 $raw=file_get_contents('php://input',false,null,0,500001);
@@ -35,6 +39,11 @@ $b=json_decode($raw,true);if(!is_array($b)||array_is_list($b))core_fail(400,'Dat
 $action=$b['action']??'';
 if(!in_array($action,['create','update','review','sign','send'],true))core_fail(400,'Acción inválida');
 if($action!=='send') {
+ if(in_array($action,['review','sign'],true)) {
+  $ready=doc_get($b['id']??'');
+  if($ready['entity_type']==='plantilla')core_fail(409,'Crea una copia del modelo para completar y firmar.');
+  if(preg_match('/\{\{[A-Z0-9_]+\}\}/',$ready['content']))core_fail(409,'Completa los datos pendientes antes de dar conformidad o firmar.');
+ }
  if($action==='sign') {
   if(!is_string($b['signature']??null)||!str_starts_with($b['signature'],'data:image/png;base64,')||strlen($b['signature'])>300000)core_fail(400,'Firma inválida');
   if(!is_array($b['recipients']??null)||!array_is_list($b['recipients'])||count($b['recipients'])>10)core_fail(400,'Indica una lista de hasta diez destinatarios');
