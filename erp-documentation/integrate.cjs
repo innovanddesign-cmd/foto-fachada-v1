@@ -13,7 +13,7 @@ replace('y.price!==null&&o.jsxs("button",{type:"button",onClick:()=>l(y)', 'o.js
 const name='index-documents-'+crypto.createHash('sha256').update(js).digest('hex').slice(0,12)+'.js';
 fs.mkdirSync(path.join(output,'assets'),{recursive:true});fs.mkdirSync(path.join(output,'api'),{recursive:true});
 fs.writeFileSync(path.join(output,'assets',name),js);fs.writeFileSync(path.join(output,'index.html'),html.replace(old,'/erp/assets/'+name));
-for(const name of ['documentos.html','documentos.js','documentos.css'])fs.copyFileSync(path.join(__dirname,name),path.join(output,name));
+for(const name of ['documentos.html','documentos.js','documentos.css','documentos-icons.js'])fs.copyFileSync(path.join(__dirname,name),path.join(output,name));
 fs.copyFileSync(path.join(__dirname,'api/documents.php'),path.join(output,'api/documents.php'));
-fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify({entry:name,baseSHA256:crypto.createHash('sha256').update(fs.readFileSync(path.join(source,old.replace('/erp/','')))).digest('hex'),files:['api/documents.php','documentos.html','documentos.js','documentos.css','assets/'+name,'index.html']},null,2));
+fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify({entry:name,baseSHA256:crypto.createHash('sha256').update(fs.readFileSync(path.join(source,old.replace('/erp/','')))).digest('hex'),files:['documentos-icons.js','api/documents.php','documentos.html','documentos.js','documentos.css','assets/'+name,'index.html']},null,2));
 console.log('ERP documentation release prepared: '+name);
