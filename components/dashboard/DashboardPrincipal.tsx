@@ -1,4 +1,5 @@
 "use client";
+import { AccountPanel } from './AccountPanel';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Pencil, Printer, Plus, Copy, Trash2 } from 'lucide-react';
@@ -18,6 +19,7 @@ export function DashboardPrincipal() {
  }
  function create() { s.reiniciar(); router.push('/create?paso=CAPTURA'); }
  return <div className="space-y-8">
+   <AccountPanel />
    <RemoteSyncPanel />
    <DynamicQRPanel />
    <section className="studio-panel"><div className="flex flex-wrap justify-between gap-3 mb-5"><div><h2 className="text-xl font-semibold">Borradores en este dispositivo</h2><p className="studio-muted mt-2">Estas copias se guardan en este navegador. Guárdalas en tu cuenta para abrirlas en la tablet.</p></div><button className="studio-button" onClick={create}><Plus size={18} /> Nuevo escaparate</button></div>

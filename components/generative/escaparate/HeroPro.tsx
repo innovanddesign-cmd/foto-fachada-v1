@@ -40,7 +40,7 @@ export const HeroPro = () => {
                     alt="Fachada"
                     className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay scale-110 blur-[1px]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-fondo)] via-[var(--color-fondo)]/40 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-[var(--color-fondo)] via-[var(--color-fondo)]/40 to-transparent" />
             </div>
 
             {/* 2. Contenido Informativo */}
@@ -92,7 +92,7 @@ export const HeroPro = () => {
                 >
                     <button className="group relative">
                         <div className="absolute inset-0 bg-[var(--color-primario)] rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity animate-[pulse_3s_infinite]" />
-                        <div className="relative bg-[var(--color-primario)] text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-[0.2em] shadow-2xl border border-white/10 backdrop-blur-sm active:scale-95 transition-all">
+                        <div className="relative bg-[var(--color-primario)] text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-[0.2em] shadow-2xl border border-white/10 backdrop-blur-xs active:scale-95 transition-all">
                             Descubrir {nombreNegocio}
                         </div>
                     </button>
@@ -102,7 +102,7 @@ export const HeroPro = () => {
                         <motion.div
                             animate={{ y: [0, 8, 0] }}
                             transition={{ repeat: Infinity, duration: 2 }}
-                            className="w-px h-8 bg-gradient-to-b from-white to-transparent"
+                            className="w-px h-8 bg-linear-to-b from-white to-transparent"
                         />
                     </div>
                 </motion.div>

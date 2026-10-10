@@ -1,0 +1,132 @@
+[
+  [
+    "Promoción anual",
+    "¿La renovación conserva un precio fijo de 100 € Pro / 190 € Business, o un descuento del 50 % sobre la tarifa que exista entonces?",
+    "Elegir precio fijo o porcentaje. Los importes son antes de IVA."
+  ],
+  [
+    "Cambio a mensual",
+    "¿Pasar de anual promocional a mensual hace perder definitivamente la promoción?",
+    "Sí o no."
+  ],
+  [
+    "Tarifa de créditos",
+    "¿Confirmamos como tarifa definitiva 1.000 créditos al mes para ambos planes y 200 por operación en Pro / 100 en Business?",
+    "Sí, o indicar cifras nuevas. Antes se presentaron como ejemplo."
+  ],
+  [
+    "Unidad de consumo",
+    "¿Diseño, análisis de marketing, análisis de foto y logo se cobran como operaciones independientes, o se agrupan en una única generación de campaña?",
+    "Recomendación: mostrar y cobrar cada operación por separado, salvo un paquete inicial expresamente definido."
+  ],
+  [
+    "Reactivación",
+    "¿Reactivar una campaña existente sin ejecutar IA cuesta cero créditos?",
+    "Recomendación: sí; sigue contando dentro del límite de campañas activas."
+  ],
+  [
+    "Free",
+    "¿Cuántos créditos recibe Free y se entregan una sola vez o cada mes?",
+    "Indicar cantidad y frecuencia; también puede ser cero."
+  ],
+  [
+    "Recargas",
+    "¿Qué paquetes de créditos venderemos y a qué precio más IVA?",
+    "Indicar cantidad de créditos y precio por paquete. Podemos calcular una propuesta al validar el coste real del modelo."
+  ],
+  [
+    "Saldo tras baja",
+    "¿El saldo al pasar a Free queda congelado hasta volver a pagar, se puede gastar en Free o caduca?",
+    "Recomendación: conservarlo congelado; concretar plazo si queréis caducidad."
+  ],
+  [
+    "Logos e imágenes",
+    "¿Crear un logo y quitarle el fondo con IA consume créditos, mientras editar manualmente o sustituir una imagen es gratuito?",
+    "Confirmar esta frontera o indicar las excepciones; la generación gratuita de imágenes depende de validar proveedor."
+  ],
+  [
+    "Presupuesto IA",
+    "¿Qué presupuesto máximo mensual destinamos a los proveedores de IA durante el lanzamiento?",
+    "Indicar euros al mes. No es una autorización para contratar un proveedor o gastar automáticamente."
+  ],
+  [
+    "Gracia: funciones",
+    "Durante el mes de impago, ¿siguen funcionando todas las campañas del plan o se limita el acceso desde el primer día?",
+    "Recomendación: conservar publicaciones durante la gracia y bloquear nuevas operaciones de pago."
+  ],
+  [
+    "Gracia: créditos",
+    "¿Durante ese mes se asignan nuevos créditos y se permite gastar el saldo acumulado?",
+    "Elegir: ninguna de las dos; solo gastar saldo; ambas."
+  ],
+  [
+    "Gracia: renovación",
+    "Si paga dentro de la gracia, ¿el nuevo periodo cuenta desde el vencimiento original o desde la fecha del pago?",
+    "Recomendación: desde el vencimiento si el servicio siguió activo."
+  ],
+  [
+    "Campañas al bajar",
+    "¿Qué campañas permanecen activas al bajar de plan: las elige el cliente, las últimas publicadas o las más antiguas?",
+    "Recomendación: elección del cliente con las más antiguas como alternativa si no responde."
+  ],
+  [
+    "Renovación de dominio",
+    "¿Business incluye la renovación anual del dominio mientras el cliente mantenga el plan?",
+    "Sí o no; confirmar que el titular será el cliente."
+  ],
+  [
+    "Dominio y baja mensual",
+    "Si Business mensual cancela tras un mes, ¿conserva el dominio pagado hasta su vencimiento sin cobrarle nada adicional?",
+    "Recomendación: titular cliente, dominio conservado hasta vencimiento; futuras renovaciones a su cargo. Confirmar quién asume el coste inicial."
+  ],
+  [
+    "Cartel en mensual",
+    "¿El primer cartel físico está incluido aunque el cliente contrate y pague solamente un mes?",
+    "Sí o no."
+  ],
+  [
+    "Revisiones de entrega",
+    "¿Cuántas rondas de cambios hechas por Javi incluimos antes de aprobar la primera entrega?",
+    "Recomendación: dos rondas agrupadas. Una ronda es una lista conjunta de cambios. La edición manual del cliente sigue siendo ilimitada."
+  ],
+  [
+    "Calendario",
+    "¿Qué días atendemos de 09:00 a 20:00 y qué días cuentan para las 24–48 horas laborables de entrega?",
+    "Indicar días de la semana y tratamiento de festivos."
+  ],
+  [
+    "Analítica por plan",
+    "¿Aprobáis Free con totales de QR y clics, Pro con desglose por campaña y fechas, y Business con comparativas y exportación?",
+    "Propuesta para aprobar o corregir; un clic no se presentará como venta o reserva confirmada."
+  ],
+  [
+    "Extras de las páginas",
+    "¿Aprobáis Free con contacto básico, Pro con servicios/oferta/horarios/mapa/redes, y Business añadiendo galería, navegación y animaciones?",
+    "Propuesta para aprobar o corregir. Reservas confirmadas, pagos o integraciones externas llevarían alcance específico."
+  ],
+  [
+    "Subida de plan",
+    "¿Calculamos el importe de la subida según la diferencia de precio y los días que queden del periodo ya pagado?",
+    "Recomendación: sí, manteniendo la fecha de vencimiento cuando no cambia mensual/anual."
+  ],
+  [
+    "Cambio de periodicidad",
+    "Al pasar de mensual a anual, ¿descontamos el importe no consumido del mes y empezamos un año nuevo ese día?",
+    "Recomendación: sí, con el cálculo y precio mostrados antes de aceptar."
+  ],
+  [
+    "Identidad fiscal",
+    "¿Qué nombre o razón social, NIF, domicilio y correo de facturación deben figurar en contrato y factura?",
+    "Completar en la hoja de pedido; no es necesario incluir datos fiscales personales en una página pública de trabajo."
+  ],
+  [
+    "Responsables",
+    "¿Quién será responsable del Dpto 06, quién revisará por el Dpto 07 y quién sustituirá a Javi cuando no esté disponible?",
+    "Indicar nombre y función para cada responsabilidad."
+  ],
+  [
+    "Firma y facturas",
+    "¿Qué herramienta utilizaréis para firmar en tablet y cuál para emitir las facturas?",
+    "Si no están elegidas, indicad que están pendientes y el presupuesto disponible; Legal debe validar el sistema de firma."
+  ]
+]

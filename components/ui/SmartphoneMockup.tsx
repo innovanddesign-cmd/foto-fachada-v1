@@ -153,7 +153,7 @@ export const SmartphoneMockup = ({
                             className="absolute inset-0 pointer-events-none z-40 opacity-20 mix-blend-screen"
                         >
                             {/* Gradiente diagonal difuso que cruza la pantalla */}
-                            <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-gradient-to-br from-transparent via-white/15 to-transparent transform rotate-12 blur-2xl" />
+                            <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-linear-to-br from-transparent via-white/15 to-transparent transform rotate-12 blur-2xl" />
                         </motion.div>
 
                         {/* B. Brillo Estático de Borde (Glass Edge Gloss) */}
@@ -235,7 +235,7 @@ export const SmartphoneMockup = ({
                         </div>
 
                         {/* 7. HOME INDICATOR (Barra de Gestos) */}
-                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-36 h-1.5 bg-white/40 rounded-full z-50 backdrop-blur-md shadow-sm" />
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-36 h-1.5 bg-white/40 rounded-full z-50 backdrop-blur-md shadow-xs" />
                     </div>
                 </div>
             </div>

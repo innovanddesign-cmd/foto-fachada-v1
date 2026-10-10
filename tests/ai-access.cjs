@@ -15,7 +15,7 @@ const req=(origin='https://example.test')=>new Request('https://example.test/api
  assert.equal(events[0].promptTokens,12);assert.equal(events[0].outputTokens,0);assert.equal(events[0].cachedTokens,null);assert.equal(events[0].secret,undefined);assert.equal(events[0].cost,null);
  usage.recordAIUsage('u1','r2','model',undefined);assert.equal(events[1].totalTokens,null);
  for(const file of ['app/api/analizar-fachada/route.ts','app/api/analyze/route.ts']){
-  const route=load(file,{'next/server':{NextResponse:Response},'@/lib/ai/access':guard,'@/lib/ai/usage':usage,'@/lib/ai/quota':{withAIQuota:()=>{throw Error('must not reach quota without auth')}},'@google/generative-ai':{GoogleGenerativeAI:class{getGenerativeModel(){providerCalls++;throw Error('must not call')}}}},{fetch:async()=>{providerCalls++;throw Error('must not call')}});
+  const route=load(file,{'next/server':{NextResponse:Response},'@/lib/ai/access':guard,'@/lib/ai/usage':usage,'@/lib/ai/campaign-provider':{campaignProviderReady:()=>false},'@/lib/ai/initial-campaign':load('lib/ai/initial-campaign.ts'),'@/lib/ai/quota':{withAIQuota:()=>{throw Error('must not reach quota without auth')}},'@google/generative-ai':{GoogleGenerativeAI:class{getGenerativeModel(){providerCalls++;throw Error('must not call')}}}},{fetch:async()=>{providerCalls++;throw Error('must not call')}});
   user=null;assert.equal((await route.POST(req())).status,401);
   user={id:'u1',is_anonymous:true};assert.equal((await route.POST(req())).status,401);
   assert.equal(providerCalls,0);

@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss" source(none);
+@config "../tailwind.config.ts";
+@source "../app";
+@source "../components";
+
+/* Preserve the v3 border default while migrating existing designs. */
+@layer base { *, ::before, ::after { border-color: var(--color-gray-200, currentColor); } }
 
 /**
  * FOTO FACHADA V2 — Sistema de Tokens Aero-Glassmorphism
@@ -206,7 +210,7 @@ body {
 .studio-shell :is(button,a,input,textarea,summary,h1) { scroll-margin-top:100px; }
 
 /* Phone silhouettes and cyan/green neon from the original INNOVA gallery. */
-.innova-phone-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:48px 28px;padding:24px 8px;background:radial-gradient(ellipse at 50% 40%,#15203455,transparent 70%)}
+.innova-phone-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px 28px;padding:24px 8px;background:radial-gradient(ellipse at 50% 40%,#15203455,transparent 70%)}
 .innova-phone-example{min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center}
 .innova-phone-heading{min-height:136px;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:24px;width:100%}
 .innova-phone-heading h3{margin:0;font-size:clamp(17px,1.7vw,25px);font-weight:700;line-height:1.2;text-transform:uppercase;letter-spacing:-.025em;color:#f5f6ff}
@@ -217,8 +221,8 @@ body {
 .innova-phone-base{stroke:#00f3ff;opacity:.35}
 .innova-phone-blue{stroke:#00f3ff;stroke-dasharray:50 50;filter:drop-shadow(0 0 7px #00f3ff) drop-shadow(0 0 14px #00f3ff99);animation:innova-neon-orbit 12s linear infinite}
 .innova-phone-green{stroke:#00ff9d;stroke-dasharray:50 50;stroke-dashoffset:50;filter:drop-shadow(0 0 7px #00ff9d) drop-shadow(0 0 14px #00ff9d99);animation:innova-neon-orbit-green 12s linear infinite}
-.innova-phone-screen{position:absolute;inset:5px;border-radius:14.58%/6.76%;overflow:hidden;background:#090909;z-index:1;pointer-events:none}
-.innova-phone-screen iframe{position:absolute;top:0;left:0;border:0;transform-origin:top left;pointer-events:none;max-width:none}
+.innova-phone-screen{position:absolute;inset:5px;border-radius:14.58%/6.76%;overflow:auto;background:#fff;z-index:1;scrollbar-width:none}
+.innova-phone-screen iframe{position:absolute;top:0;left:0;border:0;transform-origin:top left;max-width:none}
 .innova-phone-camera{position:absolute;top:3%;left:36%;width:28%;height:4.15%;background:#000;border-radius:999px;z-index:3;pointer-events:none}
 .innova-phone-open{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:14px;color:#b9d1c4;font-size:13px;text-decoration:none}
 .innova-phone:hover .innova-phone-neon{filter:brightness(1.25)}
@@ -249,3 +253,8 @@ body {
 .innova-footer a:focus-visible,.innova-footer button:focus-visible{outline:2px solid #00ff9d;outline-offset:5px}
 @media(max-width:1050px){.innova-footer-columns{grid-template-columns:repeat(2,minmax(0,1fr))}.innova-footer-invitation{align-items:flex-start;flex-direction:column;gap:24px}}
 @media(max-width:540px){.innova-footer-columns{grid-template-columns:1fr;gap:20px;padding:32px 0}.innova-footer-invitation{padding:16px 0 32px}.innova-footer-columns h3{margin-top:12px}.innova-footer-bottom{flex-direction:column}}
+
+.innova-phone-screen::-webkit-scrollbar{display:none}
+.innova-phone-screen:focus-visible{outline:3px solid #00ff9d;outline-offset:3px}
+.innova-demo-image{display:block;width:100%;height:auto;max-width:none}
+.innova-phone-hint{font-size:12px;color:#a9b8af;margin:14px 0 0}

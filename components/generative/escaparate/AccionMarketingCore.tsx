@@ -75,8 +75,8 @@ const ModoReserva = ({ onSubmit, loading }: { onSubmit: (e: any) => void, loadin
             <p className="text-white/40 text-xs text-center">Atención personalizada en segundos.</p>
         </div>
         <div className="space-y-3">
-            <input type="text" placeholder="Tu Nombre" required className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-white/20 outline-none focus:ring-1 ring-[var(--color-primario)]" />
-            <input type="datetime-local" required className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white outline-none focus:ring-1 ring-[var(--color-primario)]" />
+            <input type="text" placeholder="Tu Nombre" required className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-white/20 outline-hidden focus:ring-1 ring-[var(--color-primario)]" />
+            <input type="datetime-local" required className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white outline-hidden focus:ring-1 ring-[var(--color-primario)]" />
         </div>
         <button type="submit" disabled={loading} className="w-full bg-[var(--color-primario)] text-white font-black py-4 rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
             {loading ? "Procesando..." : "Confirmar Reserva"}
@@ -87,7 +87,7 @@ const ModoReserva = ({ onSubmit, loading }: { onSubmit: (e: any) => void, loadin
 
 const ModoCupon = ({ onSubmit, loading }: { onSubmit: (e: any) => void, loading: boolean }) => (
     <div className="space-y-8">
-        <div className="relative bg-gradient-to-br from-[var(--color-acento)]/20 to-[var(--color-primario)]/20 border-2 border-dashed border-white/20 rounded-[2.5rem] p-8 overflow-hidden">
+        <div className="relative bg-linear-to-br from-[var(--color-acento)]/20 to-[var(--color-primario)]/20 border-2 border-dashed border-white/20 rounded-[2.5rem] p-8 overflow-hidden">
             <div className="absolute top-1/2 -left-3 w-6 h-6 bg-[var(--color-fondo)] rounded-full -translate-y-1/2" />
             <div className="absolute top-1/2 -right-3 w-6 h-6 bg-[var(--color-fondo)] rounded-full -translate-y-1/2" />
             <div className="text-center space-y-4">

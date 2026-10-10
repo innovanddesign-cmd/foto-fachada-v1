@@ -31,7 +31,7 @@ export default function TarjetaCristal({
     };
 
     const clasesInteractivas = interactiva
-        ? 'cursor-pointer hover:bg-white/5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50 focus-visible:shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all'
+        ? 'cursor-pointer hover:bg-white/5 active:scale-[0.98] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400/50 focus-visible:shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all'
         : '';
 
     return (

@@ -46,7 +46,7 @@ export const BentoValor = () => {
                         alt="Fachada Analizada"
                         className="absolute inset-0 w-full h-full object-cover brightness-75 group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6">
                         <div className="flex items-center gap-2 mb-2">
                             <ShieldCheck className="w-4 h-4 text-[var(--color-acento)]" />

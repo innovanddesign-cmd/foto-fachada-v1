@@ -62,7 +62,7 @@ export const QRPersonalizado = ({ url, color = "#000000", size = 200, logo }: QR
             {/* Logo overlay en el centro */}
             {logo && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-100 px-2 py-1">
+                    <div className="bg-white rounded-lg shadow-xs border border-gray-100 px-2 py-1">
                         <span className="font-black text-sm" style={{ color }}>{logo}</span>
                     </div>
                 </div>

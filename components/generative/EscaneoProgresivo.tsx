@@ -35,11 +35,11 @@ export const EscaneoProgresivo = () => {
         <div className="relative w-full max-w-md mx-auto aspect-[3/4] overflow-hidden rounded-[48px] border border-white/20 bg-black/40 backdrop-blur-[40px] shadow-[0_48px_96px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center p-8">
 
             {/* Background Gradients */}
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-purple-500/10 to-pink-500/10" />
+            <div className="absolute inset-0 bg-linear-to-b from-blue-500/10 via-purple-500/10 to-pink-500/10" />
 
             {/* Scanning Laser Line */}
             <motion.div
-                className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_20px_rgba(34,211,238,0.8)] z-20"
+                className="absolute left-0 right-0 h-1 bg-linear-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_20px_rgba(34,211,238,0.8)] z-20"
                 animate={{ top: ["0%", "100%", "0%"] }}
                 transition={{ duration: 3, ease: "linear", repeat: Infinity }}
             />
@@ -62,7 +62,7 @@ export const EscaneoProgresivo = () => {
                 exit={{ opacity: 0, y: -10 }}
                 className="relative z-10 text-center"
             >
-                <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-200 to-purple-200 mb-2">
+                <h3 className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-cyan-200 to-purple-200 mb-2">
                     {statusText}
                 </h3>
                 <div className="h-1 w-32 mx-auto bg-white/10 rounded-full overflow-hidden">
@@ -81,7 +81,7 @@ export const EscaneoProgresivo = () => {
             </div>
 
             {/* Bottom Glow */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cyan-900/40 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-cyan-900/40 to-transparent pointer-events-none" />
         </div>
     );
 };

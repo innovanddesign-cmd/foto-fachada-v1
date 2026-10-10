@@ -148,7 +148,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
 
                   {/* Pantalla (Iframe simulado) */}
                   <div className="absolute inset-[6px] rounded-[14.58%_/_6.76%] bg-[#0f0f0f] overflow-hidden z-20" style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}>
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent z-10 pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-linear-to-b from-white/5 to-transparent z-10 pointer-events-none"></div>
                     <div className="absolute inset-0 z-20 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center pointer-events-none">
                       <span className="px-4 py-1.5 rounded-full bg-black border border-white/20 text-white text-xs font-bold uppercase tracking-wider mb-4 shadow-lg backdrop-blur-md">
                         {item.plan}

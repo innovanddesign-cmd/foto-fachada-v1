@@ -1,6 +1,7 @@
 import 'server-only';
 import postgres from 'postgres';
 import { NextResponse } from 'next/server';
+import { estimateProviderMicros } from './costs';
 
 let connection: ReturnType<typeof postgres> | undefined;
 export function quotaDiagnostic(error:unknown) {
@@ -19,26 +20,30 @@ function db() {
   const direct = parsed.hostname === `db.${ref}.supabase.co`;
   const pooled = parsed.hostname.endsWith('.pooler.supabase.com') && decodeURIComponent(parsed.username).endsWith(`.${ref}`);
   if (!['postgres:', 'postgresql:'].includes(parsed.protocol) || (!direct && !pooled)) throw new Error('AI_DATABASE_MISMATCH');
-  connection = postgres(raw, { max: 1, prepare: false, idle_timeout: 10, connect_timeout: 10, ssl: 'require' });
+  connection = postgres(raw, { max: 1, prepare: false, idle_timeout: 10, connect_timeout: 10, ssl: { rejectUnauthorized: true, ca: process.env.SUPABASE_DB_CA || undefined } });
   return connection;
 }
 
-export async function withAIQuota(userId: string, requestId: string, run: () => Promise<Response>): Promise<Response> {
+export async function withAIQuota(userId: string, requestId: string, run: () => Promise<Response>, expectedCost?: number, campaignId?: string, initial=false): Promise<Response> {
   const unavailable = () => NextResponse.json({ error:'La IA no está disponible ahora. Puedes continuar sin IA.', code:'AI_UNAVAILABLE' },{ status:503 });
   let reserved = false;
+  const credits = process.env.INNOVA_CREDITS_ENABLED === 'true';
+  if (credits && (!Number.isSafeInteger(expectedCost) || Number(expectedCost) < 0 || (initial && !/^[0-9a-f-]{36}$/i.test(campaignId||'')))) return NextResponse.json({error:'Consulta y confirma el coste antes de analizar la foto.',code:'AI_PRICE_CONFIRMATION_REQUIRED'},{status:409});
   try {
     const sql=db();
-    const rows=await sql`select public.escaparates_ai_reserve(${userId}::uuid,${requestId}::uuid) as state`;
+    const rows=credits ? await sql`select private.innova_reserve_v2(${userId}::uuid,${requestId}::uuid,'analysis',${expectedCost!},${campaignId||null}::uuid,${initial}) as state` : await sql`select public.escaparates_ai_reserve(${userId}::uuid,${requestId}::uuid) as state`;
     if(rows[0]?.state !== 'reserved') {
       const code=rows[0]?.state;
-      return NextResponse.json({error: code==='quota'?'Has alcanzado el límite mensual de IA. Puedes seguir editando sin IA.':'Espera antes de volver a intentarlo.',code:code==='quota'?'AI_QUOTA':'AI_RETRY'}, {status:code==='duplicate'?409:429});
+      if(code==='price_changed')return NextResponse.json({error:'El coste ha cambiado. Consulta de nuevo la tarifa.',code:'AI_PRICE_CONFIRMATION_REQUIRED'},{status:409});
+      if(code==='unavailable')return NextResponse.json({error:'Tu tarifa de IA todavía no está activada. Puedes seguir editando manualmente.',code:'AI_UNAVAILABLE'},{status:503});
+      return NextResponse.json({error: code==='quota'?(credits?'No tienes créditos suficientes. Puedes solicitar una recarga o seguir editando manualmente.':'Has alcanzado el límite mensual de IA. Puedes seguir editando sin IA.'):'Espera antes de volver a intentarlo.',code:code==='quota'?'AI_QUOTA':'AI_RETRY'}, {status:code==='duplicate'?409:429});
     }
     reserved=true;
     let response:Response;
     try { response=await run(); }
     catch { response=unavailable(); }
     // A terminal state is immutable: a late/repeated completion cannot refund success.
-    const done=await sql`select public.escaparates_ai_finish(${userId}::uuid,${requestId}::uuid,${response.ok}) as finished`;
+    const done=credits ? await sql`select private.innova_finish(${userId}::uuid,${requestId}::uuid,${response.ok}) as finished` : await sql`select public.escaparates_ai_finish(${userId}::uuid,${requestId}::uuid,${response.ok}) as finished`;
     if(!done[0]?.finished) return unavailable();
     return response;
   } catch (error) {
@@ -52,8 +57,8 @@ export async function saveAIAttempt(requestId:string, attempt:number, model:stri
   const usage=metadata && typeof metadata==='object'?metadata as Record<string,unknown>:{};
   const n=(key:string):number|null=>typeof usage[key]==='number' && Number.isSafeInteger(usage[key]) && (usage[key] as number)>=0 ? usage[key] as number : null;
   const sql=db();
-  await sql`insert into public.escaparates_ai_attempts(request_id,attempt,model,http_status,prompt_tokens,output_tokens,thought_tokens,cached_tokens,total_tokens)
-    values(${requestId}::uuid,${attempt},${model},${status},${n('promptTokenCount')},${n('candidatesTokenCount')},${n('thoughtsTokenCount')},${n('cachedContentTokenCount')},${n('totalTokenCount')})`;
+  await sql`insert into public.escaparates_ai_attempts(request_id,attempt,model,http_status,prompt_tokens,output_tokens,thought_tokens,cached_tokens,total_tokens,estimated_usd_micros)
+    values(${requestId}::uuid,${attempt},${model},${status},${n('promptTokenCount')},${n('candidatesTokenCount')},${n('thoughtsTokenCount')},${n('cachedContentTokenCount')},${n('totalTokenCount')},${estimateProviderMicros(model,usage)})`;
 }
 
 export async function getAIQuotaSummary(userId:string) {

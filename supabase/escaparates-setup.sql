@@ -40,7 +40,7 @@ insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) v
  ('escaparates-assets','escaparates-assets',false,10485760,array['image/jpeg','image/png','image/webp','image/gif']),
  ('escaparates-public','escaparates-public',true,10485760,array['image/jpeg','image/png','image/webp','image/gif']);
 create policy escaparates_storage_owner on storage.objects for all to authenticated
- using(bucket_id in ('escaparates-assets','escaparates-public') and (storage.foldername(name))[1]=(select auth.uid())::text)
- with check(bucket_id in ('escaparates-assets','escaparates-public') and (storage.foldername(name))[1]=(select auth.uid())::text
- and exists(select 1 from public.escaparates_campaigns c where c.id::text=(storage.foldername(name))[2] and c.owner_id=(select auth.uid())));
+ using(bucket_id in ('escaparates-assets','escaparates-public') and (storage.foldername(objects.name))[1]=(select auth.uid())::text)
+ with check(bucket_id in ('escaparates-assets','escaparates-public') and (storage.foldername(objects.name))[1]=(select auth.uid())::text
+ and exists(select 1 from public.escaparates_campaigns c where c.id::text=(storage.foldername(objects.name))[2] and c.owner_id=(select auth.uid())));
 commit;

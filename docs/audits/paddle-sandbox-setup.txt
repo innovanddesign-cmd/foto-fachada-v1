@@ -1,0 +1,37 @@
+PADDLE BILLING — ESTADO DE INTEGRACIÓN
+10 octubre 2026
+
+Implementado: /checkout/paddle, /api/paddle/checkout y /api/paddle/webhook.
+Solo Sandbox. No hay activación real de planes, saldo ni cobros Live.
+Pruebas: 17 suites correctas y TypeScript correcto. Las pruebas Paddle utilizan respuestas del proveedor simuladas y base de datos PGlite real; no sustituyen una transacción Sandbox conectada.
+
+CONFIGURACIÓN PENDIENTE EN LA CUENTA PADDLE SANDBOX
+- API key de servidor, permisos price.read, transaction.read y transaction.write.
+- Client-side token test_. No es la API key del servidor.
+- Notification destination: https://foto-fachada-v1.vercel.app/api/paddle/webhook
+- Suscribir transaction.completed. Guardar el secreto de firma solo en Vercel.
+- Default payment link: https://foto-fachada-v1.vercel.app/checkout/paddle
+- Siete precios EUR con tax_mode=external, cantidad 1:
+  PRO monthly 2000 céntimos / mes; PRO annual 10000 / año.
+  BUSINESS monthly 3800 / mes; BUSINESS annual 19000 / año.
+  CREDITS small 500; medium 1200; large 2500, sin recurrencia.
+- Variables exactas en .env.example. No pegar secretos en chats, documentos o Git.
+
+PRUEBA CONECTADA PENDIENTE
+Login -> producto -> crear transacción servidor -> checkout Paddle -> tarjeta Sandbox -> transaction.completed firmado -> historial confirmado.
+Probar rechazo, repetición del webhook, reintento de petición, retraso de notificación y volver a abrir la página.
+Un timeout al crear deja la sesión en proceso y no reintenta automáticamente la creación: reconciliar con Paddle antes de iniciar otra operación.
+
+TRABAJO OBLIGATORIO ANTES DE LIVE
+La implementación actual NO es una integración completa de cobros reales.
+Desarrollar y probar activación real separada de Sandbox, renovaciones, cancelación en Paddle, impagos, reembolsos/ajustes y conciliación con contratos y ledger.
+Confirmar elegibilidad de los primeros 50 clientes y renovación de la oferta anual. Los precios anuales anteriores son datos de prueba.
+Validar restricciones Free/gracia en recargas Live, sustitución del IVA fijo por el desglose fiscal real, portal del cliente y cambios de plan.
+Completar aprobación de cuenta/dominio y revisión de producto/condiciones por Paddle, incluida la combinación con cartel físico y entrega asistida.
+No basta con cambiar PADDLE_ENVIRONMENT: el servidor rechaza cualquier entorno distinto de Sandbox deliberadamente.
+
+Referencias oficiales:
+https://developer.paddle.com/api-reference/transactions/create-transaction/
+https://developer.paddle.com/build/transactions/pass-transaction-checkout/
+https://developer.paddle.com/webhooks/about/signature-verification/
+https://developer.paddle.com/paddle-js/methods/paddle-initialize/

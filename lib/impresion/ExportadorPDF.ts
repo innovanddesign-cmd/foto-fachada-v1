@@ -9,7 +9,7 @@ export type ExportFormat = 'PDF' | 'PNG' | 'JPG';
 
 interface ExportConfig {
     formato: ExportFormat;
-    papel?: 'A4' | 'A5' | 'SQUARE';
+    papel?: 'A3' | 'A4' | 'A5' | 'SQUARE';
     nombreArchivo: string;
     escala?: number; // Default 3 for 300 DPI
     anadirMarcasCorte?: boolean;
@@ -76,7 +76,7 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
  * Fallback de impresión profesional.
  * Abre ventana antes de operación asíncrona para evitar popup blocker.
  */
-const imprimirCanvas = (dataUrl: string, titulo: string, win: Window, papel: 'A4' | 'A5' | 'SQUARE') => {
+const imprimirCanvas = (dataUrl: string, titulo: string, win: Window, papel: 'A3' | 'A4' | 'A5' | 'SQUARE') => {
     const pageSize = papel === 'SQUARE' ? '210mm 210mm' : papel;
     const tituloSeguro = titulo.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 

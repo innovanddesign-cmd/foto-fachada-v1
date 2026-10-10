@@ -17,8 +17,8 @@ import { estrategiaConfirmada } from '@/lib/marketing/estrategia';
 import { RemoteSyncPanel } from '@/components/dashboard/RemoteSyncPanel';
 
 const steps: { id: PasoAplicacion; label: string; title: string; description: string }[] = [
- { id: 'CAPTURA', label: 'Foto', title: 'Empecemos por tu agencia', description: 'Sube una foto de tu fachada para preparar tu escaparate.' },
- { id: 'ANALISIS', label: 'Identidad', title: 'Revisa la identidad de tu agencia', description: 'Confirma el nombre y el sector antes de continuar.' },
+ { id: 'CAPTURA', label: 'Foto', title: 'Empecemos por tu negocio', description: 'Sube una foto de tu fachada para preparar tu escaparate.' },
+ { id: 'ANALISIS', label: 'Identidad', title: 'Revisa la identidad de tu negocio', description: 'Confirma el nombre y el sector antes de continuar.' },
  { id: 'ESTRATEGIA', label: 'Objetivo', title: '¿Qué quieres conseguir con tu escaparate?', description: 'Confirma el público, el motivo para escanear y la acción principal.' },
  { id: 'ESCAPARATE', label: 'Diseño', title: 'Elige cómo quieres presentarte', description: 'Revisa la propuesta y elige el diseño de tu web.' },
  { id: 'CONFIGURACION', label: 'Contenido', title: 'Hazlo tuyo', description: 'Revisa tus textos, tus horarios y las formas de contacto.' },
@@ -74,7 +74,7 @@ export default function PaginaCrear() {
  if (!hydrated) return <main className="studio-shell min-h-screen"><p role="status" className="studio-container">Abriendo tu borrador…</p></main>;
  function save() {
    const result = guardarCampañaEnStore();
-   setMessage(result ? 'Borrador guardado en este dispositivo. Usa Publicar para guardarlo en tu cuenta.' : 'Completa la identidad de tu agencia antes de guardar.');
+   setMessage(result ? 'Borrador guardado en este dispositivo. Usa Publicar para guardarlo en tu cuenta.' : 'Completa la identidad de tu negocio antes de guardar.');
  }
  function go(next: PasoAplicacion) { if (ready) guardarCampañaEnStore(); s.establecerPaso(next); }
  return <main className="studio-shell min-h-screen">
@@ -83,7 +83,7 @@ export default function PaginaCrear() {
        <Link className="studio-button" href="/dashboard" onClick={() => { if (ready) guardarCampañaEnStore(); }}><LayoutDashboard size={18} /> Mis escaparates</Link>
        {ready && <button className="studio-button" onClick={save}><Save size={18} /> Guardar borrador local</button>}
      </div>
-     <header className="mb-8"><p className="studio-eyebrow">CREADOR DE ESCAPARATES · PASO {index + 1} DE {steps.length}</p><h1 ref={title} tabIndex={-1} className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 outline-none">{info.title}</h1><p className="studio-muted mt-3 max-w-2xl">{info.description}</p></header>
+     <header className="mb-8"><p className="studio-eyebrow">CREADOR DE ESCAPARATES · PASO {index + 1} DE {steps.length}</p><h1 ref={title} tabIndex={-1} className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 outline-hidden">{info.title}</h1><p className="studio-muted mt-3 max-w-2xl">{info.description}</p></header>
      <nav aria-label="Pasos de creación" className="studio-steps mb-8">{steps.map((item, i) => <button key={item.id} aria-current={item.id === step ? 'step' : undefined} disabled={i > 0 && (i === 1 ? !s.imagenSubida : i === 2 ? !s.adnMarca : !ready || !confirmed)} onClick={() => go(item.id)}><span>{i + 1}</span>{item.label}</button>)}</nav>
      {message && <p role="status" className="studio-notice mb-6">{message}</p>}
      {step === 'CAPTURA' && <div className="studio-legacy rounded-3xl p-4 sm:p-8"><CapturaFachada /></div>}
