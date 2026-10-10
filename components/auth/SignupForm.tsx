@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from 'react';
+import { returnPath } from '@/lib/auth/return-path';
+import { useEffect, useState } from 'react';
 import { signUp } from '@/lib/supabase/auth';
 import { motion } from 'framer-motion';
 import { Mail, Lock, UserPlus, AlertCircle, CheckCircle } from 'lucide-react';
 
 export function SignupForm() {
+    const [next,setNext]=useState('/dashboard');
+    useEffect(()=>{setNext(returnPath(new URLSearchParams(location.search).get('next')));},[]);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -18,7 +21,7 @@ export function SignupForm() {
         setSuccess(false);
         setLoading(true);
 
-        const { user, error: authError } = await signUp(email, password);
+        const { user, error: authError } = await signUp(email, password, next).catch(()=>({user:null,error:'No se pudo conectar. Inténtalo de nuevo.'}));
 
         if (authError) {
             setError(authError);
@@ -26,6 +29,7 @@ export function SignupForm() {
             return;
         }
 
+        setLoading(false);
         if (user) {
             setSuccess(true);
             setLoading(false);
@@ -49,7 +53,7 @@ export function SignupForm() {
                     </p>
                 </div>
                 <a
-                    href="/auth/login"
+                    href={'/auth/login?next='+encodeURIComponent(next)}
                     className="inline-block px-6 py-3 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/15 transition-colors"
                 >
                     Ir a Iniciar Sesión
@@ -71,11 +75,11 @@ export function SignupForm() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/60 uppercase tracking-wider">Email</label>
+                    <label htmlFor="signup-email" className="text-xs font-bold text-white/60 uppercase tracking-wider">Email</label>
                     <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                         <input
-                            type="email"
+                            id="signup-email" autoComplete="email" type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -86,11 +90,11 @@ export function SignupForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/60 uppercase tracking-wider">Contraseña</label>
+                    <label htmlFor="signup-password" className="text-xs font-bold text-white/60 uppercase tracking-wider">Contraseña</label>
                     <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                         <input
-                            type="password"
+                            id="signup-password" autoComplete="new-password" type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -104,7 +108,7 @@ export function SignupForm() {
                 {error && (
                     <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">
                         <AlertCircle className="w-4 h-4 shrink-0" />
-                        <span>{error}</span>
+                        <span role="alert">{error}</span>
                     </div>
                 )}
 
@@ -126,7 +130,7 @@ export function SignupForm() {
 
             <p className="text-center text-white/30 text-xs">
                 ¿Ya tienes cuenta?{' '}
-                <a href="/auth/login" className="text-purple-400 hover:text-purple-300 font-bold">
+                <a href={'/auth/login?next='+encodeURIComponent(next)} className="text-purple-400 hover:text-purple-300 font-bold">
                     Iniciar sesión
                 </a>
             </p>

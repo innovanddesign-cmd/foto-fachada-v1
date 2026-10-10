@@ -1,0 +1,54 @@
+import ts from 'typescript';
+import vm from 'node:vm';
+import crypto from 'node:crypto';
+import { PGlite } from '@electric-sql/pglite';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const db=new PGlite();
+try {
+await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
+ create schema innova; create table innova.organizations(id uuid primary key); create table innova.organization_memberships(organization_id uuid,user_email text,role text,active boolean);
+ create schema auth; create table auth.users(id uuid primary key,email text);
+ create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+ grant usage on schema auth to anon,authenticated,service_role; grant execute on function auth.uid() to public;
+ create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+ create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);
+ create function storage.foldername(text) returns text[] language sql immutable as $$select string_to_array($1,'/')$$;
+ grant usage on schema public to anon,authenticated,service_role;`);
+await db.exec(fs.readFileSync('supabase/escaparates-setup.sql','utf8'));
+for(const name of fs.readdirSync('supabase/migrations').filter(n=>n.endsWith('.sql')).sort())await db.exec(fs.readFileSync('supabase/migrations/'+name,'utf8'));
+
+const u='00000000-0000-4000-8000-000000000001',other='00000000-0000-4000-8000-000000000002';
+await db.query('insert into auth.users(id) values($1),($2)',[u,other]);
+let owner=u,operator=false;
+const sql=async(parts,...values)=>{let query=parts[0];values.forEach((_,i)=>{query+='$'+(i+1)+parts[i+1]});return (await db.query(query,values)).rows;};
+sql.begin=async(fn)=>{await db.exec('begin');try{const r=await fn(sql);await db.exec('commit');return r;}catch(e){await db.exec('rollback');throw e;}};
+function load(file,deps){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require:n=>{if(!(n in deps))throw Error(n);return deps[n]},URL,Response,crypto:crypto.webcrypto,console});return exports;}
+const credits=load('lib/commercial/credits.ts',{}),catalog=load('lib/commercial/catalog.ts',{});
+const orders=load('lib/commercial/orders.ts',{'./catalog':catalog,'./credits':credits});
+const server={commercialDB:()=>sql,accountSummary:async id=>(await sql`select private.innova_account_summary(${id}::uuid) as account`)[0].account};
+const route=load('app/api/orders/route.ts',{'next/server':{NextResponse:Response},'@/lib/ai/access':{requireAIUser:async()=>owner?{userId:owner}:{response:Response.json({error:'auth'},{status:401})}},'@/lib/commercial/server':server,'@/lib/commercial/orders':orders});
+const staff=load('app/api/operator/orders/route.ts',{'next/server':{NextResponse:Response},'@/lib/commercial/operator':{requireOperator:async()=>operator?{userId:u}:{response:Response.json({error:'staff'},{status:403})}},'@/lib/commercial/server':server});
+const req=(body,method='POST',origin='https://example.test')=>new Request('https://example.test/api/orders',{method,headers:{origin,'Content-Type':'application/json'},body:JSON.stringify(body)});
+const selection={kind:'plan',product:'PRO',billing:'monthly',mode:'test',requestId:crypto.randomUUID(),netCents:1};
+assert.equal((await route.POST(req(selection,'POST','https://evil.test'))).status,403);
+owner=null;assert.equal((await route.POST(req(selection))).status,401);owner=u;
+let response=await route.POST(req(selection));assert.equal(response.status,200);const order=(await response.json()).order;assert.equal(order.net_cents,2000,'client cannot forge price');assert.equal(order.tax_cents,420);
+assert.equal((await (await route.POST(req(selection))).json()).order.id,order.id,'retry idempotent');
+owner=other;assert.equal((await route.PATCH(req({id:order.id,action:'test_success'},'PATCH'))).status,409);assert.equal((await (await route.GET(req({},'POST'))).json()).orders.length,0,'other account cannot see order');owner=u;
+assert.equal((await route.PATCH(req({id:order.id,action:'payment_sent',note:'fake'},'PATCH'))).status,409,'test cannot enter live settlement');
+assert.equal((await route.PATCH(req({id:order.id,action:'test_failure'},'PATCH'))).status,200);
+assert.equal((await route.PATCH(req({id:order.id,action:'test_success'},'PATCH'))).status,200,'retry rejected simulated payment');
+assert.equal((await server.accountSummary(u)).plan,'FREE');assert.equal((await server.accountSummary(u)).balance,0,'test payments grant no spendable credits');
+assert.equal((await route.POST(req({...selection,kind:'credits',product:'small',mode:'manual',requestId:crypto.randomUUID()}))).status,403,'Free cannot buy recargas');
+const live=(await (await route.POST(req({...selection,mode:'manual',requestId:crypto.randomUUID()}))).json()).order;
+assert.equal((await staff.POST(req({action:'list'}))).status,403);operator=true;
+assert.equal((await staff.POST(req({id:live.id,action:'fulfill',reference:'invented'}))).status,409,'no paid activation without proof');
+assert.equal((await staff.POST(req({id:live.id,action:'instructions',instructions:'Instrucciones de prueba, sin datos bancarios.'}))).status,200);
+assert.equal((await route.PATCH(req({id:live.id,action:'payment_sent',note:'Referencia de prueba'},'PATCH'))).status,200);
+assert.equal((await server.accountSummary(u)).plan,'FREE','customer claiming payment does not upgrade');
+await db.exec('set role authenticated');await assert.rejects(db.query('select * from private.innova_orders'),/permission denied/);await db.exec('reset role');
+const safe=load('lib/auth/return-path.ts',{}).returnPath;
+assert.equal(safe('//evil.test'),'/dashboard');assert.equal(safe('/checkout?plan=PRO'),'/checkout?plan=PRO');assert.equal(safe('/checkout\\evil'),'/dashboard');
+console.log('PASS checkout: server pricing, CSRF, authentication, isolation, replay, failed/successful test payment, no production entitlements, Free top-up denial, operator proof and private-table permissions.');
+}finally{await db.close();}

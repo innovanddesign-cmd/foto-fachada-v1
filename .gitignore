@@ -61,3 +61,4 @@ OPENCODE-*.md
 # Local Supabase CLI metadata
 supabase/.temp/
 *.tsbuildinfo
+.env*

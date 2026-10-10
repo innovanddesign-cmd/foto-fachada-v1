@@ -57,17 +57,17 @@ export function ConfirmarEstrategia() {
     mensajeWhatsApp: citas ? ['Hola, me gustaría pedir una cita.', 'Hola, ¿qué horarios tenéis disponibles?', 'Hola, quiero información antes de pedir cita.', 'Hola, he visto vuestro cartel. ¿Podemos hablar?'] : ['Hola, me gustaría recibir más información.', 'Hola, tengo una pregunta sobre vuestros servicios.', 'Hola, he visto vuestro cartel. ¿Podemos hablar?', 'Hola, ¿me podéis ayudar con una consulta?'],
   };
   return <form onSubmit={confirm} className="studio-panel max-w-2xl mx-auto space-y-6">
-    <div><h2 className="text-2xl font-semibold">Prepara tu cartel y tu WhatsApp</h2><p className="studio-muted mt-2">Te dejamos los textos preparados. Cambia lo que quieras y continúa.</p></div>
+    <div><h2 className="text-2xl font-semibold">Tu campaña, lista para revisar</h2><p className="studio-muted mt-2">Revisa la propuesta, añade tu WhatsApp y continúa. Puedes ajustar los textos si lo necesitas.</p></div>
     <fieldset disabled={busy} className="space-y-5">
       <legend className="sr-only">Propuesta de tu escaparate</legend>
       <label className="studio-field">¿Qué quieres conseguir?<select value={plan.objetivo} onChange={e=>update('objetivo',e.target.value)}><option value="CITAS">Que me pidan cita por WhatsApp</option><option value="CONSULTAS">Que me escriban por WhatsApp</option></select></label>
-      {fields.map(({key,label,max})=><div key={key} className="space-y-2">
+      <div className="studio-notice space-y-2"><p><strong>Para:</strong> {plan.publico}</p><p><strong>Cartel:</strong> {plan.textoCartel}</p><p><strong>Botón:</strong> {plan.cta}</p></div><details><summary className="cursor-pointer py-3 font-semibold">Personalizar los textos de la campaña</summary><div className="space-y-5 mt-4">{fields.map(({key,label,max})=><div key={key} className="space-y-2">
         <label className="studio-field">{label}<textarea required rows={key==='cta'?2:3} maxLength={max} value={plan[key]} onChange={e=>update(key,e.target.value)} /></label>
         <p className="studio-muted text-sm">O elige una opción y cámbiala a tu gusto:</p>
         <div className="flex flex-wrap gap-2" role="group" aria-label={`Opciones: ${label}`}>
           {alternatives[key].map(text=><button key={text} type="button" className="studio-button text-left whitespace-normal" aria-pressed={plan[key]===text} onClick={()=>update(key,text)}>{text}</button>)}
         </div>
-      </div>)}
+      </div>)}</div></details>
       <label className="studio-field">Tu número de WhatsApp<input required type="tel" autoComplete="tel" value={plan.telefono} placeholder="+34 600 123 456" onChange={e=>update('telefono',e.target.value)} /></label>
     </fieldset>
     <p className="studio-notice">El cliente podrá cambiar el mensaje antes de enviarlo. Las citas las confirmas tú por WhatsApp.</p>

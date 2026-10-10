@@ -2,6 +2,7 @@
  * Supabase Auth Helper
  * Wraps auth operations with proper error handling.
  */
+import { returnPath } from '@/lib/auth/return-path';
 import { createClient } from './client';
 import type { User, AuthError } from '@supabase/supabase-js';
 
@@ -10,13 +11,13 @@ export interface AuthResult {
     error: string | null;
 }
 
-export async function signUp(email: string, password: string): Promise<AuthResult> {
+export async function signUp(email: string, password: string, next = '/dashboard'): Promise<AuthResult> {
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnPath(next))}`,
         },
     });
 

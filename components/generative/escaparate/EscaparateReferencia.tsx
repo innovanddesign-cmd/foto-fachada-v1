@@ -30,7 +30,7 @@ export function VistaReferencia({snapshot,onContact}:{snapshot:Snapshot;onContac
  const [html,setHTML]=useState('');const [error,setError]=useState(false);const [retry,setRetry]=useState(0);
  const options=useMemo(()=>{
   const category=adn?.analisisVision?.categoriaSugerida||'';
-  const name=adn?.analisisVision?.nombreSugerido||datos?.titularPrincipal||'Mi inmobiliaria';
+  const name=adn?.analisisVision?.nombreSugerido||datos?.titularPrincipal||'Mi negocio';
   const desc=resolverDatoHibrido(datos,'descripcionValor');
   const services=datos?.ofertas?.map(x=>({title:x.titulo,text:x.descripcion,price:x.precio}))||[];
   const sections=[{type:'text',title:resolverDatoHibrido(datos,'titularPrincipal')||datos?.titularPrincipal||name,text:desc},

@@ -8,7 +8,7 @@ import type { DatosEscaparateBase } from '@/lib/estado/tipos-estado';
 export function EditorNegocio() {
   const s = useTiendaEstado();
   const datos = s.datosEscaparate;
-  if (!datos || !s.adnMarca) return <p>Completa primero la información de el negocio.</p>;
+  if (!datos || !s.adnMarca) return <p>Completa primero la información del negocio.</p>;
   function update(key: keyof DatosEscaparateBase, value: string) {
     const current = useTiendaEstado.getState().datosEscaparate;
     if (!current) return;
@@ -16,10 +16,10 @@ export function EditorNegocio() {
   }
   return <div className="studio-panel space-y-6">
     <div><h2 className="text-xl font-semibold">Contenido de tu web</h2><p className="studio-muted mt-2">Edita cualquier campo. La vista previa se actualiza mientras escribes.</p></div>
-    <label className="studio-field">Nombre de el negocio<input value={s.adnMarca.analisisVision?.nombreSugerido || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, nombreSugerido: e.target.value } })} /></label>
-    <label className="studio-field">Especialidad<input value={s.adnMarca.analisisVision?.categoriaSugerida || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, categoriaSugerida: e.target.value } })} /><span className="studio-muted text-sm">Por ejemplo: residencial, alquileres o propiedades de lujo.</span></label>
+    <label className="studio-field">Nombre del negocio<input value={s.adnMarca.analisisVision?.nombreSugerido || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, nombreSugerido: e.target.value } })} /></label>
+    <label className="studio-field">Especialidad<input value={s.adnMarca.analisisVision?.categoriaSugerida || ''} onChange={e => s.adnMarca?.analisisVision && s.actualizarAdn({ analisisVision: { ...s.adnMarca.analisisVision, categoriaSugerida: e.target.value } })} /><span className="studio-muted text-sm">Por ejemplo: venta de viviendas, tratamientos de estética o corte y barba.</span></label>
     {([
-      ['titularPrincipal', 'Titular de presentación'], ['subtitulo', 'Subtítulo'], ['descripcionValor', 'Descripción de el negocio'],
+      ['titularPrincipal', 'Titular de presentación'], ['subtitulo', 'Subtítulo'], ['descripcionValor', 'Descripción del negocio'],
       ['ctaPrincipal', 'Texto del botón principal'], ['mensajeWhatsApp', 'Mensaje inicial de WhatsApp'], ['telefono', 'Teléfono / WhatsApp con prefijo de país'], ['horario', 'Horario de atención'], ['email', 'Correo electrónico'], ['direccion', 'Dirección del negocio']
     ] as [keyof DatosEscaparateBase, string][]).map(([key, label]) => <label key={key} className="studio-field">{label}
       {key === 'descripcionValor' || key === 'horario' || key === 'mensajeWhatsApp' ? <textarea rows={3} value={datos.datosReales?.[key] ?? datos.datosSugeridos?.[key] ?? ''} onChange={e => update(key, e.target.value)} /> :

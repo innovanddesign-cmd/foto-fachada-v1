@@ -12,6 +12,7 @@ export async function GET(){
     if(!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)return false;
     const sql=commercialDB();
     const [row]=await sql`select to_regclass('private.innova_accounts') is not null
+      and to_regclass('private.innova_orders') is not null
       and to_regprocedure('public.innova_public_page(text)') is not null
       and to_regprocedure('private.innova_reserve(uuid,uuid,text,integer)') is not null as ready`;
     return row?.ready===true;

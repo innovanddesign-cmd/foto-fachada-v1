@@ -48,14 +48,14 @@ export const AnalizadorADN = () => {
         } finally { pending.current = false; setBusy(false); }
     }
     return <section className="space-y-5" aria-busy={busy}>
-        <h2 className="text-xl font-semibold">¿Cómo quieres preparar tu escaparate?</h2>
-        <p className="studio-muted">Puedes completar los datos tú mismo, gratis y sin registrarte. Para analizar la foto con IA necesitas una cuenta.</p>
+        <h2 className="text-xl font-semibold">Prepara tu campaña con IA</h2>
+        <p className="studio-muted">La IA propone tu identidad, el mensaje de campaña, la web y el texto del cartel a partir de la foto. Revisarás todo antes de publicar. La generación inicial incluida no consume créditos.</p>
         <div className="flex flex-wrap gap-3">
             <button className="studio-primary" disabled={busy} onClick={() => complete(identidadManual())}>Continuar sin IA</button>
-            <button className="studio-button" disabled={busy} onClick={() => void (quote ? analyze() : quoteCost())}>{busy ? 'Preparando…' : quote ? quote.mode==='credits' ? `Analizar foto · ${quote.cost} créditos` : 'Analizar foto · 1 uso de IA' : 'Consultar coste del análisis'}</button>
+            <button className="studio-button" disabled={busy} onClick={() => void (quote ? analyze() : quoteCost())}>{busy ? 'Preparando…' : quote ? quote.mode==='credits' ? quote.initial ? 'Generar campaña inicial · 0 créditos' : `Volver a analizar · ${quote.cost} créditos` : 'Analizar foto · 1 uso de IA' : 'Preparar mi campaña con IA'}</button>
         </div>
         {quote && <p className="studio-muted">{quote.mode==='credits' ? `Saldo disponible: ${quote.balance} créditos.` : `Usos disponibles en este periodo: ${quote.remaining}.`} El consumo se realiza al pulsar Analizar.</p>}
-        {busy && <p role="status">Preparando la identidad del negocio…</p>}
+        {busy && <p role="status">Analizando la foto y preparando la propuesta de web, campaña y cartel…</p>}
         {error && <p role="alert">{error}</p>}
         {login && <div className="studio-panel"><p className="mb-5" role="status">Inicia sesión para analizar la foto. Tu borrador se conserva.</p><LoginForm onSuccess={() => void quoteCost()} /></div>}
     </section>;

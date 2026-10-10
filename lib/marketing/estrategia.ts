@@ -12,7 +12,9 @@ export interface EstrategiaConversion {
 }
 
 export function sugerirEstrategia(adn: AdnMarca, telefono = ''): EstrategiaConversion {
-  const citas = /est[eé]t|belleza|peluq|cl[ií]nic|salud/i.test(adn.analisisVision?.categoriaSugerida || '');
+  const generated=adn.propuestaInicial;
+  if(generated && [generated.publico,generated.motivoEscaneo,generated.textoCartel,generated.cta,generated.mensajeWhatsApp].every(Boolean)) return {objetivo:generated.objetivo,publico:generated.publico,motivoEscaneo:generated.motivoEscaneo,textoCartel:generated.textoCartel,cta:generated.cta,mensajeWhatsApp:generated.mensajeWhatsApp,telefono};
+  const citas = /est[eé]t|belleza|barber|peluq|cl[ií]nic|salud/i.test(adn.analisisVision?.categoriaSugerida || '');
   return {
     objetivo: citas ? 'CITAS' : 'CONSULTAS',
     publico: 'Personas que pasan por delante de mi local.',

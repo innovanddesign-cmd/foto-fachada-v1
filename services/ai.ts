@@ -69,14 +69,14 @@ export const AIService = {
         }
 
         // Generar titulares basados en el arquetipo
-        const titular = { principal: nombre, sub: `${categoria} · Conoce nuestro negocio y contacta con nuestro equipo.` };
+        const titular = { principal: adn.propuestaInicial?.titulo || nombre, sub: adn.propuestaInicial?.descripcion || `${categoria} · Conoce nuestro negocio y contacta con nuestro equipo.` };
 
         // Generar ofertas desde servicios detectados
         const ofertas = servicios.length > 0
             ? servicios.slice(0, 3).map((s) => ({
                 titulo: s,
                 precio: "Consultar",
-                descripcion: `${s} profesional con los mejores estándares.`
+                descripcion: `Consulta más información sobre ${s}.`
             }))
             : [];
 
@@ -121,13 +121,13 @@ export const AIService = {
         const escaparate: DatosEscaparate = {
             titularPrincipal: titular.principal,
             subtitulo: titular.sub,
-            disenoSeleccionado: "heroe-centrado",
+            disenoSeleccionado: (adn.propuestaInicial?.layout || "heroe-centrado") as DatosEscaparate['disenoSeleccionado'],
             ofertas,
             secciones,
             datosSugeridos: {
                 titularPrincipal: titular.principal,
                 subtitulo: titular.sub,
-                descripcionValor: adn.analisisMarketing || gap || "",
+                descripcionValor: adn.propuestaInicial?.descripcion || "",
                 ctaPrincipal: adn.estrategiaConversion?.cta || 'Contactar con el negocio',
                 horario: "",
                 telefono: "",

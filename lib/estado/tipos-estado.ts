@@ -138,6 +138,7 @@ export interface MetadatosExif {
 // ═══════════════════════════════════════════════════════════════
 
 export interface AdnMarca {
+    propuestaInicial?: ReturnType<typeof import('@/lib/ai/initial-campaign').initialCampaign>;
     estrategiaConversion?: EstrategiaConversion;
     /** Paleta de colores extraída de la fachada (5 niveles) */
     paletaColores: {

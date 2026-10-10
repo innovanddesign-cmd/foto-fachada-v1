@@ -226,8 +226,14 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
         },
 
         agregarActivo: async (archivo: File, tipo: 'FACHADA' | 'LOGO' | 'OTRO') => {
+            // Local drafts survive navigation and sign-in; object URLs do not.
+            const url = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result));
+                reader.onerror = () => reject(new Error('No se pudo conservar la imagen.'));
+                reader.readAsDataURL(archivo);
+            });
             const anterior = get();
-            const url = URL.createObjectURL(archivo);
 
             const nuevoActivo: ActivoGaleria = {
                 id: `activo_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`,

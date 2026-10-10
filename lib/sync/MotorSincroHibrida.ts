@@ -144,7 +144,7 @@ export function generarPlaceholderIA(campo: keyof DatosEscaparateBase, config: P
         direccion: { default: '' },
         mensajeWhatsApp: { default: '' },
         titularPrincipal: {default: `Conoce ${nombreNegocio}`},
-        subtitulo: {default: 'Servicios inmobiliarios y contacto con nuestra agencia'},
+        subtitulo: {default: 'Servicios y contacto con nuestro negocio'},
         descripcionValor: {default: 'Completa aquí los servicios y la zona en la que trabaja tu agencia.'},
         ctaPrincipal: {default: 'Contactar con la agencia'},
         horario: {default: ''},
