@@ -66,7 +66,7 @@ function doc_delivery_request($id,$body,$filter='') {
  $key=$env['SUPABASE_SECRET_KEY']??$env['SUPABASE_SERVICE_ROLE_KEY']??'';
  $h=['apikey: '.$key,'Accept-Profile: innova','Content-Profile: innova','Content-Type: application/json','Prefer: return=representation'];
  if(strpos($key,'eyJ')===0)$h[]='Authorization: Bearer '.$key;
- $url=rtrim($env['SUPABASE_URL'],'/').'/rest/v1/document_deliveries?id=eq.'.doc_id($id).$filter;
+ $url=rtrim($env['SUPABASE_URL']??'https://skgpjovfkcpyenipjlxh.supabase.co','/').'/rest/v1/document_deliveries?id=eq.'.doc_id($id).$filter;
  $c=curl_init($url);curl_setopt_array($c,[CURLOPT_CUSTOMREQUEST=>'PATCH',CURLOPT_RETURNTRANSFER=>true,CURLOPT_HTTPHEADER=>$h,CURLOPT_POSTFIELDS=>json_encode($body),CURLOPT_TIMEOUT=>15]);
  $raw=curl_exec($c);$status=curl_getinfo($c,CURLINFO_HTTP_CODE);curl_close($c);
  if($status!==200||$raw===false)core_fail(503,'Documento guardado. No se pudo confirmar el estado del envío.');
