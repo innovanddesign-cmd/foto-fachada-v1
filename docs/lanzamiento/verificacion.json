@@ -9,7 +9,7 @@
     "total": 0
   },
   "localTestSuites": {
-    "passed": 11,
+    "passed": 13,
     "failed": 0
   },
   "productionBuild": "passed",
@@ -21,19 +21,33 @@
     "creatorEntry": "verified",
     "photoUpload": "blocked: ChatGPT browser extension lacks Allow access to file URLs permission"
   },
-  "remoteDeployment": "not performed",
+  "remoteDeployment": "promoted to both production domains",
   "liveAuthenticatedAndPaidProviderFlow": "not verified",
-  "productionCommit": "8c6685676e62f0327e6ca0d7a0c712d02a11f1cb",
-  "commercialMigrationOnProduction": false,
+  "productionCommit": "c3a7923",
+  "commercialMigrationOnProduction": true,
   "productionCounts": {
     "campaigns": 1,
     "publications": 0,
     "legacyAIAccounts": 0
   },
-  "vercelConfigurationInspection": "blocked: connector HTTP 403 and CLI scope-not-accessible for correct team",
+  "vercelConfigurationInspection": "verified through authorized CLI; plugin connection still has no teams",
   "supabaseSecurityAdvisors": {
-    "warning": "auth_leaked_password_protection",
-    "informationalRlsNoPolicy": 29
+    "informationalRlsNoPolicy": 26,
+    "publicDefinerFunctions": 2,
+    "warnings": [
+      "anon_security_definer_function_executable",
+      "authenticated_security_definer_function_executable",
+      "auth_leaked_password_protection"
+    ]
   },
-  "releaseVerdict": "not ready: see aceptacion.html"
+  "releaseVerdict": "technical update live; commercial and complete authenticated acceptance still pending",
+  "productionDeploymentId": "dpl_Bu9nLRCfdkbQaXf8etXgU2ceKrdc",
+  "githubEquivalentCommit": "b430746bc310b6640008f360b43ad9d27bddaf72",
+  "databaseRuntime": "dedicated least-privilege identity; certificate verification enabled; rollback test passed",
+  "publicHealth": 200,
+  "githubCI": {
+    "commit": "b430746bc310b6640008f360b43ad9d27bddaf72",
+    "run": 38040754744,
+    "conclusion": "success"
+  }
 }
