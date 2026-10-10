@@ -1,5 +1,6 @@
 'use client';
 import { AIProposal } from './AIProposal';
+import { FreeRegeneration } from './FreeRegeneration';
 import { useTiendaEstado } from '@/store/useTiendaEstado';
 import type { DatosEscaparateBase } from '@/lib/estado/tipos-estado';
 
@@ -37,6 +38,7 @@ export function EditorNegocio() {
       {(['instagram', 'web'] as const).map(key => <label key={key} className="studio-field">{key === 'web' ? 'Web externa (https://…) ' : 'Instagram (URL o usuario)'}<input type="text" value={s.redesSociales[key] || ''} onChange={e => s.actualizarRedes({ [key]: e.target.value })} /></label>)}
     </fieldset>
     <AIProposal />
+    <FreeRegeneration />
     <p className="studio-notice">Estos cambios son un borrador. En «Publicar» puedes guardarlos en tu cuenta y actualizar la web pública.</p>
   </div>;
 }

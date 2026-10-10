@@ -13,11 +13,11 @@ export function identidadManual(): AdnMarca {
 }
 
 export const AIService = {
-    analizarImagen: async (imagenBase64: string, expectedCost?: number): Promise<AdnMarca> => {
+    analizarImagen: async (imagenBase64: string, expectedCost?: number, campaignId?: string, initial=false): Promise<AdnMarca> => {
         try {
             const response = await fetch("/api/analizar-fachada", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID(), ...(expectedCost ? {'x-ai-expected-cost': String(expectedCost)} : {}) },
+                headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID(), ...(expectedCost!==undefined ? {'x-ai-expected-cost': String(expectedCost)} : {}), ...(campaignId?{'x-ai-campaign-id':campaignId}:{}),'x-ai-initial':String(initial) },
                 body: JSON.stringify({ image: imagenBase64 }),
             });
 

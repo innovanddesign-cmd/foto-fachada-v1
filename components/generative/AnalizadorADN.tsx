@@ -4,16 +4,17 @@ import { useTiendaEstado } from '@/store/useTiendaEstado';
 import { AIService, AISignInRequired, AIQuotaNotice, identidadManual } from '@/services/ai';
 import { LoginForm } from '@/components/auth/LoginForm';
 import type { AdnMarca } from '@/lib/estado/tipos-estado';
+import { aiCampaignId } from '@/lib/ai/campaign';
 
 export const AnalizadorADN = () => {
     const image = useTiendaEstado(s => s.imagenSubida);
     const [busy, setBusy] = useState(false);
     const pending = useRef(false);
     const [login, setLogin] = useState(false);
-    const [quote, setQuote] = useState<{mode:string;cost?:number;remaining?:number;balance?:number}|null>(null);
+    const [quote, setQuote] = useState<{mode:string;cost?:number;remaining?:number;balance?:number;initial?:boolean}|null>(null);
     async function quoteCost() {
       setBusy(true); setError('');
-      try { const r=await fetch('/api/ai-quote',{cache:'no-store'}); const a=await r.json(); if(r.status===401){setLogin(true);return;} if(!r.ok)throw Error(a.error); setQuote(a); setLogin(false); }
+      try { const r=await fetch('/api/ai-quote?operation=analysis&initial=true&campaignId='+aiCampaignId(),{cache:'no-store'}); const a=await r.json(); if(r.status===401){setLogin(true);return;} if(!r.ok)throw Error(a.error); setQuote(a); setLogin(false); }
       catch(e) {setError(e instanceof Error?e.message:'No se pudo consultar el coste.');}
       finally {setBusy(false);}
     }
@@ -38,7 +39,7 @@ export const AnalizadorADN = () => {
                     reader.readAsDataURL(blob);
                 });
             }
-            complete(await AIService.analizarImagen(base64, quote.cost));
+            complete(await AIService.analizarImagen(base64, quote.cost, aiCampaignId(),quote.initial));
         } catch (e) {
             setQuote(null);
             if (e instanceof AISignInRequired) setLogin(true);

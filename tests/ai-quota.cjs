@@ -3,7 +3,7 @@ let tls;
 let state='reserved',finalize=true,broken=false,ran=0,finished=[],inserts=[];
 const sql=async(strings,...values)=>{if(broken)throw Error('database offline');const q=strings.join('?');if((q.includes('ai_reserve')||q.includes('innova_reserve')))return[{state}];if((q.includes('ai_finish')||q.includes('innova_finish'))){finished.push(values[2]);return[{finished:finalize}]};inserts.push(values);return[]};
 function load(env={DATABASE_URL:'postgres://postgres:secret@db.project.supabase.co/postgres',NEXT_PUBLIC_SUPABASE_URL:'https://project.supabase.co'}){
- const exp={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/ai/quota.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:exp,require:n=>n==='server-only'?{}:n==='postgres'?{__esModule:true,default:(_url,options)=>{tls=options.ssl;return sql}}:{NextResponse:Response},URL,process:{env},console:{error:()=>{}}});return exp;
+ const exp={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/ai/quota.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:exp,require:n=>n==='./costs'?{estimateProviderMicros:()=>null}:n==='server-only'?{}:n==='postgres'?{__esModule:true,default:(_url,options)=>{tls=options.ssl;return sql}}:{NextResponse:Response},URL,process:{env},console:{error:()=>{}}});return exp;
 }
 (async()=>{
  const q=load();const run=async()=>{ran++;return new Response('{}',{status:200})};

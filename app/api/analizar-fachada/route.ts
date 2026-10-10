@@ -225,6 +225,6 @@ Reglas:
             { status: 500 }
         );
     }
-    }, Number(req.headers.get('x-ai-expected-cost')));
+    }, req.headers.has('x-ai-expected-cost')?Number(req.headers.get('x-ai-expected-cost')):undefined, req.headers.get('x-ai-campaign-id')||undefined,req.headers.get('x-ai-initial')==='true');
 }
 

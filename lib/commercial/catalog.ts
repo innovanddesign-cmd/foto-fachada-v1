@@ -7,7 +7,7 @@ export const PLANS = {
   ENTERPRISE: { name: 'Enterprise', monthly: null, annual: null, launchAnnual: null, activeCampaigns: null },
 } as const;
 export const LAUNCH_CUSTOMERS = 50;
-export const POLICY_PENDING = ['launchRenewal', 'freeCredits', 'creditPacks', 'graceCapabilities', 'domainRenewal', 'supportDays', 'initialRevisions', 'upgradeProration'] as const;
+export const POLICY_PENDING = ['legalApproval', 'fiscalIdentifierValidation', 'freeImageProviderValidation'] as const;
 export function normalizePlan(value: unknown): Plan {
   if (value === 'ESCAPARATE') return 'BUSINESS'; // Existing saved drafts remain readable.
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(PLANS, value) ? value as Plan : 'FREE';

@@ -183,6 +183,7 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
         },
 
         reiniciar: () => {
+            if(typeof window!=='undefined') sessionStorage.removeItem('innova-ai-campaign');
             // Preservar campañas guardadas al reiniciar el flujo de creación
             const campañasActuales = get().campañas;
             set({

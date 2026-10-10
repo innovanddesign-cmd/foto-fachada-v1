@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
 import { requireAIUser } from '@/lib/ai/access';
-import { getAIQuotaSummary } from '@/lib/ai/quota';
-import { accountSummary } from '@/lib/commercial/server';
+import { commercialDB } from '@/lib/commercial/server';
+import { isAIOperation } from '@/lib/commercial/credits';
 export async function GET(req: Request) {
   const access = await requireAIUser(req); if (access.response) return access.response;
   try {
-    if (process.env.INNOVA_CREDITS_ENABLED === 'true') {
-      const account = await accountSummary(access.userId!);
-      if (!account.operationCost) return NextResponse.json({ error: 'La tarifa de IA aún no está activada. Puedes continuar manualmente.' }, {status:503});
-      return NextResponse.json({mode:'credits', cost:account.operationCost, balance:account.balance}, {headers:{'Cache-Control':'no-store'}});
-    }
-    const quota = await getAIQuotaSummary(access.userId!);
-    return NextResponse.json({mode:'quota', remaining:Math.max(0, Number(quota.limit)-Number(quota.used))}, {headers:{'Cache-Control':'no-store'}});
+    const p=new URL(req.url).searchParams,op=p.get('operation')||'analysis',campaign=p.get('campaignId'),initial=p.get('initial')==='true';
+    if(!isAIOperation(op)||(campaign&&!/^[0-9a-f-]{36}$/i.test(campaign)))return NextResponse.json({error:'Solicitud inválida'},{status:400});
+    const sql=commercialDB();
+    let [r]=await sql`select private.innova_ai_quote(${access.userId!}::uuid,${op},${campaign}::uuid,${initial}) as quote`;
+    if(initial&&!r.quote.available&&r.quote.initialUsed)[r]=await sql`select private.innova_ai_quote(${access.userId!}::uuid,${op},${campaign}::uuid,false) as quote`;
+    if(!r.quote.available)return NextResponse.json({error:'No tienes una generación incluida disponible. Puedes editar manualmente o activar un plan para regenerar.'},{status:403});
+    return NextResponse.json(r.quote,{headers:{'Cache-Control':'no-store'}});
   } catch { return NextResponse.json({error:'No se pudo consultar el coste. Puedes continuar sin IA.'}, {status:503}); }
 }
