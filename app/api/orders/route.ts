@@ -20,7 +20,10 @@ export async function POST(req:Request) {
     const order=await sql.begin(async tx=>{
       await tx`select pg_advisory_xact_lock(hashtextextended(${a.userId!}::text,815))`;
       const [prior]=await tx`select * from private.innova_orders where owner_id=${a.userId!}::uuid and request_id=${b.requestId}::uuid`;
-      if(prior)return prior;
+      if(prior){
+        if(prior.kind!==selection.kind || prior.product!==selection.product || prior.billing!==selection.billing || prior.mode!==selection.mode)throw Error('REQUEST_CONFLICT');
+        return prior;
+      }
       const [count]=await tx`select count(*)::int as n from private.innova_orders where owner_id=${a.userId!}::uuid and created_at>now()-interval '1 day'`;
       if(count.n>=20)throw Error('LIMIT');
       const [pending]=await tx`select * from private.innova_orders where owner_id=${a.userId!}::uuid and mode=${selection.mode} and kind=${selection.kind} and product=${selection.product} and billing=${selection.billing} and state in ('requested','awaiting_payment','payment_review')`;

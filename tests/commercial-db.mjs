@@ -1,6 +1,8 @@
 import { PGlite } from '@electric-sql/pglite';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import ts from 'typescript';
+import vm from 'node:vm';
 const db=new PGlite();
 try {
 await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
@@ -14,6 +16,27 @@ await db.exec(`create role anon; create role authenticated; create role service_
  grant usage on schema public to anon,authenticated,service_role;`);
 await db.exec(fs.readFileSync('supabase/escaparates-setup.sql','utf8'));
 for(const name of fs.readdirSync('supabase/migrations').filter(n=>n.endsWith('.sql')).sort())await db.exec(fs.readFileSync('supabase/migrations/'+name,'utf8'));
+// Execute the route's actual readiness query against SQL, including partial upgrades.
+async function healthStatus(){
+ const exports={};
+ const sql=async(parts,...values)=>{
+  let query=parts[0];values.forEach((_,i)=>{query+='$'+(i+1)+parts[i+1]});
+  return (await db.query(query,values)).rows;
+ };
+ vm.runInNewContext(ts.transpileModule(fs.readFileSync('app/api/health/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
+  {exports,require:n=>n==='next/server'?{NextResponse:Response}:{commercialDB:()=>sql},process:{env:{NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:'test'}},Date,console});
+ return (await exports.GET()).status;
+}
+await db.exec('set role innova_mvp_runtime');assert.equal(await healthStatus(),200);await db.exec('reset role');
+await db.exec('alter function private.innova_reserve_v2(uuid,uuid,text,integer,uuid,boolean) rename to reserve_v2_missing');
+assert.equal(await healthStatus(),503,'legacy reservation alone cannot report the upgraded MVP ready');
+await db.exec('alter function private.reserve_v2_missing(uuid,uuid,text,integer,uuid,boolean) rename to innova_reserve_v2');
+await db.exec('alter table public.escaparates_ai_attempts rename column estimated_usd_micros to missing_cost_column');
+assert.equal(await healthStatus(),503,'missing provider telemetry upgrade is not ready');
+await db.exec('alter table public.escaparates_ai_attempts rename column missing_cost_column to estimated_usd_micros');
+await db.exec('alter table public.escaparates_published disable trigger innova_preserve_publication_order');
+assert.equal(await healthStatus(),503,'unprotected publication order is not ready');
+await db.exec('alter table public.escaparates_published enable trigger innova_preserve_publication_order');
 const u='00000000-0000-4000-8000-000000000001',other='00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users(id) values($1),($2)',[u,other]);
 await db.query(`insert into private.innova_accounts(owner_id,plan,billing,anchor,paid_until,monthly_credits,operation_cost)
@@ -47,6 +70,12 @@ assert.equal((await db.query('select count(*)::int as c from public.escaparates_
 // Existing visible Free publication can still be updated with excess retained pages.
 await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub','${u}',false);`);
 await db.query("update public.escaparates_published set payload=payload where slug='test-0'");
+const publishedBefore=(await db.query("select published_at from public.escaparates_published where slug='test-0'")).rows[0].published_at;
+// The client republishes with a fresh timestamp; this must not rotate the Free slot.
+await db.query("update public.escaparates_published set published_at=now()+interval '1 day',payload=payload where slug='test-0'");
+assert.equal((await db.query("select published_at from public.escaparates_published where slug='test-0'")).rows[0].published_at.getTime(),publishedBefore.getTime(),'republishing preserves first publication order');
+assert.equal((await db.query("select public.innova_public_page('test-0') as p")).rows[0].p.plan,'FREE','edited Free campaign remains visible');
+assert.equal((await db.query("select public.innova_resolve_qr('test-4',false) as q")).rows[0].q.slug,'test-0','republishing preserves printed QR fallback');
 await assert.rejects(db.query("update public.escaparates_published set payload=payload where slug='test-4'"),/límite/);
 await db.exec('reset role;');
 await db.query("update private.innova_accounts set plan='BUSINESS',paid_until=now()+interval '1 year',operation_cost=100 where owner_id=$1",[u]);

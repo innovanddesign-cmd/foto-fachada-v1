@@ -35,6 +35,8 @@ assert.equal((await route.POST(req(selection,'POST','https://evil.test'))).statu
 owner=null;assert.equal((await route.POST(req(selection))).status,401);owner=u;
 let response=await route.POST(req(selection));assert.equal(response.status,200);const order=(await response.json()).order;assert.equal(order.net_cents,2000,'client cannot forge price');assert.equal(order.tax_cents,420);
 assert.equal((await (await route.POST(req(selection))).json()).order.id,order.id,'retry idempotent');
+assert.equal((await route.POST(req({...selection,product:'BUSINESS'}))).status,409,'same request ID cannot silently return a different product');
+assert.equal((await route.POST(req({...selection,mode:'manual'}))).status,409,'same request ID cannot cross test/manual payment modes');
 owner=other;assert.equal((await route.PATCH(req({id:order.id,action:'test_success'},'PATCH'))).status,409);assert.equal((await (await route.GET(req({},'POST'))).json()).orders.length,0,'other account cannot see order');owner=u;
 assert.equal((await route.PATCH(req({id:order.id,action:'payment_sent',note:'fake'},'PATCH'))).status,409,'test cannot enter live settlement');
 assert.equal((await route.PATCH(req({id:order.id,action:'test_failure'},'PATCH'))).status,200);

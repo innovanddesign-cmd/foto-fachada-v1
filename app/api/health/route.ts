@@ -13,8 +13,18 @@ export async function GET(){
     const sql=commercialDB();
     const [row]=await sql`select to_regclass('private.innova_accounts') is not null
       and to_regclass('private.innova_orders') is not null
+      and to_regclass('private.innova_credit_operations') is not null
+      and to_regclass('private.innova_ai_budget') is not null
       and to_regprocedure('public.innova_public_page(text)') is not null
-      and to_regprocedure('private.innova_reserve(uuid,uuid,text,integer)') is not null as ready`;
+      and to_regprocedure('public.innova_resolve_qr(text,boolean)') is not null
+      and to_regprocedure('private.innova_account_summary(uuid)') is not null
+      and to_regprocedure('private.innova_reserve_v2(uuid,uuid,text,integer,uuid,boolean)') is not null
+      and to_regprocedure('private.innova_ai_quote(uuid,text,uuid,boolean)') is not null
+      and to_regprocedure('private.innova_finish(uuid,uuid,boolean)') is not null
+      and to_regprocedure('private.innova_topup(uuid,text,text,uuid)') is not null
+      and exists(select 1 from pg_attribute where attrelid=to_regclass('public.escaparates_ai_attempts') and attname='estimated_usd_micros' and not attisdropped)
+      and exists(select 1 from pg_trigger where tgrelid=to_regclass('public.escaparates_published') and tgname='innova_preserve_publication_order' and tgenabled in ('O','A') and not tgisinternal)
+      as ready`;
     return row?.ready===true;
    }catch(error){
     const code=(error as {code?:unknown})?.code;
