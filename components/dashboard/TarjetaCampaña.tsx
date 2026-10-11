@@ -55,7 +55,7 @@ export const TarjetaCampaña = ({ campaña, onVerWeb, onDescargarCartel, onEdita
             className="relative overflow-hidden rounded-3xl bg-zinc-900/80 border border-white/5 backdrop-blur-xl group"
         >
             {/* Header con miniatura */}
-            <div className="relative h-40 bg-gradient-to-br from-zinc-800 to-zinc-900 overflow-hidden">
+            <div className="relative h-40 bg-linear-to-br from-zinc-800 to-zinc-900 overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-20 h-36 bg-zinc-800 rounded-xl border border-white/10 shadow-2xl flex items-center justify-center">
                         <span className="text-[8px] font-bold text-white/20 uppercase tracking-wider">Preview</span>
@@ -80,7 +80,7 @@ export const TarjetaCampaña = ({ campaña, onVerWeb, onDescargarCartel, onEdita
                 {/* Indicador QR */}
                 {idCartel && (
                     <div className="absolute top-4 right-4">
-                        <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-xs flex items-center justify-center">
                             <QrCode size={14} className="text-white/60" />
                         </div>
                     </div>
@@ -126,7 +126,7 @@ export const TarjetaCampaña = ({ campaña, onVerWeb, onDescargarCartel, onEdita
                             initial={{ width: 0 }}
                             animate={{ width: `${metricas.puntajeSaludMarca}%` }}
                             transition={{ duration: 1, delay: 0.4 }}
-                            className="h-full bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-500 rounded-full"
+                            className="h-full bg-linear-to-r from-rose-500 via-amber-500 to-emerald-500 rounded-full"
                         />
                     </div>
                 </div>
@@ -158,7 +158,7 @@ const IconButton = ({ icon: Icon, label, onClick, danger }: { icon: React.Elemen
         type="button"
         aria-label={label}
         onClick={(e) => { e.stopPropagation(); onClick?.(); }}
-        className={`w-8 h-8 rounded-lg backdrop-blur-sm flex items-center justify-center transition-colors ${
+        className={`w-8 h-8 rounded-lg backdrop-blur-xs flex items-center justify-center transition-colors ${
             danger ? 'bg-rose-500/80 hover:bg-rose-400 text-white' : 'bg-white/10 hover:bg-white/20 text-white/70'
         }`}
     >

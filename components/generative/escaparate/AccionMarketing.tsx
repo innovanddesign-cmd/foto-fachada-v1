@@ -37,7 +37,7 @@ export const AccionMarketing = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="w-full rounded-[40px] bg-gradient-to-br from-[var(--color-primario)] to-[var(--color-secundario)] p-10 text-center shadow-2xl relative overflow-hidden"
+                className="w-full rounded-[40px] bg-linear-to-br from-[var(--color-primario)] to-[var(--color-secundario)] p-10 text-center shadow-2xl relative overflow-hidden"
             >
                 {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />

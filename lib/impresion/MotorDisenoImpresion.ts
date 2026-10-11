@@ -42,8 +42,9 @@ export interface ConfigLayoutPoster {
 /**
  * Genera la configuración de layout según el factor de escala de la UI y formato.
  */
-export const obtenerConfigLayout = (formato: 'A4' | 'A5' | 'SQUARE' = 'A4', escala: number = 1): ConfigLayoutPoster => {
+export const obtenerConfigLayout = (formato: 'A3' | 'A4' | 'A5' | 'SQUARE' = 'A4', escala: number = 1): ConfigLayoutPoster => {
     let dims = DIMENSIONES_A4;
+    if (formato === 'A3') dims = { ...DIMENSIONES_A4, ANCHO_MM: 297, ALTO_MM: 420, MARGEN_SEGURIDAD_MM: 12 };
     if (formato === 'A5') dims = { ...DIMENSIONES_A5, DPI_PREVIEW: 96, DPI_EXPORT: 300 };
     if (formato === 'SQUARE') dims = { ...DIMENSIONES_SQUARE, DPI_PREVIEW: 96, DPI_EXPORT: 300 };
 

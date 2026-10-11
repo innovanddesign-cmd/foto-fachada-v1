@@ -30,7 +30,7 @@ export default function BotonAnalisis() {
     };
 
     return (
-        <div className="flex justify-center py-16 border-t border-white/5 bg-gradient-to-b from-transparent to-white/[0.02]">
+        <div className="flex justify-center py-16 border-t border-white/5 bg-linear-to-b from-transparent to-white/[0.02]">
             <motion.button
                 onClick={manejarClick}
                 disabled={!habilitado || cargando}
@@ -51,7 +51,7 @@ export default function BotonAnalisis() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-500/20 to-blue-400/20 bg-[length:200%_100%] animate-gradient-slow group-hover:opacity-100 opacity-50 transition-opacity"
+                            className="absolute inset-0 bg-linear-to-r from-blue-400/20 via-purple-500/20 to-blue-400/20 bg-[length:200%_100%] animate-gradient-slow group-hover:opacity-100 opacity-50 transition-opacity"
                         />
                     )}
                 </AnimatePresence>
@@ -88,7 +88,7 @@ export default function BotonAnalisis() {
                 {/* Shimmer Effect */}
                 {habilitado && !cargando && (
                     <motion.div
-                        className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
+                        className="absolute inset-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/40 to-transparent -skew-x-12"
                         animate={{ left: ['-100%', '200%'] }}
                         transition={{ repeat: Infinity, duration: 3, ease: 'linear', delay: 1 }}
                     />

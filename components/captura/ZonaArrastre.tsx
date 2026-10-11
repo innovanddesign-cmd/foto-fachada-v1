@@ -219,7 +219,7 @@ export default function ZonaArrastre({
                 transition={resorteRebote}
                 className="relative"
             >
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400/30 to-purple-500/30 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-400/30 to-purple-500/30 flex items-center justify-center">
                     <AnimatePresence mode="wait">
                         {estadoActual === 'aceptado' ? (
                             <motion.svg

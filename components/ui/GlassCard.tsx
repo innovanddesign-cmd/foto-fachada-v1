@@ -16,7 +16,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
         const variants = {
             default: "bg-white/5",
             dark: "bg-black/40",
-            gradient: "bg-gradient-to-br from-white/10 to-white/5",
+            gradient: "bg-linear-to-br from-white/10 to-white/5",
         };
 
         const intensities = {

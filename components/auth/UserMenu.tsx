@@ -7,12 +7,13 @@ import { useRouter } from 'next/navigation';
 import { User, LogOut, Cloud, CloudOff } from 'lucide-react';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-export function UserMenu() {
+export function UserMenu({returnTo='/dashboard'}:{returnTo?:string}={}) {
     const router = useRouter();
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) { setLoading(false); return; }
         const supabase = createClient();
 
         // Get initial user
@@ -46,7 +47,7 @@ export function UserMenu() {
     if (!user) {
         return (
             <a
-                href="/auth/login"
+                href={'/auth/login?next='+encodeURIComponent(returnTo)}
                 className="flex items-center gap-2 min-h-11 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors text-xs font-bold"
             >
                 <User className="w-3.5 h-3.5" />
@@ -65,7 +66,7 @@ export function UserMenu() {
 
             {/* User menu */}
             <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-white/5 border border-white/10">
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-700 to-emerald-900 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg bg-linear-to-br from-emerald-700 to-emerald-900 flex items-center justify-center">
                     <span className="text-white text-[10px] font-bold">
                         {user.email?.charAt(0).toUpperCase() || 'U'}
                     </span>

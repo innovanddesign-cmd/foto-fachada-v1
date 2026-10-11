@@ -5,7 +5,7 @@
  * Motor: Antigravity v.2026 (Gemini 3 Pro)
  * 
  * Navegación mobile-first fija en la parte inferior.
- * Efecto backdrop-blur intenso y estados focus neón.
+ * Efecto backdrop-blur-sm intenso y estados focus neón.
  */
 
 import Link from 'next/link';
@@ -40,7 +40,7 @@ export default function BarraNavegacionInferior() {
                         <Link
                             key={item.ruta}
                             href={item.ruta}
-                            className="relative flex-1 flex flex-col items-center justify-center py-3 focus:outline-none focus-visible:bg-white/5"
+                            className="relative flex-1 flex flex-col items-center justify-center py-3 focus:outline-hidden focus-visible:bg-white/5"
                         >
                             {esActivo && (
                                 <motion.div
@@ -59,7 +59,7 @@ export default function BarraNavegacionInferior() {
 
                             {esActivo && (
                                 <motion.div
-                                    className="absolute bottom-0 w-8 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-full shadow-[0_0_10px_var(--color-primario)]"
+                                    className="absolute bottom-0 w-8 h-1 bg-linear-to-r from-blue-500 to-purple-500 rounded-t-full shadow-[0_0_10px_var(--color-primario)]"
                                     layoutId="nav-indicator"
                                 />
                             )}

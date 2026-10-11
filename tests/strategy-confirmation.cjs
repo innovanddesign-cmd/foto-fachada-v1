@@ -1,6 +1,7 @@
 const fs=require('fs'),ts=require('typescript'),vm=require('vm'),assert=require('node:assert/strict');
 function load(file,requires={}) {const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require:n=>{if(n in requires)return requires[n];throw Error(n)},console,Date,encodeURIComponent,URL,process});return exports;}
-const m=load('lib/marketing/estrategia.ts');
+const sectors=load('lib/marketing/sectors.ts');
+const m=load('lib/marketing/estrategia.ts',{'./sectors':sectors,'./campaign-plan':load('lib/marketing/campaign-plan.ts')});
 const p=m.sugerirEstrategia({analisisVision:{categoriaSugerida:'Estética'}});
 assert.equal(p.objetivo,'CITAS');assert.equal(m.estrategiaConfirmada(p),false);
 assert.match(m.validarEstrategia(p),/WhatsApp/);
@@ -21,3 +22,24 @@ const context={process,URL,encodeURIComponent};vm.createContext(context);vm.runI
 const url=context.contactLinksForTest({whatsapp:confirmed.telefono,whatsappMessage:confirmed.mensajeWhatsApp})[0].url;
 assert.equal(new URL(url).pathname,'/34600123456');assert.equal(new URL(url).searchParams.get('text'),confirmed.mensajeWhatsApp);
 console.log('PASS: required confirmation, phone validation, preserved edits, public field allowlist and encoded WhatsApp message.');
+
+for(const id of Object.keys(sectors.sectors)) {
+ const brief=sectors.cleanBrief({sector:id,name:'TEST',services:'Servicio confirmado',focus:'Objetivo confirmado',location:'Benidorm',offer:'',injected:'ignored'});
+ assert.equal(brief.sector,id);assert.equal(brief.injected,undefined);
+ const strategy=m.sugerirEstrategia({sectorBrief:brief});assert.equal(strategy.objetivo,id==='inmobiliarias'?'CONSULTAS':'CITAS');
+ assert.ok(sectors.sectorPrompt(brief).includes('Servicio confirmado'));
+ const publicSnapshot=load('lib/supabase/sanitize.ts').sanearPayloadPublico({adnMarca:{sectorBrief:brief},datosEscaparate:prior});
+ assert.equal(publicSnapshot.adnMarca.sectorBrief,undefined);
+}
+assert.equal(sectors.cleanBrief({sector:'__proto__'}),undefined);
+assert.equal(sectors.cleanBrief({sector:'invalid'}),undefined);
+assert.equal(sectors.cleanBrief({sector:'estetica',services:'x'.repeat(2000)}).services.length,1200);
+console.log('PASS: three sector strategies, bounded provider context, unknown sectors rejected and private brief excluded from public pages.');
+
+const marketing=load('lib/marketing/campaign-plan.ts');
+assert.equal(marketing.campaignBudget({capacity:'20',unitCost:'0.60'}),12);
+assert.equal(marketing.campaignBudget({capacity:'20',unitCost:''}),null);
+assert.ok(marketing.campaignIssues({sector:'estetica',location:'',services:'',offer:'Regalo'}).length>0);
+assert.ok(marketing.campaignIssues({sector:'estetica',location:'Benidorm',services:'Manicura',audience:'Clientes locales',placement:'Entrada',startDate:'2026-10-20',endDate:'2026-10-10',target:'2',fulfillment:'Equipo',offer:''}).some(x=>x.includes('periodo')));
+assert.ok(!sectors.sectorPrompt({sector:'estetica',offer:'REGALO_NO_APROBADO'}).includes('REGALO_NO_APROBADO'));
+console.log('PASS marketing: real unit-cost budget, missing data, reversed dates and unapproved offers.');

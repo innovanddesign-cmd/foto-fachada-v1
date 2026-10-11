@@ -8,23 +8,23 @@ export function identidadManual(): AdnMarca {
         estiloTipografico:'SANS_GEOMETRICA', ambiente:'Edición manual',
         analisisMarketing:'Completa el nombre y los datos de tu negocio. Puedes crear tu escaparate sin usar IA.',
         logoExtraido:null, publicoObjetivo:'', contextoMercado:'', confianza:0,
-        analisisVision: {nombreSugerido:'Mi inmobiliaria',categoriaSugerida:'Inmobiliaria',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true}
+        analisisVision: {nombreSugerido:'Mi negocio',categoriaSugerida:'Negocio local',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true}
     };
 }
 
 export const AIService = {
-    analizarImagen: async (imagenBase64: string): Promise<AdnMarca> => {
+    analizarImagen: async (imagenBase64: string, expectedCost?: number, campaignId?: string, initial=false, sectorBrief?: import('@/lib/marketing/sectors').SectorBrief): Promise<AdnMarca> => {
         try {
             const response = await fetch("/api/analizar-fachada", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID() },
-                body: JSON.stringify({ image: imagenBase64 }),
+                headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID(), ...(expectedCost!==undefined ? {'x-ai-expected-cost': String(expectedCost)} : {}), ...(campaignId?{'x-ai-campaign-id':campaignId}:{}),'x-ai-initial':String(initial) },
+                body: JSON.stringify({ image: imagenBase64, sectorBrief }),
             });
 
             if (!response.ok) {
                 if (response.status === 401) throw new AISignInRequired('Inicia sesión para usar la IA.');
                 const errorData = await response.json().catch(() => ({}));
-                if (['AI_QUOTA','AI_RETRY'].includes(errorData.code)) throw new AIQuotaNotice(errorData.error);
+                if (['AI_QUOTA','AI_RETRY','AI_UNAVAILABLE','AI_PRICE_CONFIRMATION_REQUIRED'].includes(errorData.code)) throw new AIQuotaNotice(errorData.error);
                 const detalle = errorData.detalle || errorData.error || `HTTP ${response.status}`;
                 throw new Error(`Error de API: ${detalle}`);
             }
@@ -49,16 +49,16 @@ export const AIService = {
                 logoExtraido: null,
                 publicoObjetivo: "Desconocido",
                 contextoMercado: "Sin datos",
-                analisisVision: {nombreSugerido:'Mi inmobiliaria',categoriaSugerida:'Inmobiliaria',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true},
+                analisisVision: {nombreSugerido:'Mi negocio',categoriaSugerida:'Negocio local',paletaColores:{primario:'#000000',secundario:'#333333',acento:'#c9a45c',fondo:'#FFFFFF',primarioHSL:'0 0% 0%',secundarioHSL:'0 0% 20%'},objetosDetectados:[],confianzaAnalisis:0,logoDetectado:false,logoCreationRequired:true},
                 confianza: 0
             };
         }
     },
 
     generarEscaparate: async (adn: AdnMarca): Promise<DatosEscaparate> => {
-        const nombre = adn.analisisVision?.nombreSugerido || "Tu Inmobiliaria";
+        const nombre = adn.analisisVision?.nombreSugerido || "Tu negocio";
         const categoria = adn.analisisVision?.categoriaSugerida || "Servicios";
-        const servicios = adn.inteligenciaMarketing?.serviciosDetectados || [];
+        const servicios = adn.sectorBrief?.services ? adn.sectorBrief.services.split(/[;\n]+/).map(x=>x.trim()).filter(Boolean) : adn.inteligenciaMarketing?.serviciosDetectados || [];
         const gap = adn.inteligenciaMarketing?.gapDeMercado || "";
         const arquetipoRaw = adn.inteligenciaMarketing?.arquetipoMarca || "El Explorador";
 
@@ -69,14 +69,14 @@ export const AIService = {
         }
 
         // Generar titulares basados en el arquetipo
-        const titular = { principal: nombre, sub: `${categoria} · Conoce nuestra agencia y contacta con nuestro equipo.` };
+        const titular = { principal: adn.propuestaInicial?.titulo || nombre, sub: adn.propuestaInicial?.descripcion || adn.sectorBrief?.services || `${categoria} · Conoce nuestro negocio y contacta con nuestro equipo.` };
 
         // Generar ofertas desde servicios detectados
         const ofertas = servicios.length > 0
             ? servicios.slice(0, 3).map((s) => ({
                 titulo: s,
                 precio: "Consultar",
-                descripcion: `${s} profesional con los mejores estándares.`
+                descripcion: `Consulta más información sobre ${s}.`
             }))
             : [];
 
@@ -108,7 +108,7 @@ export const AIService = {
                 contenido: {
                     titulo: "Contacta con Nosotros",
                     cta: {
-                        texto: adn.estrategiaConversion?.cta || 'Contactar con la agencia',
+                        texto: adn.estrategiaConversion?.cta || 'Contactar con el negocio',
                         accion: "#contacto"
                     }
                 }
@@ -121,14 +121,15 @@ export const AIService = {
         const escaparate: DatosEscaparate = {
             titularPrincipal: titular.principal,
             subtitulo: titular.sub,
-            disenoSeleccionado: "heroe-centrado",
+            disenoSeleccionado: (adn.propuestaInicial?.layout || "heroe-centrado") as DatosEscaparate['disenoSeleccionado'],
             ofertas,
-            secciones,
+            datosReales: adn.sectorBrief ? {direccion:adn.sectorBrief.location,descripcionValor:[titular.sub,adn.sectorBrief.propertyPrice,adn.sectorBrief.incentiveApproved?adn.sectorBrief.offer:''].filter(Boolean).join(' · ')} : undefined,
+            secciones: [...secciones,...(adn.sectorBrief?.incentiveApproved&&adn.sectorBrief.offer?[{id:'campaign-conditions',tipo:'Promo' as const,variante:'Glass' as const,contenido:{titulo:'Condiciones de la campaña',descripcion:[adn.sectorBrief.offer,adn.sectorBrief.startDate&&adn.sectorBrief.endDate?`Del ${adn.sectorBrief.startDate} al ${adn.sectorBrief.endDate}`:'',adn.sectorBrief.capacity?`${adn.sectorBrief.capacity} unidades o plazas. Confirma disponibilidad con el negocio.`:''].filter(Boolean).join(' · ')}}]:[])],
             datosSugeridos: {
                 titularPrincipal: titular.principal,
                 subtitulo: titular.sub,
-                descripcionValor: adn.analisisMarketing || gap || "",
-                ctaPrincipal: adn.estrategiaConversion?.cta || 'Contactar con la agencia',
+                descripcionValor: adn.propuestaInicial?.descripcion || "",
+                ctaPrincipal: adn.estrategiaConversion?.cta || 'Contactar con el negocio',
                 horario: "",
                 telefono: "",
             }

@@ -138,6 +138,8 @@ export interface MetadatosExif {
 // ═══════════════════════════════════════════════════════════════
 
 export interface AdnMarca {
+    sectorBrief?: import('@/lib/marketing/sectors').SectorBrief;
+    propuestaInicial?: ReturnType<typeof import('@/lib/ai/initial-campaign').initialCampaign>;
     estrategiaConversion?: EstrategiaConversion;
     /** Paleta de colores extraída de la fachada (5 niveles) */
     paletaColores: {
@@ -224,7 +226,7 @@ export interface OfertaProducto {
 // CARTELERÍA Y CAMPAÑAS (FASE 4 - BLOQUE 1 - PARTE B)
 // ═══════════════════════════════════════════════════════════════
 
-export type FormatoPoster = 'A4' | 'A5' | 'SQUARE';
+export type FormatoPoster = 'A3' | 'A4' | 'A5' | 'SQUARE';
 
 export interface CampanaCartel {
     id: string;
@@ -276,6 +278,8 @@ export interface DatosEscaparate {
 /** Campos base editables (usados en datosReales y datosSugeridos) */
 export interface DatosEscaparateBase {
     mensajeWhatsApp?: string;
+    email?: string;
+    direccion?: string;
     titularPrincipal: string;
     subtitulo: string;
     descripcionValor: string;
@@ -336,6 +340,7 @@ export interface MarketingIntelligence {
 // ═══════════════════════════════════════════════════════════════
 
 export interface EstadoTienda {
+    sectorBrief?: import('@/lib/marketing/sectors').SectorBrief;
     /** Paso actual en el flujo */
     pasoActual: PasoAplicacion;
 

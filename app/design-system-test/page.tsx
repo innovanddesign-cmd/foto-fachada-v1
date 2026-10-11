@@ -7,7 +7,7 @@ import { Tipografia } from "@/components/sistema-diseno/Tipografia";
 
 export default function DesignSystemTest() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-blue-900 p-10 flex flex-col gap-10">
+        <div className="min-h-screen bg-linear-to-br from-purple-900 to-blue-900 p-10 flex flex-col gap-10">
             <Tipografia as="h1" className="text-white text-4xl mb-10">
                 Prueba de Sistema de Diseño: Cristal Líquido 2026
             </Tipografia>
