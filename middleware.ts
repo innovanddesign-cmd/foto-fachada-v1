@@ -9,4 +9,4 @@ export async function middleware(request:NextRequest){
  if(privateRoute)response.headers.set('Cache-Control','private, no-store');
  return response;
 }
-export const config={matcher:['/','/dashboard/:path*','/create/:path*','/auth/:path*','/checkout/:path*','/operator/:path*','/v/:path*','/t/:path*','/test-mockup']};
+export const config={matcher:['/inmobiliarias','/estetica','/peluquerias','/','/dashboard/:path*','/create/:path*','/auth/:path*','/checkout/:path*','/operator/:path*','/v/:path*','/t/:path*','/test-mockup']};

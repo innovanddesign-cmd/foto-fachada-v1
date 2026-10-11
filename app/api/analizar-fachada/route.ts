@@ -1,3 +1,4 @@
+import {sectorPrompt} from '@/lib/marketing/sectors';
 import { NextResponse } from "next/server";
 import { requireAIUser, aiRequestId } from '@/lib/ai/access';
 import { recordAIUsage } from '@/lib/ai/usage';
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { image } = await req.json();
+        const { image, sectorBrief } = await req.json();
 
         if (typeof image !== 'string' || !image) {
             return NextResponse.json({ error: "No image provided" }, { status: 400 });
@@ -50,12 +51,13 @@ export async function POST(req: Request) {
         console.log(`[analizar-fachada] Iniciando análisis. MimeType: ${mimeType}, Tamaño base64: ${base64Data.length} chars`);
 
         const prompt = `Eres el asistente de campaña de INNOVA. Crea una propuesta sencilla, útil y comprensible para una persona sin conocimientos de marketing.
-Analiza esta imagen para crear un escaparate de un negocio local (inmobiliaria, centro de estética, barbería u otro sector). Describe solo datos visibles. No inventes propiedades, precios, disponibilidad, servicios ni trayectoria. Si un dato no se ve, déjalo vacío o indícalo como pendiente de confirmar; serviciosDetectados debe incluir solo servicios escritos en la imagen.
+${sectorPrompt(sectorBrief)}
+Analiza esta imagen para crear un escaparate de un negocio local (inmobiliaria, centro de estética, barbería u otro sector). Describe solo datos visibles o confirmados por el cliente. No inventes propiedades, precios, disponibilidad, servicios ni trayectoria. Si un dato no se ve, déjalo vacío o indícalo como pendiente de confirmar; serviciosDetectados debe incluir solo servicios escritos en la imagen o confirmados por el cliente.
 
 Responde ÚNICAMENTE con un objeto JSON válido, sin bloques markdown, sin texto adicional:
 
 {
-  "nombreSugerido": "nombre del negocio legible en la imagen; vacío si no es legible",
+  "nombreSugerido": "nombre confirmado por el cliente o legible en la imagen; vacío si no consta",
   "categoriaSugerida": "sector visible del negocio; Negocio local si no se puede determinar",
   "paletaColores": {
     "primario": "#RRGGBB",

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { User, LogOut, Cloud, CloudOff } from 'lucide-react';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-export function UserMenu() {
+export function UserMenu({returnTo='/dashboard'}:{returnTo?:string}={}) {
     const router = useRouter();
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [loading, setLoading] = useState(true);
@@ -47,7 +47,7 @@ export function UserMenu() {
     if (!user) {
         return (
             <a
-                href="/auth/login"
+                href={'/auth/login?next='+encodeURIComponent(returnTo)}
                 className="flex items-center gap-2 min-h-11 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors text-xs font-bold"
             >
                 <User className="w-3.5 h-3.5" />

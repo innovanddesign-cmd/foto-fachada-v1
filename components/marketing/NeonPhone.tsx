@@ -4,7 +4,7 @@ import { findDemo } from '@/lib/marketing/demos';
 import { useEffect, useRef, useState } from 'react';
 
 const outline = 'M 450 0 L 756 0 A 144 144 0 0 1 900 144 L 900 1756 A 144 144 0 0 1 756 1900 L 144 1900 A 144 144 0 0 1 0 1756 L 0 144 A 144 144 0 0 1 144 0 Z';
-export function NeonPhone({ id, name, sector, priority = false }: { id: string; name: string; sector: string; priority?: boolean }) {
+export function NeonPhone({ id, name, sector, priority = false, returnTo }: { id: string; name: string; sector: string; priority?: boolean; returnTo?: string }) {
  const screen = useRef<HTMLDivElement>(null);
  const [size, setSize] = useState({width:260,height:550});
  const width = size.width;
@@ -27,6 +27,6 @@ export function NeonPhone({ id, name, sector, priority = false }: { id: string; 
    </div>
   </div>
   <p className="innova-phone-hint">Desliza dentro del teléfono para ver más</p>
-  <Link href={'/test-mockup?demo=' + id + (demo.landingFile ? '&format=landing' : '')} className="innova-phone-open">Explorar diseño <span aria-hidden="true">↗</span></Link>
+  <Link href={'/test-mockup?demo=' + id + (demo.landingFile ? '&format=landing' : '') + (returnTo?'&returnTo='+encodeURIComponent(returnTo):'')} className="innova-phone-open">Explorar diseño <span aria-hidden="true">↗</span></Link>
  </article>;
 }

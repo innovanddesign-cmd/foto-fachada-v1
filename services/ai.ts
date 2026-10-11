@@ -13,12 +13,12 @@ export function identidadManual(): AdnMarca {
 }
 
 export const AIService = {
-    analizarImagen: async (imagenBase64: string, expectedCost?: number, campaignId?: string, initial=false): Promise<AdnMarca> => {
+    analizarImagen: async (imagenBase64: string, expectedCost?: number, campaignId?: string, initial=false, sectorBrief?: import('@/lib/marketing/sectors').SectorBrief): Promise<AdnMarca> => {
         try {
             const response = await fetch("/api/analizar-fachada", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", 'x-request-id': crypto.randomUUID(), ...(expectedCost!==undefined ? {'x-ai-expected-cost': String(expectedCost)} : {}), ...(campaignId?{'x-ai-campaign-id':campaignId}:{}),'x-ai-initial':String(initial) },
-                body: JSON.stringify({ image: imagenBase64 }),
+                body: JSON.stringify({ image: imagenBase64, sectorBrief }),
             });
 
             if (!response.ok) {
@@ -58,7 +58,7 @@ export const AIService = {
     generarEscaparate: async (adn: AdnMarca): Promise<DatosEscaparate> => {
         const nombre = adn.analisisVision?.nombreSugerido || "Tu negocio";
         const categoria = adn.analisisVision?.categoriaSugerida || "Servicios";
-        const servicios = adn.inteligenciaMarketing?.serviciosDetectados || [];
+        const servicios = adn.sectorBrief?.services ? adn.sectorBrief.services.split(/[;\n]+/).map(x=>x.trim()).filter(Boolean) : adn.inteligenciaMarketing?.serviciosDetectados || [];
         const gap = adn.inteligenciaMarketing?.gapDeMercado || "";
         const arquetipoRaw = adn.inteligenciaMarketing?.arquetipoMarca || "El Explorador";
 
@@ -69,7 +69,7 @@ export const AIService = {
         }
 
         // Generar titulares basados en el arquetipo
-        const titular = { principal: adn.propuestaInicial?.titulo || nombre, sub: adn.propuestaInicial?.descripcion || `${categoria} · Conoce nuestro negocio y contacta con nuestro equipo.` };
+        const titular = { principal: adn.propuestaInicial?.titulo || nombre, sub: adn.propuestaInicial?.descripcion || adn.sectorBrief?.services || `${categoria} · Conoce nuestro negocio y contacta con nuestro equipo.` };
 
         // Generar ofertas desde servicios detectados
         const ofertas = servicios.length > 0
@@ -123,7 +123,8 @@ export const AIService = {
             subtitulo: titular.sub,
             disenoSeleccionado: (adn.propuestaInicial?.layout || "heroe-centrado") as DatosEscaparate['disenoSeleccionado'],
             ofertas,
-            secciones,
+            datosReales: adn.sectorBrief ? {direccion:adn.sectorBrief.location,descripcionValor:[titular.sub,adn.sectorBrief.propertyPrice,adn.sectorBrief.incentiveApproved?adn.sectorBrief.offer:''].filter(Boolean).join(' · ')} : undefined,
+            secciones: [...secciones,...(adn.sectorBrief?.incentiveApproved&&adn.sectorBrief.offer?[{id:'campaign-conditions',tipo:'Promo' as const,variante:'Glass' as const,contenido:{titulo:'Condiciones de la campaña',descripcion:[adn.sectorBrief.offer,adn.sectorBrief.startDate&&adn.sectorBrief.endDate?`Del ${adn.sectorBrief.startDate} al ${adn.sectorBrief.endDate}`:'',adn.sectorBrief.capacity?`${adn.sectorBrief.capacity} unidades o plazas. Confirma disponibilidad con el negocio.`:''].filter(Boolean).join(' · ')}}]:[])],
             datosSugeridos: {
                 titularPrincipal: titular.principal,
                 subtitulo: titular.sub,

@@ -39,7 +39,7 @@ export function VistaReferencia({snapshot,onContact}:{snapshot:Snapshot;onContac
    ...(datos?.datosReales?.horario?[{type:'hours',title:'Horario',text:datos.datosReales.horario}]:[]),
    {type:'cta',text:resolverDatoHibrido(datos,'ctaPrincipal')||'Descubrir',action:datos?.datosReales?.telefono?'whatsapp':'link'}];
   return {business:{name,category,plan:datos?.planVisual||'PRO',description:desc,email:datos?.datosReales?.email,address:datos?.datosReales?.direccion,colors:adn?.paletaColores,phone:datos?.datosReales?.telefono,whatsapp:datos?.datosReales?.telefono,whatsappMessage:datos?.datosReales?.mensajeWhatsApp,website:redes?.web,instagram:redes?.instagram,logo:adn?.logoExtraido},
-   content:{layout:datos?.disenoSeleccionado,title:name,subtitle:resolverDatoHibrido(datos,'subtitulo')||category,heroImage:foto?.urlImagen,sections,gallery:activos.filter(x=>x.tipo==='OTRO').map(x=>({url:x.url,alt:x.nombreArchivo}))}};
+   content:{layout:datos?.disenoSeleccionado,title:resolverDatoHibrido(datos,'titularPrincipal')||name,subtitle:resolverDatoHibrido(datos,'subtitulo')||category,heroImage:foto?.urlImagen,sections,gallery:activos.filter(x=>x.tipo==='OTRO').map(x=>({url:x.url,alt:x.nombreArchivo}))}};
  },[adn,datos,activos,foto,redes]);
  useEffect(()=>{let active=true;setError(false);buildLandingDocument(options).then(doc=>{if(active)setHTML(doc)}).catch(()=>{if(active)setError(true)});return()=>{active=false};},[options,retry]);
  if(error)return <div role="alert" className="p-8 text-center text-white"><p>No se pudo cargar el diseño.</p><button type="button" onClick={()=>setRetry(n=>n+1)} className="mt-4 rounded-lg bg-white px-6 py-3 text-black">Reintentar</button></div>;

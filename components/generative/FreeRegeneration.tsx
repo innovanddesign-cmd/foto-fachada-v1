@@ -4,7 +4,7 @@ import {useTiendaEstado} from '@/store/useTiendaEstado';
 export function FreeRegeneration(){
  const [kind,setKind]=useState('text'),[prompt,setPrompt]=useState(''),[available,setAvailable]=useState<Record<string,boolean>>({}),[busy,setBusy]=useState(false),[error,setError]=useState(''),[result,setResult]=useState<{text?:string;image?:string}|null>(null);
  useEffect(()=>{fetch('/api/ai-free').then(r=>r.json()).then(setAvailable).catch(()=>setAvailable({}));},[]);
- async function generate(){setBusy(true);setError('');setResult(null);try{const r=await fetch('/api/ai-free',{method:'POST',headers:{'Content-Type':'application/json','x-request-id':crypto.randomUUID()},body:JSON.stringify({kind,prompt})});const d=await r.json();if(!r.ok)throw Error(d.error);setResult(d);}catch(e){setError(e instanceof Error?e.message:'No se pudo generar.');}finally{setBusy(false);}}
+ async function generate(){setBusy(true);setError('');setResult(null);try{const r=await fetch('/api/ai-free',{method:'POST',headers:{'Content-Type':'application/json','x-request-id':crypto.randomUUID()},body:JSON.stringify({kind,prompt,sectorBrief:useTiendaEstado.getState().adnMarca?.sectorBrief})});const d=await r.json();if(!r.ok)throw Error(d.error);setResult(d);}catch(e){setError(e instanceof Error?e.message:'No se pudo generar.');}finally{setBusy(false);}}
  function apply(){if(!result)return;const s=useTiendaEstado.getState();if(!s.datosEscaparate)return;
   if(result.text)s.regenerarEscaparate({...s.datosEscaparate,datosReales:{...s.datosEscaparate.datosReales,descripcionValor:result.text}});
   if(result.image&&kind==='logo')s.actualizarAdn({logoExtraido:result.image});

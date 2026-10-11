@@ -1,3 +1,4 @@
+import {sectorPrompt} from '@/lib/marketing/sectors';
 import {NextResponse} from 'next/server';
 import {requireAIUser,aiRequestId} from '@/lib/ai/access';
 import {commercialDB} from '@/lib/commercial/server';
@@ -16,7 +17,7 @@ export async function POST(req:Request){
   const [r]=await sql`select private.innova_reserve_v2(${access.userId!}::uuid,${id}::uuid,${op},0,null,false) as state`;
   if(r.state!=='reserved')return NextResponse.json({error:'Espera antes de volver a generar. No se han descontado créditos.'},{status:429});
   reserved=true;
-  const result=await generateFree(b.kind as FreeKind,b.prompt);
+  const result=await generateFree(b.kind as FreeKind,sectorPrompt(b.sectorBrief)+'\n'+b.prompt);
   const [done]=await sql`select private.innova_finish(${access.userId!}::uuid,${id}::uuid,true) as finished`;
   if(!done.finished)throw Error('FINALIZATION');
   return NextResponse.json({...result,cost:0},{headers:{'Cache-Control':'no-store'}});

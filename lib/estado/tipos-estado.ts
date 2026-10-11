@@ -138,6 +138,7 @@ export interface MetadatosExif {
 // ═══════════════════════════════════════════════════════════════
 
 export interface AdnMarca {
+    sectorBrief?: import('@/lib/marketing/sectors').SectorBrief;
     propuestaInicial?: ReturnType<typeof import('@/lib/ai/initial-campaign').initialCampaign>;
     estrategiaConversion?: EstrategiaConversion;
     /** Paleta de colores extraída de la fachada (5 niveles) */
@@ -339,6 +340,7 @@ export interface MarketingIntelligence {
 // ═══════════════════════════════════════════════════════════════
 
 export interface EstadoTienda {
+    sectorBrief?: import('@/lib/marketing/sectors').SectorBrief;
     /** Paso actual en el flujo */
     pasoActual: PasoAplicacion;
 

@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import {sectors,sectorId} from '@/lib/marketing/sectors';
+import {registrarCambio} from '@/lib/estado/SemillaEstado';
 import { ArrowLeft, ArrowRight, Save, LayoutDashboard } from 'lucide-react';
 import { useTiendaEstado } from '@/store/useTiendaEstado';
 import type { PasoAplicacion } from '@/lib/estado/tipos-estado';
@@ -29,7 +31,18 @@ function normalized(step: PasoAplicacion) { return step === 'BIBLIOTECA_CARTELER
 export default function PaginaCrear() {
  const s = useTiendaEstado();
  const [hydrated, setHydrated] = useState(false);
- useEffect(() => setHydrated(true), []);
+ const [switchSector,setSwitchSector]=useState<ReturnType<typeof sectorId>>();
+ useEffect(() => {
+  const id=sectorId(new URLSearchParams(location.search).get('sector')),state=useTiendaEstado.getState();
+  if(id && (state.adnMarca?.sectorBrief||state.sectorBrief)?.sector!==id){
+   if(state.imagenSubida||state.adnMarca||state.datosEscaparate)setSwitchSector(id);
+   else {const b={sector:id,name:'',services:'',focus:sectors[id].focus[0],location:'',offer:''};useTiendaEstado.setState({sectorBrief:b});registrarCambio({}, {sectorBrief:b},'selectSector');}
+  }
+  setHydrated(true);
+ }, []);
+ const sector=s.adnMarca?.sectorBrief?.sector||s.sectorBrief?.sector;
+ function startSector(){if(!switchSector)return;if(s.adnMarca&&s.datosEscaparate)guardarCampañaEnStore();s.reiniciar();const b={sector:switchSector,name:'',services:'',focus:sectors[switchSector].focus[0],location:'',offer:''};useTiendaEstado.setState({sectorBrief:b});registrarCambio({}, {sectorBrief:b},'selectSector');setSwitchSector(undefined);}
+
  const ready = Boolean(s.adnMarca && s.datosEscaparate);
  const confirmed = estrategiaConfirmada(s.adnMarca?.estrategiaConversion);
  const requestedStep = normalized(s.pasoActual);
@@ -71,6 +84,7 @@ export default function PaginaCrear() {
    window.scrollTo({ top: 0, behavior: 'instant' });
    title.current?.focus({ preventScroll: true });
  }, [step]);
+ if(hydrated&&switchSector)return <main className="studio-shell"><section className="studio-container"><h1 className="text-3xl font-semibold">Tienes una campaña abierta</h1><p className="studio-muted my-5">Puedes seguir con ella o comenzar una para {sectors[switchSector].label.toLowerCase()}. Si la campaña actual tiene identidad y diseño, guardaremos su borrador local antes de cambiar. Una foto sin analizar no se conservará.</p><div className="flex flex-wrap gap-3"><button className="studio-primary" onClick={startSector}>Empezar campaña de {sectors[switchSector].label.toLowerCase()}</button><button className="studio-button" onClick={()=>{const u=new URL(location.href);if(sector)u.searchParams.set('sector',sector);else u.searchParams.delete('sector');history.replaceState(history.state,'',u);setSwitchSector(undefined);}}>Seguir con mi campaña abierta</button></div></section></main>;
  if (!hydrated) return <main className="studio-shell min-h-screen"><p role="status" className="studio-container">Abriendo tu borrador…</p></main>;
  function save() {
    const result = guardarCampañaEnStore();
@@ -83,7 +97,7 @@ export default function PaginaCrear() {
        <Link className="studio-button" href="/dashboard" onClick={() => { if (ready) guardarCampañaEnStore(); }}><LayoutDashboard size={18} /> Mis escaparates</Link>
        {ready && <button className="studio-button" onClick={save}><Save size={18} /> Guardar borrador local</button>}
      </div>
-     <header className="mb-8"><p className="studio-eyebrow">CREADOR DE ESCAPARATES · PASO {index + 1} DE {steps.length}</p><h1 ref={title} tabIndex={-1} className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 outline-hidden">{info.title}</h1><p className="studio-muted mt-3 max-w-2xl">{info.description}</p></header>
+     <header className="mb-8"><p className="studio-eyebrow">{sector?sectors[sector].label.toUpperCase():'CREADOR DE ESCAPARATES'} · PASO {index + 1} DE {steps.length}</p><h1 ref={title} tabIndex={-1} className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 outline-hidden">{info.title}</h1><p className="studio-muted mt-3 max-w-2xl">{step==='CAPTURA'&&sector?sectors[sector].photo:info.description}</p></header>
      <nav aria-label="Pasos de creación" className="studio-steps mb-8">{steps.map((item, i) => <button key={item.id} aria-current={item.id === step ? 'step' : undefined} disabled={i > 0 && (i === 1 ? !s.imagenSubida : i === 2 ? !s.adnMarca : !ready || !confirmed)} onClick={() => go(item.id)}><span>{i + 1}</span>{item.label}</button>)}</nav>
      {message && <p role="status" className="studio-notice mb-6">{message}</p>}
      {step === 'CAPTURA' && <div className="studio-legacy rounded-3xl p-4 sm:p-8"><CapturaFachada /></div>}

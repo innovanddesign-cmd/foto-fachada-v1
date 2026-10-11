@@ -1,4 +1,6 @@
 "use client";
+import {sectors} from '@/lib/marketing/sectors';
+import {registrarCambio} from '@/lib/estado/SemillaEstado';
 import { useRef, useState } from 'react';
 import { useTiendaEstado } from '@/store/useTiendaEstado';
 import { AIService, AISignInRequired, AIQuotaNotice, identidadManual } from '@/services/ai';
@@ -20,7 +22,10 @@ export const AnalizadorADN = () => {
     }
     const [error, setError] = useState('');
     function complete(adn: AdnMarca) {
-        useTiendaEstado.setState({ adnMarca: adn, analizando: false });
+        const state=useTiendaEstado.getState(),brief=state.adnMarca?.sectorBrief||state.sectorBrief;
+        const enriched=brief?{...adn,sectorBrief:brief,analisisVision:adn.analisisVision?{...adn.analisisVision,nombreSugerido:brief.name||adn.analisisVision.nombreSugerido,categoriaSugerida:sectors[brief.sector].category}:adn.analisisVision}:adn;
+        useTiendaEstado.setState({ adnMarca: enriched, analizando: false });
+        registrarCambio({}, {adnMarca:enriched,analizando:false},'completeSectorAnalysis');
     }
     async function analyze() {
         if (pending.current || !image?.urlImagen || !quote) return;
@@ -39,7 +44,7 @@ export const AnalizadorADN = () => {
                     reader.readAsDataURL(blob);
                 });
             }
-            complete(await AIService.analizarImagen(base64, quote.cost, aiCampaignId(),quote.initial));
+            complete(await AIService.analizarImagen(base64, quote.cost, aiCampaignId(),quote.initial,useTiendaEstado.getState().adnMarca?.sectorBrief||useTiendaEstado.getState().sectorBrief));
         } catch (e) {
             setQuote(null);
             if (e instanceof AISignInRequired) setLogin(true);

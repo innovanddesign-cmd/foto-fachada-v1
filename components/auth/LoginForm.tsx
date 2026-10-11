@@ -10,7 +10,7 @@ import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 export function LoginForm({ onSuccess }: { onSuccess?: () => void } = {}) {
     const router = useRouter();
     const [next,setNext]=useState('/dashboard');
-    useEffect(()=>{setNext(returnPath(new URLSearchParams(location.search).get('next')));},[]);
+    useEffect(()=>{setNext(returnPath(onSuccess?location.pathname+location.search:new URLSearchParams(location.search).get('next')));},[onSuccess]);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);

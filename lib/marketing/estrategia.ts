@@ -1,3 +1,5 @@
+import {campaignOutline} from './campaign-plan';
+import {sectors} from './sectors';
 import type { AdnMarca, DatosEscaparate } from '@/lib/estado/tipos-estado';
 
 export interface EstrategiaConversion {
@@ -14,6 +16,7 @@ export interface EstrategiaConversion {
 export function sugerirEstrategia(adn: AdnMarca, telefono = ''): EstrategiaConversion {
   const generated=adn.propuestaInicial;
   if(generated && [generated.publico,generated.motivoEscaneo,generated.textoCartel,generated.cta,generated.mensajeWhatsApp].every(Boolean)) return {objetivo:generated.objetivo,publico:generated.publico,motivoEscaneo:generated.motivoEscaneo,textoCartel:generated.textoCartel,cta:generated.cta,mensajeWhatsApp:generated.mensajeWhatsApp,telefono};
+  if(adn.sectorBrief){const b=adn.sectorBrief,c=sectors[b.sector],outline=campaignOutline(b);return {objetivo:c.goal,publico:b.audience||c.audience,motivoEscaneo:outline.benefit,textoCartel:(b.incentiveApproved&&b.offer?b.offer+' · Escanea para ver condiciones':outline.benefit+' Escanea aquí.').slice(0,160),cta:outline.cta,mensajeWhatsApp:'Hola, he visto vuestro cartel. Quisiera '+outline.cta.toLowerCase()+'.',telefono};}
   const citas = /est[eé]t|belleza|barber|peluq|cl[ií]nic|salud/i.test(adn.analisisVision?.categoriaSugerida || '');
   return {
     objetivo: citas ? 'CITAS' : 'CONSULTAS',

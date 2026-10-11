@@ -44,6 +44,7 @@ type TiendaCompleta = EstadoTienda & AccionesExtendidas;
 // ═══════════════════════════════════════════════════════════════
 
 const estadoInicial: EstadoTienda = {
+    sectorBrief: undefined,
     pasoActual: 'CAPTURA',
     imagenSubida: null,
     analizando: false,
