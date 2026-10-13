@@ -26,7 +26,7 @@ export const NavbarPro = () => {
                             className="w-8 h-8 rounded-full object-cover border border-white/20"
                         />
                     ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primario)] to-[var(--color-secundario)]" />
+                        <div className="w-8 h-8 rounded-full bg-linear-to-br from-[var(--color-primario)] to-[var(--color-secundario)]" />
                     )}
                     <span className="font-bold text-white text-sm tracking-tight truncate max-w-[120px]">
                         {/* Placeholder para nombre del negocio */}

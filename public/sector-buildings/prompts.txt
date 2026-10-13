@@ -1,0 +1,9 @@
+INNOVA sector storefronts — generated with the built-in image generation tool.
+Shared prompt: stylized-concept; original premium photoreal miniature 3D isometric cutaway storefront diorama; two walls, open roof, visible interior, small square beveled platform; three-quarter camera, whole building visible; soft studio light, realistic wood, glass and metal; transparent background; no people, text, watermark or UI.
+
+inmobiliaria.png: Real estate agency; cream facade, navy trim, property listing photos in window, desk, computer, client chairs, house scale model, keys and plants.
+estetica.png: Advanced aesthetics center; ivory/blush facade, curved doorway, frosted glass, treatment bed, treatment device, magnifying lamp, skincare bottles, sage accents.
+peluqueria.png: Contemporary salon; sage facade, rounded mirrors, tan styling chairs, shampoo basin, hair dryer, brushes, hair color bottles, plants; no barber pole or treatment bed.
+barberia.png: Classic premium barbershop; brick, black awning, cream door, red-white-blue barber pole, burgundy vintage chair, wooden mirror station, shaving tools, checkerboard floor.
+
+Runtime treatment: transparent source images rendered with Next Image; CSS floating transform, green rear glow and elliptical neon base; accessible real HTML labels with layered 3D text shadows. Reduced-motion preference disables animation. Source PNGs remain unchanged.

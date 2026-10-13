@@ -28,7 +28,12 @@ async function assets(snapshot:Record<string,any>,owner:string,id:string,mode:'s
  }
  if(result.imagenSubida){const a=await image(result.imagenSubida.urlImagen,result.imagenSubida.assetPath);result.imagenSubida={...result.imagenSubida,urlImagen:a.url,assetPath:a.path,archivo:undefined};}
  if(result.adnMarca?.logoExtraido||result.adnMarca?.logoAssetPath){const a=await image(result.adnMarca.logoExtraido,result.adnMarca.logoAssetPath);result.adnMarca.logoExtraido=a.url;result.adnMarca.logoAssetPath=a.path;}
- result.galeriaActivos=await Promise.all((result.galeriaActivos||[]).filter((a:any)=>mode!=='publish'||a.tipo==='OTRO').map(async(a:any)=>{const im=await image(a.url,a.assetPath);return{...a,url:im.url,assetPath:im.path,archivo:undefined};}));
+ result.galeriaActivos=await Promise.all((result.galeriaActivos||[]).filter((a:any)=>mode!=='publish'||a.tipo==='OTRO').map(async(a:any)=>{
+  // The facade also appears in the gallery. Reuse its durable asset instead of
+  // fetching a duplicate blob URL that expires after login or page reload.
+  if(a.tipo==='FACHADA'&&result.imagenSubida?.assetPath)return {...a,url:result.imagenSubida.urlImagen,assetPath:result.imagenSubida.assetPath,archivo:undefined};
+  const im=await image(a.url,a.assetPath);return{...a,url:im.url,assetPath:im.path,archivo:undefined};
+ }));
  return result;
 }
 export async function saveCampaignRemote(c:Omit<RemoteCampaign,'id'|'owner_id'|'created_at'|'updated_at'> & {id?:string;localId?:string}):Promise<PersistResult>{
@@ -64,5 +69,5 @@ export async function unpublishCampaign(id:string):Promise<PersistResult>{
 export async function deleteCampaignRemote(id:string):Promise<PersistResult>{const result=await unpublishCampaign(id);if(!result.success)return result;try{const{sb,user}=await session();const{error}=await sb.from('escaparates_campaigns').delete().eq('id',id).eq('owner_id',user.id);if(error)throw error;return{success:true,error:null};}catch(e){return fail(e);}}
 export async function loadPublishedBySlug(slug:string):Promise<{data:PublishedEscaparate|null;error:string|null}>{
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)return{data:null,error:'Supabase no está configurado.'};
- try{const{createClient:publicClient}=await import('@supabase/supabase-js');const sb=publicClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});const{data,error}=await sb.from('escaparates_published').select('slug,payload,plan,published_at,updated_at').eq('slug',slug).maybeSingle();if(error)throw error;return{data,error:data?null:'NOT_FOUND'};}catch(e){return{data:null,error:fail(e).error};}
+ try{const{createClient:publicClient}=await import('@supabase/supabase-js');const sb=publicClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});const{data,error}=await sb.rpc('innova_public_page',{p_slug:slug});if(error)throw error;return{data,error:data?null:'NOT_FOUND'};}catch(e){return{data:null,error:fail(e).error};}
 }

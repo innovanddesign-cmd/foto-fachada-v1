@@ -1,0 +1,13 @@
+const fs=require('fs'),ts=require('typescript'),vm=require('vm'),assert=require('node:assert/strict');
+function setup(plan,denied=false,broken=false){
+ const queries=[];const owner='own-user';
+ const sb={from(table){const filters=[];const q={select(...a){q.selection=a;return q},eq(...a){filters.push(a);return q},gte(...a){filters.push(a);return q},lt(...a){filters.push(a);return q},order(){return q},limit(){return q},then(resolve){queries.push({table,filters,selection:q.selection});return Promise.resolve(broken?{error:{message:'secret'}}:table==='escaparates_campaigns'?{data:[{id:'own-campaign',name:'Test',slug:'test'}]}:{count:table==='escaparates_qr_scans'?3:2}).then(resolve)}};return q}};
+ const exp={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('app/api/analytics/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:exp,require:n=>n==='next/server'?{NextResponse:Response}:n.includes('/access')?{requireAIUser:async()=>denied?{response:new Response('',{status:401})}:{userId:owner}}:n.includes('/commercial/')?{accountSummary:async()=>({plan})}:{createClient:async()=>sb},Date,URL,Error,Number,Promise});return{exp,queries};
+}
+(async()=>{
+ let s=setup('BUSINESS',true);assert.equal((await s.exp.GET(new Request('https://example.test/api/analytics'))).status,401);assert.equal(s.queries.length,0);
+ s=setup('BUSINESS');let r=await s.exp.GET(new Request('https://example.test/api/analytics?from=2026-02-30&to=2026-03-01'));assert.equal(r.status,400);assert.equal(s.queries.length,0);
+ for(const plan of ['FREE','PRO','BUSINESS']){s=setup(plan);r=await s.exp.GET(new Request('https://example.test/api/analytics?from=2025-01-01&to=2025-01-31&owner=other'));assert.equal(r.status,200);assert.equal(r.headers.get('cache-control'),'private, no-store');const d=await r.json();assert.deepEqual(d.current,{scans:3,clicks:2});assert.equal(d.canExport,plan==='BUSINESS');assert.equal(!!d.previous,plan==='BUSINESS');assert.equal(d.campaigns.length,plan==='FREE'?0:1);for(const q of s.queries){if(q.table==='escaparates_campaigns')assert.ok(q.filters.some(f=>f[0]==='owner_id'&&f[1]==='own-user'));else assert.equal(q.selection[1].count,'exact')}if(plan==='FREE')assert.equal(d.from,null);}
+ s=setup('BUSINESS',false,true);r=await s.exp.GET(new Request('https://example.test/api/analytics'));assert.equal(r.status,503);assert.ok(!(await r.text()).includes('secret'));
+ console.log('PASS analytics: authentication, real dates, exact counts, session/RLS client, owner scope, plan levels, comparisons, private cache and safe errors.');
+})().catch(e=>{console.error(e);process.exit(1)});

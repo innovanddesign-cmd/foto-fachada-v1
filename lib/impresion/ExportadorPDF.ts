@@ -9,7 +9,7 @@ export type ExportFormat = 'PDF' | 'PNG' | 'JPG';
 
 interface ExportConfig {
     formato: ExportFormat;
-    papel?: 'A4' | 'A5' | 'SQUARE';
+    papel?: 'A3' | 'A4' | 'A5' | 'SQUARE';
     nombreArchivo: string;
     escala?: number; // Default 3 for 300 DPI
     anadirMarcasCorte?: boolean;
@@ -33,12 +33,24 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
     try {
         console.log(`[Exportador] Iniciando captura de alta fidelidad: ${config.formato}`);
 
+        await document.fonts.ready;
+        await Promise.all(Array.from(elemento.querySelectorAll('img')).map(img => img.decode()));
         const canvas = await html2canvas(elemento, {
             scale: config.escala || 3, // Forzar alta resolución
             useCORS: true,
             backgroundColor: null,
             logging: false,
             onclone: (doc) => {
+                // html2canvas does not parse modern CSS colors inherited from the app.
+                // Resolve them through the browser's canvas color engine in the clone only.
+                const probe=doc.createElement('canvas');probe.width=probe.height=1;
+                const context=probe.getContext('2d',{willReadFrequently:true});
+                const colors=new Map<string,string>();
+                const rgb=(value:string)=>{if(colors.has(value))return colors.get(value)!;if(!context)return value;context.clearRect(0,0,1,1);context.fillStyle=value;context.fillRect(0,0,1,1);const [r,g,b,a]=context.getImageData(0,0,1,1).data;const result=`rgba(${r},${g},${b},${a/255})`;colors.set(value,result);return result;};
+                const root=doc.getElementById(elementId);
+                const nodes=root?[root,...Array.from(root.querySelectorAll<HTMLElement>('*'))]:[];
+                let ancestor=root?.parentElement;while(ancestor){nodes.push(ancestor);ancestor=ancestor.parentElement;}
+                for(const node of nodes){const computed=doc.defaultView!.getComputedStyle(node);for(let i=0;i<computed.length;i++){const property=computed[i];const value=computed.getPropertyValue(property);if(/(?:oklch|oklab|lch|lab|color)\(/.test(value))node.style.setProperty(property,value.replace(/(?:oklch|oklab|lch|lab|color)\([^)]*\)/g,rgb),'important');}}
                 // Preview is scaled to fit the device; export the original print dimensions.
                 doc.querySelectorAll<HTMLElement>('[data-poster-scale]').forEach(node => { node.style.transform = 'none'; });
                 // Manipulación del DOM clonado antes de la captura (ej: marcas de corte)
@@ -76,7 +88,7 @@ export const exportarCartel = async (elementId: string, config: ExportConfig) =>
  * Fallback de impresión profesional.
  * Abre ventana antes de operación asíncrona para evitar popup blocker.
  */
-const imprimirCanvas = (dataUrl: string, titulo: string, win: Window, papel: 'A4' | 'A5' | 'SQUARE') => {
+const imprimirCanvas = (dataUrl: string, titulo: string, win: Window, papel: 'A3' | 'A4' | 'A5' | 'SQUARE') => {
     const pageSize = papel === 'SQUARE' ? '210mm 210mm' : papel;
     const tituloSeguro = titulo.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 

@@ -161,7 +161,7 @@ export default function VistaPrevia({
 
                 {/* Indicador de zoom */}
                 <motion.div
-                    className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm"
+                    className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-xs"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}

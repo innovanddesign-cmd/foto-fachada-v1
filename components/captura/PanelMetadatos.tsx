@@ -281,7 +281,7 @@ export default function PanelMetadatos({
                     border ${sitioWebValido ? 'border-white/15' : 'border-red-500/50'}
                     rounded-2xl
                     text-white placeholder-white/30
-                    outline-none
+                    outline-hidden
                     transition-all duration-200
                     focus:bg-white/10 focus:border-white/30
                   `}
@@ -311,7 +311,7 @@ export default function PanelMetadatos({
                                 className={`
                   w-full py-4
                   flex items-center justify-center gap-2
-                  bg-gradient-to-r from-green-500 to-emerald-600
+                  bg-linear-to-r from-green-500 to-emerald-600
                   rounded-2xl
                   text-white font-medium
                   shadow-lg shadow-green-500/25

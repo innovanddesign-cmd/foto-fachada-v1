@@ -30,7 +30,7 @@ export default function NotFoundVistaPublica() {
                     </div>
 
                     <div className="space-y-2">
-                        <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+                        <h1 className="text-2xl font-bold tracking-tight bg-linear-to-b from-white to-white/60 bg-clip-text text-transparent">
                             Escaparate no encontrado
                         </h1>
                         <p className="text-sm text-white/40 leading-relaxed">
@@ -49,9 +49,9 @@ export default function NotFoundVistaPublica() {
 
                 {/* Detalle Técnico Decorativo */}
                 <div className="mt-8 flex justify-center gap-4 opacity-20">
-                    <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-white" />
+                    <div className="h-[1px] w-8 bg-linear-to-r from-transparent to-white" />
                     <span className="text-[10px] font-mono tracking-widest uppercase">FF-V2-0x404</span>
-                    <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-white" />
+                    <div className="h-[1px] w-8 bg-linear-to-l from-transparent to-white" />
                 </div>
             </motion.div>
         </div>

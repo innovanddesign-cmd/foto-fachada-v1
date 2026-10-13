@@ -22,7 +22,7 @@ export const HeroDinamico = () => {
                     alt="Fachada"
                     className="w-full h-full object-cover brightness-50"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-fondo)] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-[var(--color-fondo)] via-transparent to-transparent" />
             </div>
 
             <motion.div

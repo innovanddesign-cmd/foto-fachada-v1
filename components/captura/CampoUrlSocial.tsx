@@ -80,7 +80,7 @@ export default function CampoUrlSocial({ tipo, valor, alCambiar, placeholder }: 
                         value={valor}
                         onChange={(e) => alCambiar(e.target.value)}
                         placeholder={placeholder}
-                        className="w-full bg-transparent border-none outline-none text-white/80 placeholder:text-white/20 text-sm font-medium"
+                        className="w-full bg-transparent border-none outline-hidden text-white/80 placeholder:text-white/20 text-sm font-medium"
                     />
                 </div>
 

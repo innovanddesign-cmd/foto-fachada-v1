@@ -47,7 +47,7 @@ export default function VistaPreviaGaleria() {
                                 {/* Imagen de fondo o Icono */}
                                 {activo.tipo === 'FACHADA' || activo.nombreArchivo.match(/\.(jpg|jpeg|png|webp|svg)$/i) ? (
                                     <div className="absolute inset-0">
-                                        <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/20 to-black/80 z-10" />
+                                        <div className="absolute inset-0 bg-linear-to-b from-black/0 via-black/20 to-black/80 z-10" />
                                         <img
                                             src={activo.url}
                                             alt={activo.nombreArchivo}

@@ -10,17 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'daily',
             priority: 1,
         },
-        {
-            url: `${baseUrl}/create`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.8,
-        },
-        {
-            url: `${baseUrl}/dashboard`,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 0.9,
-        },
+        ...['inmobiliarias','estetica','peluquerias','barberias'].map(sector=>({url:baseUrl+'/'+sector,changeFrequency:'weekly' as const,priority:0.9})),
     ];
 }

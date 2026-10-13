@@ -198,6 +198,16 @@
       "bgImage": "familyfirst-0.png",
       "accent": "#59b38a",
       "overlay": "rgba(3,12,18,.55)"
+    },
+    "barber": {
+      "accent": "#dba56e",
+      "bgImage": "",
+      "overlay": "rgba(10,10,10,.75)"
+    },
+    "clinic": {
+      "accent": "#73a88d",
+      "bgImage": "clinic-0.jpg",
+      "overlay": "rgba(5,20,15,.55)"
     }
   }
 }

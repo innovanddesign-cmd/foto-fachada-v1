@@ -7,8 +7,8 @@ import { NavbarGlobal } from "@/components/layout/NavbarGlobal";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "INNOVA — Escaparates digitales para inmobiliarias",
-    description: "Conecta el escaparate de tu inmobiliaria con el móvil: web de tu agencia, servicios, propiedades, cartelería y QR de contacto.",
+    title: "INNOVA — Escaparates digitales para negocios",
+    description: "Conecta tu negocio con el móvil: presencia digital, servicios, cartelería y QR para inmobiliarias, estética y barberías.",
 };
 
 export default function RootLayout({

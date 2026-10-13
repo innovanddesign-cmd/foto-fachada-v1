@@ -1,0 +1,2 @@
+-- Qualify the outer object path: bare name inside the subquery resolves to c.name.
+alter policy escaparates_storage_owner on storage.objects to authenticated using (bucket_id in ('escaparates-assets','escaparates-public') and (storage.foldername(objects.name))[1]=(select auth.uid())::text) with check (bucket_id in ('escaparates-assets','escaparates-public') and (storage.foldername(objects.name))[1]=(select auth.uid())::text and exists(select 1 from public.escaparates_campaigns c where c.id::text=(storage.foldername(objects.name))[2] and c.owner_id=(select auth.uid())));
