@@ -60,7 +60,7 @@ export default function Home() {
                         </a>
                     </div>
                     <div className="p-6 rounded-3xl bg-white/4 border border-white/8 flex flex-col">
-                        <h3 className="text-white font-bold text-lg">ESCAPARATE</h3>
+                        <h3 className="text-white font-bold text-lg">BUSINESS</h3>
                         <p className="text-white/50 text-sm mb-4">Máxima experiencia visual</p>
                         <div className="flex items-baseline gap-2 mb-4">
                             <span className="text-white/30 line-through text-sm font-bold">400€</span>
@@ -73,8 +73,8 @@ export default function Home() {
                             <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#00ff9d] shrink-0" /> 10 regeneraciones IA/mes</li>
                             <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#00ff9d] shrink-0" /> Analítica avanzada</li>
                         </ul>
-                        <a href="mailto:innovandesign@gmail.com?subject=Quiero%20el%20plan%20ESCAPARATE" className="block w-full py-3 rounded-2xl bg-white text-black hover:bg-gray-100 transition-colors font-bold text-sm text-center">
-                            Elegir ESCAPARATE
+                        <a href="mailto:innovandesign@gmail.com?subject=Quiero%20el%20plan%20BUSINESS" className="block w-full py-3 rounded-2xl bg-white text-black hover:bg-gray-100 transition-colors font-bold text-sm text-center">
+                            Elegir BUSINESS
                         </a>
                     </div>
                 </div>
