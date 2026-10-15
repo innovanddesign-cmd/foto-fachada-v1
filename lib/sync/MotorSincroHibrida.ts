@@ -45,7 +45,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => void>(
 // ═══════════════════════════════════════════════════════════════
 
 export function resolverDatoHibrido<K extends keyof DatosEscaparateBase>(
-    escaparate: DatosEscaparate | null,
+    escaparate: Pick<DatosEscaparate,'titularPrincipal'|'subtitulo'|'datosReales'|'datosSugeridos'> | null,
     campo: K
 ): string {
     if (!escaparate) return '';

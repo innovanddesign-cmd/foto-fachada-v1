@@ -1,0 +1,30 @@
+const fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript'),assert=require('node:assert/strict');
+let enabled=false,user=null,calls=0;
+function load(file,deps){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports,require:n=>deps[n],URL,Response,Number,JSON,process:{env:{get COMMERCIAL_DEMOS_ENABLED(){return enabled?'true':undefined}}}});return exports;}
+const auth=load('lib/commercial/operator.ts',{'next/server':{NextResponse:Response},'@/lib/supabase/server':{createClient:async()=>({auth:{getUser:async()=>({data:{user},error:null})}})}});
+const route=load('app/api/operator/demos/route.ts',{'next/server':{NextResponse:Response},'@/lib/commercial/operator':auth,'@/lib/commercial/server':{commercialDB:()=>async()=>{calls++;return [{demo:{id:'test',state:'draft'}}]}}});
+const req=(b,origin='https://example.test')=>new Request('https://example.test/api/operator/demos',{method:'POST',headers:{origin},body:JSON.stringify(b)});
+(async()=>{
+ const b={action:'create',reference:'fixture',campaignId:'20000000-0000-4000-8000-000000000001',plan:'BUSINESS'};
+ assert.equal((await route.POST(req(b))).status,503);assert.equal(calls,0);
+ enabled=true;assert.equal((await route.POST(req(b))).status,403);
+ user={id:'operator',user_metadata:{innova_operator:true}};assert.equal((await route.POST(req(b))).status,403);
+ user={id:'operator',app_metadata:{innova_operator:true}};
+ assert.equal((await route.POST(req(b,'https://foreign.test'))).status,403);
+ assert.equal((await route.POST(req({...b,plan:'ESCAPARATE'}))).status,400);
+ assert.equal((await route.POST(req({...b,campaignId:'---'}))).status,400);
+ assert.equal((await route.POST(req({action:'delivery',id:b.campaignId,eventId:'evt'}))).status,400);
+ assert.equal((await route.POST(req({...b,reference:'x'.repeat(5000)}))).status,413);
+ assert.equal(calls,0);
+ const r=await route.POST(req(b));assert.equal(r.status,200);assert.equal(calls,1);assert.match(r.headers.get('cache-control'),/no-store/);
+ let pageCalls=0;
+ const sanitize=load('lib/supabase/sanitize.ts',{});
+ const page=load('app/demos/[id]/page.tsx',{'react/jsx-runtime':require('react/jsx-runtime'),'next/navigation':{notFound:()=>{throw Error('NOT_FOUND')}},'@/lib/commercial/server':{commercialDB:()=>async()=>{pageCalls++;return [{demo:{effectiveState:'published',plan:'BUSINESS',reference:'private-reference',deliveries:[{evidenceRef:'private-evidence'}],payload:{secret:'private-analysis',datosEscaparate:{titularPrincipal:'Public title',planVisual:'FREE'}}}}]}},'@/components/commercial/DemoProposal':{DemoProposal:'proposal'},'@/lib/supabase/sanitize':sanitize});
+ enabled=false;await assert.rejects(page.default({params:Promise.resolve({id:b.campaignId})}),/NOT_FOUND/);assert.equal(pageCalls,0);
+ enabled=true;await assert.rejects(page.default({params:Promise.resolve({id:'invalid'})}),/NOT_FOUND/);assert.equal(pageCalls,0);
+ const rendered=await page.default({params:Promise.resolve({id:b.campaignId})});
+ assert.equal(rendered.props.snapshot.datosEscaparate.planVisual,'ESCAPARATE');
+ assert.ok(!JSON.stringify(rendered.props).includes('private-'));
+ assert.equal(page.metadata.robots.index,false);assert.equal(page.metadata.robots.follow,false);assert.equal(page.dynamic,'force-dynamic');
+ console.log('PASS demo API: default off, trusted operator, CSRF, real plan validation, evidence requirement, size limits and private readback.');
+})().catch(e=>{console.error(e);process.exitCode=1});

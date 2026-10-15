@@ -1,0 +1,95 @@
+INNOVA — Integración de demos comerciales
+
+Base conservada: home con edificios 3D y cuatro carruseles, commit c9a983d.
+Las demos son propuestas independientes de las cuentas y sus suscripciones.
+La implementación no envía correos, no llama a IA y no compra servicios.
+
+ACCIONES Y AUTENTICACIÓN
+Operador: POST /api/operator/demos, Content-Type: application/json.
+Requiere sesión Supabase del equipo con app_metadata.innova_operator=true y
+Origin igual al dominio de la aplicación. COMMERCIAL_DEMOS_ENABLED=true habilita
+la ruta y las vistas; sin esa configuración, la ruta responde 503 y la vista 404.
+No se concede el rol de operador desde esta integración.
+
+Automatización desde el backend de captación:
+POST https://skgpjovfkcpyenipjlxh.supabase.co/rest/v1/rpc/innova_commercial_demo_v1
+Usar la autenticación Supabase service_role ya gestionada por el backend, siempre
+fuera del navegador. No hay una contraseña compartida nueva.
+Cuerpo: {"p_action":"read","p_body":{"id":"UUID_DEMO"}}.
+El RPC únicamente permite referencias autorizadas expresamente en
+private.innova_demo_authorizations. La tabla comienza vacía. Ni service_role ni
+el operador web pueden darse de alta en esa lista. El responsable de base de datos
+registra cada referencia con la evidencia de autorización del lote aprobado.
+No es necesario abrir el esquema private a la API.
+
+En la ruta de operador, añadir action al mismo objeto. En el RPC, separar action
+como p_action y enviar el resto en p_body. Acciones:
+
+create: {reference, campaignId, plan, customerOwnerId?}
+  plan: FREE, PRO o BUSINESS. campaignId identifica una campaña ya publicada y
+  autorizada como origen. Copia el payload público; no ejecuta IA ni consume
+  campañas o créditos adicionales. reference identifica de forma estable la demo.
+  La repetición con los mismos datos devuelve el mismo id; otro contenido falla.
+  customerOwnerId es opcional: no se inventa una cuenta para el prospecto.
+publish: {id}
+  Publica la propuesta en /demos/UUID_DEMO, sin arrancar el contador.
+version: {id, campaignId, expectedVersion}
+  Copia otra versión publicada. Conserva las anteriores y rechaza ediciones
+  basadas en una versión obsoleta. No reinicia el contador.
+delivery: {id, eventId, evidenceRef}
+  Solo después de confirmar la entrega real. eventId es el identificador estable
+  del evento y evidenceRef la evidencia conservada por captación. No llamar al
+  enviar, programar ni abrir un mensaje. Las 48 horas empiezan en la recepción
+  del primer evento confirmado; otro evento o una repetición no amplían el plazo.
+  La API confía en el backend/operador autorizado: no verifica al proveedor de
+  correo por sí sola ni envía el documento.
+link: {id, customerOwnerId}
+  Vincula una cuenta confirmada por captación. Idempotente para la misma cuenta;
+  impide reasignarla a otra. Debe ocurrir antes de decidir una caducidad tras compra.
+expire: {id}
+  Comprueba plazo y contrato pagado vigente bajo el mismo bloqueo que el registro
+  de contratos. Solo cambia la demo; nunca cancela ni rebaja la cuenta del cliente.
+read: {id}
+  Devuelve estado, plan, versión, entregas/evidencias, fechas, purchaseProtected,
+  effectiveState y contenido. La vista pública solo recibe el contenido saneado.
+
+ESTADOS Y RECUPERACIÓN
+Una demo sin entrega no caduca. Tras 48 horas, la vista deja de servirla aunque el
+trabajador todavía no haya ejecutado expire. Se conservan versiones y contenido.
+Un contrato pagado vigente de la cuenta vinculada protege la propuesta y permite
+recuperarla incluso si el registro ya se había marcado expired. Las reservas y
+contactos de la propuesta permanecen desactivados: la aceptación/alta definitiva
+se realiza por el flujo comercial existente, no por abrir o pagar esta demo.
+
+COMPRA Y LÍMITES
+La fuente de compra verificada es private.innova_contracts (paid_at y periodo
+vigente); pedidos pendientes, Paddle sandbox y promesas de pago no cuentan.
+Captación debe registrar el contrato real mediante el flujo existente y confirmar
+la relación prospecto–cuenta. No se interpreta un contacto/email como identidad.
+Si la cuenta cambia durante una transacción, CUSTOMER_CHANGED_RETRY requiere
+reintentar la misma acción; no se permite expirar con una identidad obsoleta.
+Las imágenes son referencias al origen: mantener los activos originales accesibles
+mientras las propuestas/versiones deban conservarse. No borrar su almacenamiento.
+
+PUBLICACIÓN SEGURA
+Las propuestas llevan aviso INNOVA y noindex/nofollow/noarchive, sin formularios,
+contactos externos activos ni telemetría de conversión. Los enlaces internos de
+navegación se conservan. La vista se calcula sin caché estática.
+Los archivos de la home, galerías, tarifas y edificios no se modifican en esta entrega.
+
+ANTES DE ACTIVAR EL LOTE
+1. Confirmar una referencia autorizada y el backend emisor del evento de entrega.
+2. Conectar en ese backend los cuerpos anteriores y el enlace de identidad/compra.
+3. Mantener el alojamiento compatible con el uso comercial y el límite de cero gasto.
+4. Activar COMMERCIAL_DEMOS_ENABLED solo tras comprobar el lote autorizado.
+La publicación del código no activa estos pasos ni autoriza envíos comerciales.
+
+VERIFICACIÓN DE SEGURIDAD
+Las cuatro tablas nuevas niegan acceso directo y solo se usan mediante funciones
+con permisos limitados. El aviso informativo RLS sin políticas es intencional:
+https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy
+El asesor también señala las funciones públicas existentes de páginas/QR, cuyo
+acceso público es necesario para ese recorrido, y la protección de contraseñas
+filtradas desactivada en Free, decisión anterior del titular:
+https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+No se han ampliado sus permisos ni cambiado el plan contratado.

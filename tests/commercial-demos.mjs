@@ -1,0 +1,76 @@
+import { PGlite } from '@electric-sql/pglite';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+import vm from 'node:vm';
+const db=new PGlite();
+try {
+await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
+ create schema innova; create table innova.organizations(id uuid primary key); create table innova.organization_memberships(organization_id uuid,user_email text,role text,active boolean);
+ create schema auth; create table auth.users(id uuid primary key,email text);
+ create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+ grant usage on schema auth to anon,authenticated,service_role; grant execute on function auth.uid() to public;
+ create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+ create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);
+ create function storage.foldername(text) returns text[] language sql immutable as $$select string_to_array($1,'/')$$;
+ grant usage on schema public to anon,authenticated,service_role;`);
+await db.exec(fs.readFileSync('supabase/escaparates-setup.sql','utf8'));
+for(const name of fs.readdirSync('supabase/migrations').filter(n=>n.endsWith('.sql')).sort())await db.exec(fs.readFileSync('supabase/migrations/'+name,'utf8'));
+
+const u='00000000-0000-4000-8000-000000000001';
+const c='20000000-0000-4000-8000-000000000001';
+await db.query('insert into auth.users(id) values($1)',[u]);
+await db.query("insert into public.escaparates_campaigns(id,owner_id,name) values($1,$2,'Fixture')",[c,u]);
+await db.query("insert into public.escaparates_published(campaign_id,owner_id,slug,payload,plan) values($1,$2,'fixture','{\"datosEscaparate\":{\"titularPrincipal\":\"Fixture\"}}','FREE')",[c,u]);
+const call=async(action,body)=>(await db.query('select private.innova_demo_action($1,$2::jsonb) as d',[action,JSON.stringify(body)])).rows[0].d;
+await db.exec('set role innova_mvp_runtime');
+const input={reference:'demo-fixture',campaignId:c,plan:'BUSINESS',customerOwnerId:u};
+const d=await call('create',input),id=d.id;
+assert.equal((await call('create',input)).id,id);
+await assert.rejects(call('create',{...input,plan:'PRO'}),/DEMO_CONFLICT/);
+assert.equal(d.delivered_at,null);
+await call('publish',{id});
+assert.equal((await call('expire',{id})).state,'published','publication never starts the timer');
+const delivered=await call('delivery',{id,eventId:'provider-event-1',evidenceRef:'proof-1'});
+assert.equal(new Date(delivered.expires_at)-new Date(delivered.delivered_at),48*3600000);
+assert.equal((await call('delivery',{id,eventId:'provider-event-2',evidenceRef:'proof-2'})).expires_at,delivered.expires_at,'another delivery cannot extend the deadline');
+assert.equal((await call('delivery',{id,eventId:'provider-event-1',evidenceRef:'proof-1'})).expires_at,delivered.expires_at);
+await assert.rejects(call('delivery',{id,eventId:'provider-event-1',evidenceRef:'different'}),/DELIVERY_CONFLICT/);
+await call('version',{id,campaignId:c,expectedVersion:1});
+await assert.rejects(call('version',{id,campaignId:c,expectedVersion:1}),/VERSION_CONFLICT/);
+assert.equal((await call('read',{id})).versions.length,2);
+await assert.rejects(db.query('select * from private.innova_demos'),/permission denied/);
+await db.exec('reset role');
+await db.query("update private.innova_demos set delivered_at=now()-interval '49 hours',expires_at=now()-interval '1 hour' where id=$1",[id]);
+assert.equal((await call('read',{id})).effectiveState,'expired','late worker cannot leave expired proposal accessible');
+await call('expire',{id});
+assert.equal((await call('read',{id})).state,'expired');
+assert.equal((await call('delivery',{id,eventId:'provider-event-1',evidenceRef:'proof-1'})).state,'expired','delivery replay after expiry is harmless');
+assert.equal(await call('read',{id:'00000000-0000-4000-8000-000000000099'}),null);
+assert.equal((await db.query('select count(*)::int as n from private.innova_demo_versions')).rows[0].n,2,'expired content retained');
+assert.equal((await db.query('select count(*)::int as n from private.innova_accounts')).rows[0].n,0,'demo never grants or downgrades subscriptions');
+await db.query("insert into private.innova_contracts(owner_id,reference,plan,billing,net_cents,tax_cents,payment_method,paid_at,period_start,period_end,accepted_document_ref,recorded_by) values($1,'paid-fixture','PRO','annual',10000,2100,'transfer',now(),now(),now()+interval '1 year','signed-fixture',$1)",[u]);
+assert.equal((await call('expire',{id})).effectiveState,'protected','paid contract recovers an expired proposal');
+assert.equal((await call('read',{id})).purchaseProtected,true);
+const unlinked=await call('create',{...input,reference:'unlinked-fixture',customerOwnerId:null});
+assert.equal(unlinked.customer_owner_id,null,'prospect is independent of an account');
+await call('publish',{id:unlinked.id});
+assert.equal((await call('link',{id:unlinked.id,customerOwnerId:u})).purchaseProtected,true,'confirmed account association sees existing purchase');
+assert.equal((await call('link',{id:unlinked.id,customerOwnerId:u})).customer_owner_id,u,'account link is idempotent');
+await assert.rejects(call('link',{id:unlinked.id,customerOwnerId:'00000000-0000-4000-8000-000000000099'}),/CUSTOMER_CONFLICT/);
+
+for(const role of ['anon','authenticated']){
+ await db.exec('set role '+role);
+ await assert.rejects(call('read',{id}),/permission denied/);
+ await db.exec('reset role');
+}
+await db.exec('set role service_role');
+await assert.rejects(db.query('select public.innova_commercial_demo_v1($1,$2::jsonb)',['read',JSON.stringify({id})]),/DEMO_NOT_AUTHORIZED/);
+await assert.rejects(db.query("insert into private.innova_demo_authorizations(reference,authorization_ref) values('demo-fixture','self-approved')"),/permission denied/);
+await db.exec('reset role');
+await db.query("insert into private.innova_demo_authorizations(reference,authorization_ref) values('demo-fixture','local-fixture-authorization')");
+await db.exec('set role service_role');
+assert.equal((await db.query('select public.innova_commercial_demo_v1($1,$2::jsonb) as d',['read',JSON.stringify({id})])).rows[0].d.id,id);
+await db.exec('reset role');
+console.log('PASS demo lifecycle: separate identity, real plan, versions, first delivery 48h, replay/conflict, retained expiry, payment recovery, private access.');
+}finally{await db.close();}
