@@ -25,9 +25,14 @@ La copia Vercel anterior no determina qué código sirve el dominio tras el camb
 de DNS. No volver a apuntar el dominio allí como parte de un despliegue rutinario.
 
 La transferencia de variables fue autorizada expresamente por el titular.
-Pendiente al 16/10/2026: DATABASE_URL. Vercel exporta vacíos sus secretos sensibles;
-no confundir la existencia del nombre con la presencia de un valor. La clave Groq
-se recuperó de la configuración local y se importó de nuevo sin mostrarla.
+Resuelto el 16/10/2026: DATABASE_URL, mediante usuario independiente autorizado
+innova_netlify_runtime. Hereda solo innova_mvp_runtime, sin administración ni
+bypass de RLS, con máximo de 5 conexiones y timeouts de 30 segundos. Conexión
+TLS verificada. Migración remota: netlify_limited_runtime_role. Vercel conserva
+su acceso. La contraseña no se guarda en este documento ni en Git.
+Vercel exporta vacíos sus secretos sensibles; no confundir la existencia del
+nombre con la presencia de un valor. Groq se recuperó de la configuración local
+y se importó sin mostrarla. La nueva conexión está guardada en Netlify.
 No se transfieren claves de Vercel, Gemini, OpenRouter ni pagos. Mantener secretos
 fuera de Git y del navegador; los valores quedan configurados en el proyecto.
 
@@ -36,11 +41,20 @@ el runtime Python existente y Core. El panel de ensayo es /erp/demos.html.
 
 Estado verificado 16/10/2026: DNS continúa en Vercel. No cambiarlo hasta que
 /api/health devuelva 200 y las demos se prueben con datos reales de prueba.
-La copia Netlify compila, sirve la home y optimiza las imágenes (HTTP 200).
-Despliegue completo: 6ad235ac778ef0b5ecd31385. No basta con promover un paquete:
+La copia Netlify compila y optimiza las imágenes (HTTP 200). El despliegue
+6ad24f1d850631dfe477e75b devuelve /api/health 200 con la nueva conexión limitada.
+La comprobación de demos detectó y corrigió doble serialización de JSON:
+usar sql.json(objeto), nunca JSON.stringify(objeto) como parámetro ::jsonb.
+No basta con promover un paquete:
 una subida --no-build sin configuración generada pierde las reglas de imágenes.
 Usar build completo con el plugin local integration/netlify-runtime, después del
 adaptador oficial. Su guardia detiene el despliegue si cambia la estructura.
+Proceso comprobado desde la copia aislada: netlify build --context production;
+conservar netlify.toml original, sustituirlo temporalmente por .netlify/netlify.toml;
+netlify deploy --site 6a1afbad-ae07-4232-8d74-4088ed99bdea --prod --no-build
+--skip-functions-cache --dir .netlify/static --functions .netlify/functions-internal.
+Restaurar netlify.toml original antes del siguiente build. No omitir las reglas
+generadas ni reutilizar el paquete de funciones en caché del despliegue integrado.
 La corrección soporta el ESM anidado y el aplanado por Netlify en Windows.
 Tras introducir DATABASE_URL o cambiar cualquier variable, volver a desplegar
 para que el servidor reciba los valores nuevos. No activar public_ready hasta
