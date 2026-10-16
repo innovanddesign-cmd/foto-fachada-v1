@@ -49,6 +49,9 @@ build/.next/
 
 # Local development sessions and deployment metadata
 .work/
+.netlify/
+__pycache__/
+*.py[cod]
 .vercel/
 OPENCODE-*.txt
 OPENCODE-*.md

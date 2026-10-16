@@ -1,0 +1,47 @@
+Escaparates — alojamiento comercial sin cuota adicional
+
+Proyecto de destino: innova-escaparates en Netlify, cuenta innovanddesign-cmd.
+Site ID: 6a1afbad-ae07-4232-8d74-4088ed99bdea.
+Dominio previsto: escaparates.innovandesign.com.
+Plan comprobado el 15/10/2026: Free, 300 créditos/mes, sin tarjeta ni recarga
+automática. Al agotar el límite se pausa el alojamiento; no se compra capacidad.
+https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/billing-faq-for-credit-based-plans/
+
+NO usar el site heredado effulgent-yeot-8776ec de otra carpeta. Pasar siempre el
+Site ID explícito. No publicar desde una copia antigua ni desde un node_modules
+compartido por junction: el primer ensayo omitió Next.js al empaquetar dependencias
+externas. Usar npm ci en una copia aislada del código vigente, sin enlaces de
+dependencias a otro checkout. netlify.toml configura el adaptador oficial.
+
+Conservar la protección scripts/check-release-baseline.cjs: comprueba edificios,
+cuatro nichos/carruseles y rutas comerciales. La home se conserva desde c9a983d.
+Antes de publicar: npm test, las pruebas Python de integration/captacion, build,
+salud real, vista pública y demo. No basta con que compile.
+
+Publicar primero una vista previa con --site explícito y --context production.
+Promover únicamente el despliegue que se haya probado. El proyecto se creó sin
+vinculación automática de Git: un push no significa que Netlify haya publicado.
+La copia Vercel anterior no determina qué código sirve el dominio tras el cambio
+de DNS. No volver a apuntar el dominio allí como parte de un despliegue rutinario.
+
+La transferencia de variables fue autorizada expresamente por el titular.
+Pendiente al 16/10/2026: DATABASE_URL. Vercel exporta vacíos sus secretos sensibles;
+no confundir la existencia del nombre con la presencia de un valor. La clave Groq
+se recuperó de la configuración local y se importó de nuevo sin mostrarla.
+No se transfieren claves de Vercel, Gemini, OpenRouter ni pagos. Mantener secretos
+fuera de Git y del navegador; los valores quedan configurados en el proyecto.
+
+Captación permanece en Hostinger Premium, reutilizando el alojamiento pagado,
+el runtime Python existente y Core. El panel de ensayo es /erp/demos.html.
+
+Estado verificado 16/10/2026: DNS continúa en Vercel. No cambiarlo hasta que
+/api/health devuelva 200 y las demos se prueben con datos reales de prueba.
+La copia Netlify compila, sirve la home y optimiza las imágenes (HTTP 200).
+Despliegue completo: 6ad235ac778ef0b5ecd31385. No basta con promover un paquete:
+una subida --no-build sin configuración generada pierde las reglas de imágenes.
+Usar build completo con el plugin local integration/netlify-runtime, después del
+adaptador oficial. Su guardia detiene el despliegue si cambia la estructura.
+La corrección soporta el ESM anidado y el aplanado por Netlify en Windows.
+Tras introducir DATABASE_URL o cambiar cualquier variable, volver a desplegar
+para que el servidor reciba los valores nuevos. No activar public_ready hasta
+comprobar salud y vista de las tres demos. No hay envíos habilitados.
