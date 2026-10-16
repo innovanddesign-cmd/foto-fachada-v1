@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "public_ready": false,
+  "public_ready": true,
   "public_base": "https://innova-escaparates.netlify.app",
   "items": [
     {

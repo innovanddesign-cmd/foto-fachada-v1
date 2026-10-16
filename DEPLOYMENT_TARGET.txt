@@ -59,3 +59,12 @@ La corrección soporta el ESM anidado y el aplanado por Netlify en Windows.
 Tras introducir DATABASE_URL o cambiar cualquier variable, volver a desplegar
 para que el servidor reciba los valores nuevos. No activar public_ready hasta
 comprobar salud y vista de las tres demos. No hay envíos habilitados.
+
+Verificación final 16/10/2026: despliegue 6ad2506c2789b2afd463f76d,
+/api/health 200; tres demos 200 con su contenido; imágenes 200. El ERP preparó
+las tres mediante sesión real. public_ready=true. Tres registros publicados,
+cero relojes de entrega iniciados. DOM del ERP muestra los tres enlaces.
+DNS permanece en Vercel: la sesión de Hostinger caducó y requiere nuevo acceso.
+La automatización del navegador bloquea el dominio netlify.app; se verificaron
+los HTML por HTTPS y el panel ERP en navegador. Revisión visual final de las
+demos pendiente del usuario o de completar el dominio propio con sesión válida.
