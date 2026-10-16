@@ -29,8 +29,13 @@ en Core con versión esperada. No aprueba una propuesta, un canal ni un envío.
 Si Core falla tras la publicación, reintentar recupera la misma demo.
 sync consulta el producto y solo transfiere una entrega si Core contiene un
 intento reservado en estado delivered con el mismo recibo. Nunca fabrica recibos.
-El plazo del producto empieza al recibir esa primera confirmación; puede ser
-posterior al timestamp del proveedor conservado en Core. La vista pública del
+El plazo del producto empieza en la fecha de entrega original del recibo de Core,
+no en la sincronización. first_delivery_at debe coincidir con dispatch.delivered_at,
+con zona horaria y sin fecha futura. El servidor envía deliveredAt; el navegador
+no puede proporcionarlo ni confirmar una entrega por la API de operador.
+PostgreSQL conserva received_at como auditoría de recepción y occurred_at como
+fecha real. Caducidad = occurred_at + 48 horas; reintentos con otra fecha se
+rechazan. La vista pública del
 producto determina la disponibilidad real; no se amplía el plazo por reintento.
 
 La cuenta del comprador solo se vincula mediante una relación confirmada incluida
@@ -48,6 +53,9 @@ Pruebas: python -B -m unittest discover -s integration/captacion -p 'test_*.py'
 Incluyen aislamiento por organización, caducidad de sesión, roles, bloqueo del
 alojamiento, versiones, exclusiones, reintentos, inyección de cuenta/campaña,
 recibos no verificados y protección ante compra local sin confirmar en producto.
+Incluyen sincronización t0+24h conservando t0, fechas ausentes/futuras/incoherentes
+y rechazo de fecha inyectada por el navegador. El test SQL commercial-demos.mjs
+verifica caducidad exacta t0+48h y replay sin ampliación.
 
 Los datos/credenciales de despliegue y copias anteriores se mantienen en .work,
 excluido de Git. No copiar la exportación de FileZilla al repositorio ni al hosting.

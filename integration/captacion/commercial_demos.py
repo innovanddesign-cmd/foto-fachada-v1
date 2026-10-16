@@ -4,6 +4,7 @@ from hashlib import sha256
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 from uuid import UUID
+from datetime import datetime
 from core_service import ApiError, Response, CaptacionService, WRITE_ROLES, ALLOWED_ORIGINS, _object
 from core_repository import RevisionConflict, RepositoryError
 from motor import blocked, iso
@@ -104,8 +105,16 @@ class DemoService:
                 dispatch = op.get('dispatch') or {}
                 if dispatch.get('status') != 'delivered' or dispatch.get('delivery_ref') != op.get('delivery_id'):
                     raise ApiError(409, 'Falta recibo confirmado del intento de envío')
+                try:
+                    delivered = datetime.fromisoformat(dispatch['delivered_at'].replace('Z', '+00:00'))
+                    first = datetime.fromisoformat(op['first_delivery_at'].replace('Z', '+00:00'))
+                    if delivered.tzinfo is None or first.tzinfo is None or delivered != first or delivered > now:
+                        raise ValueError()
+                except (KeyError, TypeError, AttributeError, ValueError):
+                    raise ApiError(409, 'Fecha de entrega no confirmada por el recibo de Core') from None
                 remote = self.rpc('delivery', {'id': demo_id, 'eventId': 'captacion:' + sha256(
                     (session.organization_id + ':' + op['delivery_id']).encode()).hexdigest(),
+                    'deliveredAt': iso(delivered),
                     'evidenceRef': 'core:' + session.organization_id + ':' + dispatch['id'] + ':' + op['delivery_id']})
             # Never infer a customer account from email or accept a browser-supplied identity.
             if entry.get('customer_owner_id'):

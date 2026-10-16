@@ -15,6 +15,7 @@ const req=(b,origin='https://example.test')=>new Request('https://example.test/a
  assert.equal((await route.POST(req({...b,plan:'ESCAPARATE'}))).status,400);
  assert.equal((await route.POST(req({...b,campaignId:'---'}))).status,400);
  assert.equal((await route.POST(req({action:'delivery',id:b.campaignId,eventId:'evt'}))).status,400);
+ assert.equal((await route.POST(req({action:'delivery',id:b.campaignId,eventId:'evt',evidenceRef:'proof',deliveredAt:new Date().toISOString()}))).status,403,'browser cannot supply a delivery receipt timestamp');
  assert.equal((await route.POST(req({...b,reference:'x'.repeat(5000)}))).status,413);
  assert.equal(calls,0);
  const r=await route.POST(req(b));assert.equal(r.status,200);assert.equal(calls,1);assert.match(r.headers.get('cache-control'),/no-store/);

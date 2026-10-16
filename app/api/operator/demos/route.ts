@@ -19,6 +19,8 @@ export async function POST(req:Request) {
   if(b.action==='version'&&(!uuid(b.campaignId)||!Number.isSafeInteger(b.expectedVersion)||b.expectedVersion<1))throw Error();
   if(b.action==='delivery'&&(!text(b.eventId,160)||!text(b.evidenceRef,500)))throw Error();
  }catch{return NextResponse.json({error:'Datos de demo no válidos'},{status:400,headers});}
+ // Delivery time is accepted only from the server-side Core receipt bridge.
+ if(b.action==='delivery')return NextResponse.json({error:'La entrega se confirma desde captación con su recibo.'},{status:403,headers});
  try{
   const sql=commercialDB();
   const [row]=await sql`select private.innova_demo_action(${b.action},${sql.json(b)}::jsonb) as demo`;

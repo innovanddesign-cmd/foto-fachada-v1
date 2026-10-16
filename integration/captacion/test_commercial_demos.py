@@ -67,10 +67,27 @@ class BridgeTests(unittest.TestCase):
     def test_reserved_delivery_retries_use_identical_event_id(self):
         self.call();op=self.repo.state['opportunities'][self.repo.oid]
         op['first_delivery_at']=NOW.isoformat();op['delivery_id']='provider-1'
-        op['dispatch']={'id':'reserved-1','status':'delivered','delivery_ref':'provider-1'}
+        op['dispatch']={'id':'reserved-1','status':'delivered','delivery_ref':'provider-1','delivered_at':NOW.isoformat()}
         self.assertEqual(self.call('sync').status,200);self.assertEqual(self.call('sync').status,200)
         receipts=[body for action,body in self.calls if action=='delivery']
         self.assertEqual(len(receipts),2);self.assertEqual(receipts[0],receipts[1])
+        self.assertEqual(datetime.fromisoformat(receipts[0]['deliveredAt']),NOW)
+    def test_late_sync_preserves_core_delivery_time(self):
+        self.call();op=self.repo.state['opportunities'][self.repo.oid]
+        t0=NOW-timedelta(hours=24)
+        op.update(first_delivery_at=t0.isoformat(),delivery_id='provider-1',dispatch={
+            'id':'reserved-1','status':'delivered','delivery_ref':'provider-1','delivered_at':t0.isoformat()})
+        self.assertEqual(self.call('sync').status,200)
+        body=next(b for a,b in self.calls if a=='delivery')
+        self.assertEqual(datetime.fromisoformat(body['deliveredAt']),t0)
+        self.assertEqual(self.call('sync',deliveredAt=NOW.isoformat()).status,400)
+    def test_missing_mismatched_naive_or_future_receipt_time_rejected(self):
+        self.call();op=self.repo.state['opportunities'][self.repo.oid]
+        op.update(first_delivery_at=NOW.isoformat(),delivery_id='provider-1')
+        for date in [None,(NOW-timedelta(hours=1)).isoformat(),NOW.replace(tzinfo=None).isoformat(),(NOW+timedelta(hours=1)).isoformat()]:
+            op['dispatch']={'id':'reserved-1','status':'delivered','delivery_ref':'provider-1','delivered_at':date}
+            self.assertEqual(self.call('sync').status,409)
+        self.assertNotIn('delivery',[a for a,b in self.calls])
     def test_local_purchase_without_product_proof_prevents_expiry(self):
         self.call();self.repo.state['opportunities'][self.repo.oid]['paid']=True
         self.assertEqual(self.call('sync').status,409)
