@@ -1,0 +1,70 @@
+Escaparates — alojamiento comercial sin cuota adicional
+
+Proyecto de destino: innova-escaparates en Netlify, cuenta innovanddesign-cmd.
+Site ID: 6a1afbad-ae07-4232-8d74-4088ed99bdea.
+Dominio previsto: escaparates.innovandesign.com.
+Plan comprobado el 15/10/2026: Free, 300 créditos/mes, sin tarjeta ni recarga
+automática. Al agotar el límite se pausa el alojamiento; no se compra capacidad.
+https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/billing-faq-for-credit-based-plans/
+
+NO usar el site heredado effulgent-yeot-8776ec de otra carpeta. Pasar siempre el
+Site ID explícito. No publicar desde una copia antigua ni desde un node_modules
+compartido por junction: el primer ensayo omitió Next.js al empaquetar dependencias
+externas. Usar npm ci en una copia aislada del código vigente, sin enlaces de
+dependencias a otro checkout. netlify.toml configura el adaptador oficial.
+
+Conservar la protección scripts/check-release-baseline.cjs: comprueba edificios,
+cuatro nichos/carruseles y rutas comerciales. La home se conserva desde c9a983d.
+Antes de publicar: npm test, las pruebas Python de integration/captacion, build,
+salud real, vista pública y demo. No basta con que compile.
+
+Publicar primero una vista previa con --site explícito y --context production.
+Promover únicamente el despliegue que se haya probado. El proyecto se creó sin
+vinculación automática de Git: un push no significa que Netlify haya publicado.
+La copia Vercel anterior no determina qué código sirve el dominio tras el cambio
+de DNS. No volver a apuntar el dominio allí como parte de un despliegue rutinario.
+
+La transferencia de variables fue autorizada expresamente por el titular.
+Resuelto el 16/10/2026: DATABASE_URL, mediante usuario independiente autorizado
+innova_netlify_runtime. Hereda solo innova_mvp_runtime, sin administración ni
+bypass de RLS, con máximo de 5 conexiones y timeouts de 30 segundos. Conexión
+TLS verificada. Migración remota: netlify_limited_runtime_role. Vercel conserva
+su acceso. La contraseña no se guarda en este documento ni en Git.
+Vercel exporta vacíos sus secretos sensibles; no confundir la existencia del
+nombre con la presencia de un valor. Groq se recuperó de la configuración local
+y se importó sin mostrarla. La nueva conexión está guardada en Netlify.
+No se transfieren claves de Vercel, Gemini, OpenRouter ni pagos. Mantener secretos
+fuera de Git y del navegador; los valores quedan configurados en el proyecto.
+
+Captación permanece en Hostinger Premium, reutilizando el alojamiento pagado,
+el runtime Python existente y Core. El panel de ensayo es /erp/demos.html.
+
+Estado verificado 16/10/2026: DNS continúa en Vercel. No cambiarlo hasta que
+/api/health devuelva 200 y las demos se prueben con datos reales de prueba.
+La copia Netlify compila y optimiza las imágenes (HTTP 200). El despliegue
+6ad24f1d850631dfe477e75b devuelve /api/health 200 con la nueva conexión limitada.
+La comprobación de demos detectó y corrigió doble serialización de JSON:
+usar sql.json(objeto), nunca JSON.stringify(objeto) como parámetro ::jsonb.
+No basta con promover un paquete:
+una subida --no-build sin configuración generada pierde las reglas de imágenes.
+Usar build completo con el plugin local integration/netlify-runtime, después del
+adaptador oficial. Su guardia detiene el despliegue si cambia la estructura.
+Proceso comprobado desde la copia aislada: netlify build --context production;
+conservar netlify.toml original, sustituirlo temporalmente por .netlify/netlify.toml;
+netlify deploy --site 6a1afbad-ae07-4232-8d74-4088ed99bdea --prod --no-build
+--skip-functions-cache --dir .netlify/static --functions .netlify/functions-internal.
+Restaurar netlify.toml original antes del siguiente build. No omitir las reglas
+generadas ni reutilizar el paquete de funciones en caché del despliegue integrado.
+La corrección soporta el ESM anidado y el aplanado por Netlify en Windows.
+Tras introducir DATABASE_URL o cambiar cualquier variable, volver a desplegar
+para que el servidor reciba los valores nuevos. No activar public_ready hasta
+comprobar salud y vista de las tres demos. No hay envíos habilitados.
+
+Verificación final 16/10/2026: despliegue 6ad2506c2789b2afd463f76d,
+/api/health 200; tres demos 200 con su contenido; imágenes 200. El ERP preparó
+las tres mediante sesión real. public_ready=true. Tres registros publicados,
+cero relojes de entrega iniciados. DOM del ERP muestra los tres enlaces.
+DNS permanece en Vercel: la sesión de Hostinger caducó y requiere nuevo acceso.
+La automatización del navegador bloquea el dominio netlify.app; se verificaron
+los HTML por HTTPS y el panel ERP en navegador. Revisión visual final de las
+demos pendiente del usuario o de completar el dominio propio con sesión válida.

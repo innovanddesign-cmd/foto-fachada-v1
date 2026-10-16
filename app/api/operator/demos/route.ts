@@ -21,7 +21,7 @@ export async function POST(req:Request) {
  }catch{return NextResponse.json({error:'Datos de demo no válidos'},{status:400,headers});}
  try{
   const sql=commercialDB();
-  const [row]=await sql`select private.innova_demo_action(${b.action},${JSON.stringify(b)}::jsonb) as demo`;
+  const [row]=await sql`select private.innova_demo_action(${b.action},${sql.json(b)}::jsonb) as demo`;
   return NextResponse.json({demo:row.demo},{headers});
  }catch{return NextResponse.json({error:'No se pudo completar la operación. Revisa la versión, la publicación y las referencias.'},{status:409,headers});}
 }

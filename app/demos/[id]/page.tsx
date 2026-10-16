@@ -10,7 +10,7 @@ export default async function DemoPage({params}:{params:Promise<{id:string}>}){
  const {id}=await params;
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))notFound();
  const sql=commercialDB();
- const [row]=await sql`select private.innova_demo_action('read',${JSON.stringify({id})}::jsonb) as demo`;
+ const [row]=await sql`select private.innova_demo_action('read',${sql.json({id})}::jsonb) as demo`;
  const demo=row?.demo;
  if(!demo||!['published','protected'].includes(demo.effectiveState))notFound();
  const payload=sanearPayloadPublico(demo.payload);

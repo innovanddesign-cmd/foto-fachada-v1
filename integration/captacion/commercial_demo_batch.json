@@ -1,0 +1,37 @@
+{
+  "enabled": true,
+  "public_ready": true,
+  "public_base": "https://innova-escaparates.netlify.app",
+  "items": [
+    {
+      "organization_id": "f7ddaf05-c8c3-41da-9e8e-4b4bcb7a5028",
+      "opportunity_id": "qa-demo-20261015-inmobiliaria:ESCAPARATES",
+      "name": "Barbería · Barrio Norte",
+      "reference": "f7ddaf05-c8c3-41da-9e8e-4b4bcb7a5028:qa-demo-20261015-inmobiliaria",
+      "campaign_id": "d9c08d69-689e-4835-b3bb-ec5ebb2905bf",
+      "plan": "BUSINESS",
+      "rights_ref": "internal-e2e-campaign:user-authorized-test-20261015",
+      "qa_ref": "commercial-demo-v1:automated-controls-20261015:human-review-pending"
+    },
+    {
+      "organization_id": "f7ddaf05-c8c3-41da-9e8e-4b4bcb7a5028",
+      "opportunity_id": "qa-demo-20261015-peluqueria:ESCAPARATES",
+      "name": "Peluquería · Atelier",
+      "reference": "f7ddaf05-c8c3-41da-9e8e-4b4bcb7a5028:qa-demo-20261015-peluqueria",
+      "campaign_id": "8939ed0e-79da-4dfe-abe4-1ed5f38512d5",
+      "plan": "BUSINESS",
+      "rights_ref": "internal-e2e-campaign:user-authorized-test-20261015",
+      "qa_ref": "commercial-demo-v1:automated-controls-20261015:human-review-pending"
+    },
+    {
+      "organization_id": "f7ddaf05-c8c3-41da-9e8e-4b4bcb7a5028",
+      "opportunity_id": "qa-demo-20261015-estetica:ESCAPARATES",
+      "name": "Estética · Serena",
+      "reference": "f7ddaf05-c8c3-41da-9e8e-4b4bcb7a5028:qa-demo-20261015-estetica",
+      "campaign_id": "33440ebc-e1c2-4fe3-a25a-9072709c8779",
+      "plan": "BUSINESS",
+      "rights_ref": "internal-e2e-campaign:user-authorized-test-20261015",
+      "qa_ref": "commercial-demo-v1:automated-controls-20261015:human-review-pending"
+    }
+  ]
+}
