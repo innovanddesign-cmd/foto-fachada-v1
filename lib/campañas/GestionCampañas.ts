@@ -1,6 +1,7 @@
 "use client";
 
 import { useTiendaEstado } from '@/store/useTiendaEstado';
+import {aiCampaignId} from '@/lib/ai/campaign';
 import type { CampañaUsuario, MetricasCampaña, DatosDashboard } from '@/lib/estado/tipos-estado';
 
 /**
@@ -125,7 +126,7 @@ export function crearCampañaDesdeEstadoActual(nombrePersonalizado?: string): Ca
         || `${nombreNegocio} — ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`;
 
     const nuevaCampaña: CampañaUsuario & { snapshot?: any } = {
-        id: `camp_${Date.now()}`,
+        id: aiCampaignId(),
         nombreCampaña: nombreFinal,
         idEscaparate: slug || `esc_${Date.now()}`,
         idCartel: cartelesGenerados.length > 0 ? cartelesGenerados[0].id : null,

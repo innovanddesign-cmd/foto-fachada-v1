@@ -28,6 +28,8 @@ export async function withAIQuota(userId: string, requestId: string, run: () => 
   const unavailable = () => NextResponse.json({ error:'La IA no está disponible ahora. Puedes continuar sin IA.', code:'AI_UNAVAILABLE' },{ status:503 });
   let reserved = false;
   const credits = process.env.INNOVA_CREDITS_ENABLED === 'true';
+  // A missing rollout flag must fail closed, never reopen the retired free allowance.
+  if (!credits) return unavailable();
   if (credits && (!Number.isSafeInteger(expectedCost) || Number(expectedCost) < 0 || (initial && !/^[0-9a-f-]{36}$/i.test(campaignId||'')))) return NextResponse.json({error:'Consulta y confirma el coste antes de analizar la foto.',code:'AI_PRICE_CONFIRMATION_REQUIRED'},{status:409});
   try {
     const sql=db();

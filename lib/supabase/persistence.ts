@@ -1,6 +1,6 @@
 import {createClient} from './client';
 import {sanearPayloadPublico} from './sanitize';
-type Plan='FREE'|'PRO'|'ESCAPARATE';
+type Plan='FREE'|'BASIC'|'PRO'|'ESCAPARATE';
 export interface RemoteCampaign {id:string;owner_id:string;local_id?:string|null;name:string;slug:string|null;status:'draft'|'active'|'paused';snapshot:Record<string,any>;plan:Plan;created_at:string;updated_at:string;}
 export interface PublishedEscaparate {slug:string;payload:Record<string,any>;plan:Plan;published_at:string;updated_at:string;}
 export interface PersistResult {success:boolean;error:string|null;data?:any;}
@@ -66,7 +66,13 @@ export async function unpublishCampaign(id:string):Promise<PersistResult>{
  if(list.data.length){const remove=await sb.storage.from('escaparates-public').remove(list.data.map(x=>`${prefix}/${x.name}`));if(remove.error)throw remove.error;}
  const update=await sb.from('escaparates_campaigns').update({status:'draft'}).eq('id',id).eq('owner_id',user.id);if(update.error)throw update.error;return{success:true,error:null};}catch(e){return fail(e);}
 }
-export async function deleteCampaignRemote(id:string):Promise<PersistResult>{const result=await unpublishCampaign(id);if(!result.success)return result;try{const{sb,user}=await session();const{error}=await sb.from('escaparates_campaigns').delete().eq('id',id).eq('owner_id',user.id);if(error)throw error;return{success:true,error:null};}catch(e){return fail(e);}}
+export async function deleteCampaignRemote(id:string,confirmPurchased=false):Promise<PersistResult>{
+ try{const{sb,user}=await session();const{error}=await sb.rpc('innova_delete_campaign',{p_campaign:id,p_confirm_purchased:confirmPurchased});if(error)throw error;
+ // Deletion and loss of rights are atomic in SQL. Storage cleanup cannot undo that confirmed deletion.
+ let cleanupPending=false;for(const bucket of ['escaparates-public','escaparates-assets']){try{const prefix=`${user.id}/${id}`;const list=await sb.storage.from(bucket).list(prefix,{limit:1000});if(list.error)throw list.error;if(list.data?.length){const r=await sb.storage.from(bucket).remove(list.data.map(x=>`${prefix}/${x.name}`));if(r.error)throw r.error;}}catch{cleanupPending=true;}}
+ return{success:true,error:null,data:{cleanupPending}};
+ }catch(e){return fail(e);}
+}
 export async function loadPublishedBySlug(slug:string):Promise<{data:PublishedEscaparate|null;error:string|null}>{
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)return{data:null,error:'Supabase no está configurado.'};
  try{const{createClient:publicClient}=await import('@supabase/supabase-js');const sb=publicClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});const{data,error}=await sb.rpc('innova_public_page',{p_slug:slug});if(error)throw error;return{data,error:data?null:'NOT_FOUND'};}catch(e){return{data:null,error:fail(e).error};}

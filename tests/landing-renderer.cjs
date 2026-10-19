@@ -18,6 +18,7 @@ const exp={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/supabase
  for(const color of ['--primary:#123456','--secondary:#654321','--accent:#000000','--text:#181511','--button-text:#ffffff'])assert.ok(pro.includes(color),color);
  assert.ok(pro.includes('margin-left:8%'));assert.ok(pro.includes('Servicios únicos'));assert.ok(!pro.includes('id="galeria"'));
  const free=await ctx.render({business:{...business,plan:'FREE'},content});assert.ok(!free.includes('Servicios únicos'));
+ const basic=await ctx.render({business:{...business,plan:'BASIC'},content});assert.ok(!basic.includes('Servicios únicos'));assert.ok(!basic.includes('INNOVA AND DESIGN'));assert.equal(basic.replaceAll('BASIC','FREE'),free.replaceAll('INNOVA AND DESIGN','').replaceAll('<p class="simple-brand"></p>','').replaceAll(' · </footer>','</footer>'));
  const businessPage=await ctx.render({business:{...business,plan:'BUSINESS'},content});assert.ok(businessPage.includes('id="galeria"'));assert.ok(businessPage.includes('visual-tabs" aria-label'));
  assert.equal(ctx.imageURL('javascript:alert(1)'), '');assert.equal(ctx.imageURL('tel:123'), '');assert.equal(ctx.imageURL('data:image/svg+xml;base64,AAAA'), '');
  const injected=await ctx.render({business:{...business,plan:'PRO'},content:{heroImage:"https://example.test/a');color:red;/*"}});

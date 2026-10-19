@@ -17,6 +17,11 @@ export async function POST(req:Request) {
     if(!selection || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(b.requestId||''))return NextResponse.json({error:'Revisa el plan o recarga seleccionado.'},{status:400,headers});
     if(selection.kind==='credits')return NextResponse.json({error:'Las recargas no están disponibles en el lanzamiento.'},{status:403,headers});
     const price=orderPrice(selection), sql=commercialDB();
+    if(selection.kind==='campaign'){
+      const owned=await sql`select id from public.escaparates_campaigns where id=${selection.product}::uuid and owner_id=${a.userId!}::uuid`;
+      const bought=await sql`select id from private.innova_campaign_purchases where campaign_id=${selection.product}::uuid and owner_id=${a.userId!}::uuid`;
+      if(!owned.length||bought.length)return NextResponse.json({error:'La campaña no está disponible para comprar o ya la tienes comprada.'},{status:409,headers});
+    }
     const order=await sql.begin(async tx=>{
       await tx`select pg_advisory_xact_lock(hashtextextended(${a.userId!}::text,815))`;
       const [prior]=await tx`select * from private.innova_orders where owner_id=${a.userId!}::uuid and request_id=${b.requestId}::uuid`;

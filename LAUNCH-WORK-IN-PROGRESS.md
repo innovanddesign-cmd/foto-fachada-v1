@@ -17,15 +17,17 @@ Estado: rama de desarrollo; NO preparada para despliegue de lanzamiento.
 
 - Reglas de análisis de métricas 20/40, selección de hasta tres campañas y 90 días, lista explícita de campos agregados, ausencia de datos, muestra pequeña y validación del informe.
 - Reglas de notificaciones, preferencias, agrupación y alertas de cuota. No se ha conectado Resend ni enviado correo.
-- BASIC tiene soporte de créditos en la base de datos. Su contratación, representación pública sin marca y derechos completos aún no están integrados.
+- Migración 20261019183617_trials_purchases_basic.sql integrada y probada localmente: prueba de campaña de siete días desde la primera publicación, sin reinicio al republicar; compra asistida de 40 € + IVA con verificación de pago por operador; derechos permanentes y publicaciones simultáneas, incluso en FREE. El borrado exige confirmación y conserva la evidencia financiera.
+- BASIC integrado en contratación asistida, activación, créditos y representación pública: mismas funciones de FREE, sin marca INNOVA, 100 créditos/mes y acumulación máxima de 200; 6 €/mes o 60 €/año + IVA. Prueba BASIC de 48 horas con 40 créditos aislados y no repetibles, disponible después de la prueba de campaña.
+- El panel permite preparar la prueba, solicitar la compra y continuar hacia PRO, BASIC o FREE. Los permisos se calculan en servidor; las campañas compradas permanecen al bajar de plan. Los avisos temporales se registran en cola, pero todavía no se envían.
 
 ## Bloqueos de despliegue pendientes de desarrollo
 
-1. Sustituir el antiguo permiso de generación inicial por derechos de prueba de siete días y compra de campaña. La migración bloquea el antiguo acceso inicial y las operaciones agrupadas sin tarifa aprobada. NO desplegarla sola: faltaría completar ese recorrido.
-2. Campañas de 40 € permanentes, publicables simultáneamente y conservadas al bajar de plan; advertencia explícita antes del borrado.
-3. BASIC completo, cupo de lanzamiento de 100 negocios y precio conservado por renovación continua.
+1. Validar las dos migraciones juntas con datos representativos y comprobar los recorridos con autenticación real tras la recuperación de Supabase. La generación inicial ya utiliza derechos de prueba, compra o cuota de suscripción; las operaciones agrupadas sin tarifa siguen bloqueadas.
+2. Completar la limpieza reintentable de archivos tras borrar una campaña: actualmente el cliente intenta limpiarlos después del borrado autorizado. La prueba única se controla por cuenta propietaria; no existe deduplicación entre distintas cuentas de un mismo negocio.
+3. Asignación segura del cupo de lanzamiento de 100 negocios y precio conservado por renovación continua. Las compras de campaña y BASIC funcionan por contratación asistida; no se ha habilitado cobro automático real.
 4. Contactos, conservación, publicación programada, métricas de sesiones e informes reales.
-5. Envío de correo, verificación del dominio y colas/reintentos. Empezar gratis según decisión de Javi.
+5. Envío de correo, verificación del dominio y procesamiento/reintentos de la cola. Revalidar derechos al enviar para no pedir pagos a quien ya ha contratado. Empezar gratis según decisión de Javi.
 6. Pruebas de navegador y del recorrido comercial completo, comprobación de recuperación del QR y actualización final de documentos.
 
 ## Supabase

@@ -1,16 +1,19 @@
 import { PLANS } from './catalog';
 import { CREDIT_POLICY } from './credits';
-export type OrderInput = { kind: 'plan' | 'credits'; product: string; billing: 'monthly' | 'annual'; mode: 'test' | 'manual' };
+export type OrderInput = { kind: 'plan' | 'credits' | 'campaign'; product: string; billing: 'monthly' | 'annual' | 'once'; mode: 'test' | 'manual' };
 export function orderSelection(input: unknown): OrderInput | null {
   if (!input || typeof input !== 'object') return null;
   const b = input as Record<string, unknown>;
-  if (!['test','manual'].includes(String(b.mode)) || !['monthly','annual'].includes(String(b.billing))) return null;
-  if (b.kind === 'plan' && ['PRO','BUSINESS'].includes(String(b.product)) || b.kind === 'credits' && CREDIT_POLICY.packs.some(p=>p.id===b.product)) return b as OrderInput;
+  if (!['test','manual'].includes(String(b.mode))) return null;
+  if (b.kind==='campaign' && b.billing==='once' && typeof b.product==='string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(b.product)) return b as OrderInput;
+  if (!['monthly','annual'].includes(String(b.billing))) return null;
+  if (b.kind === 'plan' && ['BASIC','PRO','BUSINESS'].includes(String(b.product)) || b.kind === 'credits' && CREDIT_POLICY.packs.some(p=>p.id===b.product)) return b as OrderInput;
   return null;
 }
 export function orderPrice(input: OrderInput) {
+  if(input.kind==='campaign')return {netCents:4000,taxCents:840,credits:0};
   const pack = CREDIT_POLICY.packs.find(p=>p.id===input.product);
-  const plan = PLANS[input.product as 'PRO'|'BUSINESS'];
+  const plan = PLANS[input.product as 'BASIC'|'PRO'|'BUSINESS'];
   // Annual launch eligibility is confirmed with the customer before accepting payment.
   const netCents = input.kind === 'credits' ? pack!.netCents : (input.billing === 'annual' ? plan.launchAnnual : plan.monthly) * 100;
   return { netCents, taxCents: Math.round(netCents * .21), credits: pack?.credits || 0 };

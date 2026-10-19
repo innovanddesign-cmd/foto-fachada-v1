@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const raw=await req.text(); if(raw.length>16000) return NextResponse.json({error:'Solicitud demasiado grande'},{status:413});
     const b=JSON.parse(raw);
     const uuid=/^[0-9a-f-]{36}$/i;
-    if (!uuid.test(b.ownerId||'') || !['PRO','BUSINESS','ENTERPRISE'].includes(b.plan) || !['monthly','annual'].includes(b.billing)
+    if (!uuid.test(b.ownerId||'') || !['BASIC','PRO','BUSINESS','ENTERPRISE'].includes(b.plan) || !['monthly','annual'].includes(b.billing)
       || !['bizum','transfer','cash','card'].includes(b.paymentMethod) || typeof b.reference!=='string' || b.reference.length<3 || b.reference.length>160
       || typeof b.documentReference!=='string' || b.documentReference.length<3 || b.documentReference.length>500
       || !Number.isSafeInteger(b.netCents) || b.netCents<0 || !Number.isSafeInteger(b.taxCents) || b.taxCents<0
@@ -17,7 +17,8 @@ export async function POST(req: Request) {
       || (b.plan==='ENTERPRISE' && (!Number.isSafeInteger(b.activeLimit)||b.activeLimit<1||b.activeLimit>10000)))
       return NextResponse.json({error:'Revisa los datos del contrato y las condiciones aprobadas.'},{status:400});
     if(b.paymentMethod==='cash' && b.netCents+b.taxCents>=100000) return NextResponse.json({error:'Esta operación requiere un medio distinto de efectivo.'},{status:400});
-    if(b.plan==='PRO'||b.plan==='BUSINESS'){b.monthlyCredits=b.plan==='PRO'?200:400;b.operationCost=5;}
+    if(b.plan==='BASIC'&&(b.netCents!==(b.billing==='annual'?6000:600)||b.taxCents!==Math.round(b.netCents*.21)))return NextResponse.json({error:'BASIC cuesta 6 €/mes o 60 €/año, más IVA.'},{status:400});
+    if(['BASIC','PRO','BUSINESS'].includes(b.plan)){b.monthlyCredits=b.plan==='BASIC'?100:b.plan==='PRO'?200:400;b.operationCost=5;}
     const sql=commercialDB();
     await sql.begin(async tx=>{
       await tx`select pg_advisory_xact_lock(hashtextextended(${b.ownerId}::text,813))`;
