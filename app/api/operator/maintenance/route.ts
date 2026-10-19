@@ -9,6 +9,8 @@ export async function POST(req:Request){
  if(process.env.INNOVA_MAINTENANCE_ENABLED!=='true')return NextResponse.json({error:'Mantenimiento pendiente de configurar y validar.'},{status:503,headers});
  try{
   const raw=await req.text();if(raw.length>1000)throw Error();const body=JSON.parse(raw);const sql=commercialDB();
+  if(body.action==='retention'){const [result]=await sql`select private.innova_process_retention() as result`;return NextResponse.json(result,{headers});}
+  if(body.action==='prepare_contact_emails'){const [result]=await sql`select private.innova_prepare_contact_emails() as prepared`;return NextResponse.json({...result,sent:0},{headers});}
   if(body.action==='scheduled_publication'){
    if(process.env.INNOVA_SCHEDULING_ENABLED!=='true')return NextResponse.json({error:'Programación no activada.'},{status:503,headers});
    const [result]=await sql`select private.innova_run_scheduled_publication() as result`;return NextResponse.json(result,{headers});

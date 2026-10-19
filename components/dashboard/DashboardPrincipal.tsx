@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 import { AccountPanel } from './AccountPanel';
 import { AnalyticsPanel } from './AnalyticsPanel';
 import { useState } from 'react';
@@ -21,6 +22,7 @@ export function DashboardPrincipal() {
  function create() { s.reiniciar(); router.push('/create?paso=CAPTURA'); }
  return <div className="space-y-8">
    <AccountPanel />
+   <Link href="/contacts" className="studio-button">Consultas recibidas · exportar y borrar</Link>
    <RemoteSyncPanel />
    <AnalyticsPanel />
    <DynamicQRPanel />
