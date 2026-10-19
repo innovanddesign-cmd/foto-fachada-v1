@@ -13,6 +13,18 @@ export async function GET(){
     const sql=commercialDB();
     const [row]=await sql`select to_regclass('private.innova_accounts') is not null
       and to_regclass('private.innova_orders') is not null
+      and to_regclass('private.innova_experiences') is not null
+      and to_regclass('private.innova_campaign_purchases') is not null
+      and to_regprocedure('private.innova_plan_quote(uuid,text,text)') is not null
+      and to_regclass('private.innova_storage_cleanup') is not null
+      and to_regclass('private.innova_publication_schedule') is not null
+      and to_regclass('private.innova_contacts') is not null
+      and to_regprocedure('private.innova_process_retention()') is not null
+      and to_regprocedure('private.innova_claim_worker()') is not null
+      and to_regprocedure('private.innova_claim_email(text,text)') is not null
+      and to_regprocedure('public.innova_delete_campaign(uuid,boolean)') is not null
+      and exists(select 1 from pg_attribute where attrelid=to_regclass('private.innova_accounts') and attname='included_balance' and not attisdropped)
+      and exists(select 1 from pg_attribute where attrelid=to_regclass('private.innova_credit_operations') and attname='included_debit' and not attisdropped)
       and to_regclass('private.innova_credit_operations') is not null
       and to_regclass('private.innova_ai_budget') is not null
       and to_regprocedure('public.innova_public_page(text)') is not null

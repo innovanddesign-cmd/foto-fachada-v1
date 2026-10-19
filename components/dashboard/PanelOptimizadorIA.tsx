@@ -20,12 +20,10 @@ export const PanelOptimizadorIA = ({ campaña }: Props) => {
     const generarInsights = useTiendaEstado((s) => s.generarInsights);
     const insights = useTiendaEstado((s) => s.insightsIA);
 
-    // Generar insights al montar si no hay
+    // Remove historical demo suggestions; loading a panel must not consume AI credits.
     useEffect(() => {
-        if (insights.length === 0) {
-            generarInsights(campaña.id);
-        }
-    }, [campaña.id, generarInsights, insights.length]);
+        generarInsights(campaña.id);
+    }, [campaña.id, generarInsights]);
 
     const getIcono = (tipo: InsightIA['tipo']) => {
         switch (tipo) {
@@ -43,7 +41,7 @@ export const PanelOptimizadorIA = ({ campaña }: Props) => {
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-white">Optimizador IA</h3>
-                    <p className="text-xs text-white/40">Sugerencias para aumentar conversión</p>
+                    <p className="text-xs text-white/40">Los informes se solicitan expresamente. Sin datos analizados no mostramos conclusiones.</p>
                 </div>
             </div>
 
@@ -88,7 +86,7 @@ export const PanelOptimizadorIA = ({ campaña }: Props) => {
 
                 {insights.length === 0 && (
                     <div className="text-center py-8 text-white/20 text-sm">
-                        Analizando datos de rendimiento...
+                        Los informes de análisis todavía no están disponibles. No hay un análisis en curso.
                     </div>
                 )}
             </div>

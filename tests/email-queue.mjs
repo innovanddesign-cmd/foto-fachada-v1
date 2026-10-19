@@ -1,0 +1,42 @@
+import { PGlite } from '@electric-sql/pglite';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+import vm from 'node:vm';
+const db=new PGlite();
+try {
+await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
+ create schema innova; create table innova.organizations(id uuid primary key); create table innova.organization_memberships(organization_id uuid,user_email text,role text,active boolean);
+ create schema auth; create table auth.users(id uuid primary key,email text);
+ create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+ grant usage on schema auth to anon,authenticated,service_role; grant execute on function auth.uid() to public;
+ create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+ create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);
+ create function storage.foldername(text) returns text[] language sql immutable as $$select string_to_array($1,'/')$$;
+ grant usage on schema public to anon,authenticated,service_role;`);
+await db.exec(fs.readFileSync('supabase/escaparates-setup.sql','utf8'));
+for(const name of fs.readdirSync('supabase/migrations').filter(n=>n.endsWith('.sql')).sort())await db.exec(fs.readFileSync('supabase/migrations/'+name,'utf8'));
+const u='00000000-0000-4000-8000-000000000001',v='00000000-0000-4000-8000-000000000002';
+await db.query('insert into auth.users(id) values($1),($2)',[u,v]);
+const c='20000000-0000-4000-8000-000000000001';await db.query("insert into public.escaparates_campaigns(id,owner_id,name) values($1,$2,'Mail test')",[c,u]);
+let i=0;async function event(){const id=`30000000-0000-4000-8000-${String(++i).padStart(12,'0')}`;await db.query("insert into private.innova_contacts(id,owner_id,campaign_id,name,channel,address,message,scope,access_until) values($1,$2,$3,'Private name','email','private@example.test','Never in email','purchase',now()+interval '12 months')",[id,u,c]);await db.query("insert into private.innova_contact_notices(owner_id,kind,dedupe_key,details) values($1,'contact',$2,$3)",[u,'contact:'+id,{campaignId:c,count:1}]);return id;}
+const prepare=async()=>(await db.query('select private.innova_prepare_contact_emails() n')).rows[0].n;
+const pref=async(mode,zone='Europe/Madrid')=>db.query('select private.innova_set_email_preferences($1,$2,$3)',[u,mode,zone]);
+await event();await event();assert.equal(await prepare(),2);assert.equal(await prepare(),0);
+let jobs=(await db.query("select * from private.innova_email_jobs where kind='contact'")).rows;assert.equal(jobs.length,1);assert.equal(jobs[0].event_count,2);assert.ok(!JSON.stringify(jobs).includes('private@example.test'));assert.equal(jobs[0].sent_at,null,'Preparation is not sending');
+await pref('daily');assert.equal((await db.query("select extract(hour from scheduled_at at time zone 'Europe/Madrid') h from private.innova_email_jobs where state='pending'")).rows[0].h,'9');
+await pref('off');await event();assert.equal(await prepare(),0);assert.equal((await db.query("select count(*)::int n from private.innova_email_jobs where kind='contact' and state='pending'")).rows[0].n,0);
+await db.query("insert into private.innova_contact_notices(owner_id,kind,dedupe_key) values($1,'deletion_warning','essential-warning')",[u]);assert.equal(await prepare(),1,'Essential notices survive contact opt-out');
+await pref('immediate');await event();await prepare();
+await db.query("update private.innova_email_jobs set state='sent',sent_at=now() where kind='contact' and state='pending'");
+await event();await prepare();jobs=(await db.query("select * from private.innova_email_jobs where kind='contact' and state='pending'")).rows;
+assert.equal(jobs.length,1);assert.ok(Date.parse(jobs[0].scheduled_at)>Date.now()+14*60000);
+const scheduled=jobs[0].scheduled_at;await event();await prepare();assert.equal(String((await db.query("select scheduled_at from private.innova_email_jobs where kind='contact' and state='pending'")).rows[0].scheduled_at),String(scheduled),'Grouping must not postpone a due delivery');
+await assert.rejects(pref('daily','Invalid/Zone'),/INVALID_PREFERENCE/);
+await db.exec('set role authenticated');await assert.rejects(db.query('select * from private.innova_email_jobs'),/permission denied/);await db.exec('reset role');
+const sql=async(parts,...values)=>{let query=parts[0];values.forEach((_,i)=>{query+='$'+(i+1)+parts[i+1]});return(await db.query(query,values)).rows;};let owner=u;
+const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('app/api/email-preferences/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,URL,require:n=>({'next/server':{NextResponse:Response},'@/lib/ai/access':{requireAIUser:async()=>owner?{userId:owner}:{response:Response.json({error:'auth'},{status:401})}},'@/lib/commercial/server':{commercialDB:()=>sql}})[n]});
+const req=(origin='https://example.test')=>new Request('https://example.test/api/email-preferences',{method:'POST',headers:{origin},body:JSON.stringify({mode:'daily',timezone:'Europe/Madrid',ownerId:v})});
+assert.equal((await exports.POST(req('https://evil.test'))).status,403);assert.equal((await exports.POST(req())).status,200);owner=v;assert.equal((await (await exports.GET(req())).json()).contact_mode,'immediate','Client cannot change another owner');owner=null;assert.equal((await exports.GET(req())).status,401);
+console.log('PASS email preparation: grouping/deduplication, 15-minute window, local 09:00 daily, preference changes, opt-out leaves essential mail, no personal payload, no sends, private permissions and API ownership.');
+}finally{await db.close();}

@@ -42,14 +42,14 @@ await db.query('insert into auth.users(id) values($1),($2)',[u,other]);
 await db.query(`insert into private.innova_accounts(owner_id,plan,billing,anchor,paid_until,monthly_credits,operation_cost)
  values($1,'PRO','annual',now()-interval '2 months',now()+interval '10 months',1000,200)`,[u]);
 const summary=async()=> (await db.query('select private.innova_account_summary($1) as a',[u])).rows[0].a;
-assert.equal((await summary()).balance,3000);assert.equal((await summary()).balance,3000,'monthly accrual idempotent');
+assert.equal((await summary()).balance,400);assert.equal((await summary()).balance,400,'monthly accrual idempotent');
 const op='10000000-0000-4000-8000-000000000001';
-const reserve=async(id,owner=u)=> (await db.query("select private.innova_reserve($1,$2,'analysis',case private.innova_plan($1) when 'PRO' then 100 else 50 end) as s",[owner,id])).rows[0].s;
-assert.equal(await reserve(op),'reserved');assert.equal(await reserve(op),'duplicate');assert.equal((await summary()).balance,2900);
+const reserve=async(id,owner=u)=> (await db.query("select private.innova_reserve($1,$2,'free_image',20) as s",[owner,id])).rows[0].s;
+assert.equal(await reserve(op),'reserved');assert.equal(await reserve(op),'duplicate');assert.equal((await summary()).balance,380);
 assert.equal((await db.query('select private.innova_finish($1,$2,false) as done',[other,op])).rows[0].done,false,'cross-account refund denied');
-await db.query('select private.innova_finish($1,$2,false)',[u,op]);assert.equal((await summary()).balance,3000);
-await db.query('select private.innova_finish($1,$2,false)',[u,op]);assert.equal((await summary()).balance,3000,'refund exactly once');
-const success='10000000-0000-4000-8000-000000000002';await reserve(success);await db.query('select private.innova_finish($1,$2,true)',[u,success]);await db.query('select private.innova_finish($1,$2,false)',[u,success]);assert.equal((await summary()).balance,2900,'successful consumption immutable');
+await db.query('select private.innova_finish($1,$2,false)',[u,op]);assert.equal((await summary()).balance,400);
+await db.query('select private.innova_finish($1,$2,false)',[u,op]);assert.equal((await summary()).balance,400,'refund exactly once');
+const success='10000000-0000-4000-8000-000000000002';await reserve(success);await db.query('select private.innova_finish($1,$2,true)',[u,success]);await db.query('select private.innova_finish($1,$2,false)',[u,success]);assert.equal((await summary()).balance,380,'successful consumption immutable');
 assert.equal(await reserve('10000000-0000-4000-8000-000000000003',other),'unavailable','Free has no paid regenerations');
 for(let i=0;i<6;i++)await db.query(`insert into public.escaparates_campaigns(id,owner_id,name,slug) values($1,$2,'test',$3)`,[`20000000-0000-4000-8000-00000000000${i}`,u,'test-'+i]);
 await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub','${u}',false);`);
@@ -85,8 +85,8 @@ for(let i=6;i<11;i++) await db.query(`insert into public.escaparates_published(c
 await assert.rejects(db.query(`insert into public.escaparates_published(campaign_id,owner_id,slug,plan) values('20000000-0000-4000-8000-000000000005',$1,'test-5','FREE')`,[u]),/límite/);
 await db.exec('reset role;');
 assert.equal((await summary()).active,10);
-assert.equal((await db.query("select private.innova_reserve($1,'40000000-0000-4000-8000-000000000001','design',200) as s",[u])).rows[0].s,'price_changed');
-await db.query('update private.innova_accounts set balance=10 where owner_id=$1',[u]);
+assert.equal((await db.query("select private.innova_reserve($1,'40000000-0000-4000-8000-000000000001','free_image',200) as s",[u])).rows[0].s,'price_changed');
+await db.query('update private.innova_accounts set balance=10,included_balance=0 where owner_id=$1',[u]);
 assert.equal(await reserve('40000000-0000-4000-8000-000000000002'),'quota','insufficient credits rejected');
 await db.exec('set role innova_mvp_runtime;');
 assert.equal((await summary()).balance,10,'dedicated runtime can read its commercial accounts');
@@ -95,30 +95,30 @@ await assert.rejects(db.query('select * from auth.users'),/permission denied/);
 await assert.rejects(db.query('delete from private.innova_ledger'),/permission denied/);
 await assert.rejects(db.query('update public.escaparates_published set payload=payload'),/permission denied/);
 await db.exec('reset role;');
-// Included creation cannot be replayed under a different request ID or new campaign ID in Free.
+// Legacy initial generation is blocked until the approved trial entitlement is integrated.
 const first='60000000-0000-4000-8000-000000000001',campaign='70000000-0000-4000-8000-000000000001';
 const initial=async(id,c=campaign)=>(await db.query("select private.innova_reserve_v2($1,$2,'analysis',0,$3,true) as s",[other,id,c])).rows[0].s;
-assert.equal(await initial(first),'reserved');
+assert.equal(await initial(first),'unavailable');
 assert.equal(await initial('60000000-0000-4000-8000-000000000002'),'unavailable');
 await db.query('select private.innova_finish($1,$2,false)',[other,first]);
-const retry='60000000-0000-4000-8000-000000000003';assert.equal(await initial(retry),'reserved');
+const retry='60000000-0000-4000-8000-000000000003';assert.equal(await initial(retry),'unavailable');
 await db.query('select private.innova_finish($1,$2,true)',[other,retry]);
 assert.equal(await initial('60000000-0000-4000-8000-000000000004','70000000-0000-4000-8000-000000000002'),'unavailable');
 assert.equal((await db.query('select balance from private.innova_accounts where owner_id=$1',[other])).rows[0].balance,0);
-// Grace retains accrual and spending but rejects purchases; expired balance is frozen.
+// Grace does not grant additional credits or spending rights.
 await db.query("update private.innova_accounts set anchor=now()-interval '1 month',credited_period=0,paid_until=now()-interval '1 second',grace_until=now()+interval '1 month',cancel_at_end=false,balance=1000 where owner_id=$1",[u]);
-assert.equal((await summary()).status,'grace');assert.equal((await summary()).balance,2000);
+assert.equal((await summary()).balance,1000); // No grant at a boundary after paid access ends.
 assert.equal((await summary()).canTopUp,false);
-await assert.rejects(db.query("select private.innova_topup($1,'small','test-topup',$1)",[u]),/TOPUP_UNAVAILABLE/);
-assert.equal(await reserve('80000000-0000-4000-8000-000000000001'),'reserved');
+await assert.rejects(db.query("select private.innova_topup($1,'small','test-topup',$1)",[u]),/TOPUPS_DISABLED/);
+assert.equal(await reserve('80000000-0000-4000-8000-000000000001'),'unavailable');
 await db.query("update private.innova_accounts set grace_until=paid_until where owner_id=$1",[u]);
 assert.equal((await summary()).balanceFrozen,true);assert.equal(await reserve('80000000-0000-4000-8000-000000000002'),'unavailable');
 await db.query("update private.innova_accounts set paid_until=now()+interval '1 month',grace_until=null where owner_id=$1",[u]);
 const beforeTopup=(await summary()).balance;
-await db.query("select private.innova_topup($1,'small','test-topup',$1)",[u]);assert.equal((await summary()).balance,beforeTopup+200);
-await assert.rejects(db.query("select private.innova_topup($1,'small','test-topup',$1)",[u]),/unique/);
+await assert.rejects(db.query("select private.innova_topup($1,'small','test-topup',$1)",[u]),/TOPUPS_DISABLED/);assert.equal((await summary()).balance,beforeTopup);
+await assert.rejects(db.query("select private.innova_topup($1,'small','test-topup',$1)",[u]),/TOPUPS_DISABLED/);
 await db.exec('update private.innova_ai_budget set limit_micros=committed_micros');
-assert.equal(await reserve('80000000-0000-4000-8000-000000000003'),'budget');
+assert.equal((await db.query("select private.innova_reserve_v2($1,'80000000-0000-4000-8000-000000000003','metrics_analysis',20,null,false) as s",[u])).rows[0].s,'budget');
 // Document isolation, optimistic concurrency, explicit consent, immutable signing and atomic mail queue.
 const org='90000000-0000-4000-8000-000000000001';
 await db.query('insert into innova.organizations(id) values($1)',[org]);
@@ -138,5 +138,5 @@ assert.equal(doc.status,'signed');assert.match(doc.signature_hash,/^[a-f0-9]{64}
 await assert.rejects(action('update',{id:doc.id,revision:doc.revision,title:'Changed',content:'Changed'}),/IMMUTABLE/);
 assert.equal((await db.query('select count(*)::integer as n from innova.document_deliveries')).rows[0].n,1);
 await db.exec('set role authenticated');await assert.rejects(db.query('select * from innova.service_documents'),/permission denied/);await db.exec('reset role');
-console.log('PASS commercial and ERP SQL: 1/5/10, accrual, replay/refund, initial allowance, grace, frozen balance, topups, budget, document permissions, stale versions, consent, immutable signatures and unique mail queue.');
+console.log('PASS commercial and ERP SQL: 1/5/10, accrual, replay/refund, blocked legacy initial allowance, grace freeze, frozen balance, disabled topups, budget, document permissions, stale versions, consent, immutable signatures and unique mail queue.');
 } finally {await db.close();}

@@ -30,7 +30,9 @@ export default function Privacidad() {
                 </section>
                 <section>
                     <h2 className="text-white font-bold text-base mb-2">4. Conservación y retirada</h2>
-                    <p>Puedes retirar una publicación desde tu cuenta conservando su borrador. Las condiciones de contratación contemplan la conservación del contenido bloqueado durante tres años para permitir su recuperación, sin perjuicio de las solicitudes de supresión que procedan. Los justificantes contractuales y de facturación tienen su conservación propia. Para solicitar la eliminación de datos de la cuenta, escribe al contacto de privacidad.</p>
+                    <p>Puedes retirar una publicación conservando su borrador. La web y sus contenidos actuales se conservan mientras la cuenta esté abierta; las campañas compradas no caducan. Las campañas que pierdan el derecho de publicación se archivan durante 12 meses, con avisos de 30 y 7 días antes del borrado y opción de descargar su contenido.</p>
+                    <p>Las consultas del formulario contienen nombre, un medio de contacto y mensaje, sin adjuntos ni alta automática en publicidad. Se conservan como máximo 12 meses desde su recepción, o menos si dejan de ser necesarias. Consultarlas o exportarlas no reinicia ese plazo. Si el negocio pierde el servicio de almacenamiento, dispone de hasta 30 días para consultar, exportar o borrar los datos, sin prolongar una caducidad anterior. Las campañas compradas conservan sus derechos de almacenamiento.</p>
+                    <p>Los justificantes contractuales y de facturación tienen su conservación propia. Para solicitar la eliminación de datos de la cuenta, escribe al contacto de privacidad. El plazo operativo previsto es de un máximo de 30 días, sin demora innecesaria, separando los datos sujetos a conservación legal.</p>
                 </section>
                 <section>
                     <h2 className="text-white font-bold text-base mb-2">5. Tus derechos</h2>

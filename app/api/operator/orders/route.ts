@@ -11,10 +11,13 @@ export async function POST(req:Request){
   const [o]=await tx`select * from private.innova_orders where id=${b.id}::uuid for update`;
   if(!o||o.mode!=='manual'||!['requested','awaiting_payment','payment_review'].includes(o.state))throw Error();
   if(b.action==='instructions'&&typeof b.instructions==='string'&&b.instructions.trim().length>=10&&b.instructions.length<=4000){
+   if(o.kind==='plan'){const [q]=await tx`select private.innova_plan_quote(${o.owner_id}::uuid,${o.product},${o.billing}) as price`;if(q.price.netCents!==o.net_cents||q.price.taxCents!==o.tax_cents)throw Error('PRICE_CHANGED');}
    await tx`update private.innova_orders set instructions=${b.instructions.trim()},state=case when state='payment_review' then state else 'awaiting_payment' end,updated_at=now() where id=${o.id}::uuid`;
-  }else if(b.action==='fulfill'&&typeof b.reference==='string'&&b.reference.length>=3&&b.reference.length<=160){
+  }else if(b.action==='verify_campaign_payment'&&o.kind==='campaign'&&b.paymentVerified===true&&typeof b.reference==='string'&&b.reference.trim().length>=3&&b.reference.length<=160){
+   await tx`select private.innova_verify_campaign_order(${o.id}::uuid,${b.reference.trim()},${a.userId!}::uuid)`;
+  }else if(b.action==='fulfill'&&o.kind!=='campaign'&&typeof b.reference==='string'&&b.reference.length>=3&&b.reference.length<=160){
    // A status change alone must never manufacture a payment or entitlement.
-   const proof=o.kind==='plan'?await tx`select reference from private.innova_contracts where owner_id=${o.owner_id}::uuid and reference=${b.reference} and plan=${o.product} and billing=${o.billing} and period_end>now()` :await tx`select reference from private.innova_ledger where owner_id=${o.owner_id}::uuid and reference=${'topup:'+b.reference} and amount=${o.credits}`;
+   const proof=o.kind==='plan'?await tx`select reference from private.innova_contracts where owner_id=${o.owner_id}::uuid and reference=${b.reference} and plan=${o.product} and billing=${o.billing} and net_cents=${o.net_cents} and tax_cents=${o.tax_cents} and period_end>now()` :await tx`select reference from private.innova_ledger where owner_id=${o.owner_id}::uuid and reference=${'topup:'+b.reference} and amount=${o.credits}`;
    if(!proof.length)throw Error();
    const duplicate=await tx`select id from private.innova_orders where mode='manual' and fulfillment_reference=${b.reference} and state='fulfilled'`;
    if(duplicate.length)throw Error();

@@ -28,6 +28,8 @@ export async function withAIQuota(userId: string, requestId: string, run: () => 
   const unavailable = () => NextResponse.json({ error:'La IA no está disponible ahora. Puedes continuar sin IA.', code:'AI_UNAVAILABLE' },{ status:503 });
   let reserved = false;
   const credits = process.env.INNOVA_CREDITS_ENABLED === 'true';
+  // A missing rollout flag must fail closed, never reopen the retired free allowance.
+  if (!credits) return unavailable();
   if (credits && (!Number.isSafeInteger(expectedCost) || Number(expectedCost) < 0 || (initial && !/^[0-9a-f-]{36}$/i.test(campaignId||'')))) return NextResponse.json({error:'Consulta y confirma el coste antes de analizar la foto.',code:'AI_PRICE_CONFIRMATION_REQUIRED'},{status:409});
   try {
     const sql=db();
@@ -36,7 +38,7 @@ export async function withAIQuota(userId: string, requestId: string, run: () => 
       const code=rows[0]?.state;
       if(code==='price_changed')return NextResponse.json({error:'El coste ha cambiado. Consulta de nuevo la tarifa.',code:'AI_PRICE_CONFIRMATION_REQUIRED'},{status:409});
       if(code==='unavailable')return NextResponse.json({error:'Tu tarifa de IA todavía no está activada. Puedes seguir editando manualmente.',code:'AI_UNAVAILABLE'},{status:503});
-      return NextResponse.json({error: code==='quota'?(credits?'No tienes créditos suficientes. Puedes solicitar una recarga o seguir editando manualmente.':'Has alcanzado el límite mensual de IA. Puedes seguir editando sin IA.'):'Espera antes de volver a intentarlo.',code:code==='quota'?'AI_QUOTA':'AI_RETRY'}, {status:code==='duplicate'?409:429});
+      return NextResponse.json({error: code==='quota'?(credits?'No tienes créditos suficientes. Puedes esperar tu siguiente asignación o seguir editando manualmente.':'Has alcanzado el límite mensual de IA. Puedes seguir editando sin IA.'):'Espera antes de volver a intentarlo.',code:code==='quota'?'AI_QUOTA':'AI_RETRY'}, {status:code==='duplicate'?409:429});
     }
     reserved=true;
     let response:Response;

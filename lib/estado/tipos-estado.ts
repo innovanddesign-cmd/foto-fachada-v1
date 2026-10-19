@@ -250,7 +250,7 @@ export interface CartelGenerado {
 
 export interface DatosEscaparate {
     /** Visual tier; optional for compatibility with existing saved campaigns. */
-    planVisual?: 'FREE' | 'PRO' | 'ESCAPARATE';
+    planVisual?: 'FREE' | 'BASIC' | 'PRO' | 'ESCAPARATE';
     /** Titular principal */
     titularPrincipal: string;
 

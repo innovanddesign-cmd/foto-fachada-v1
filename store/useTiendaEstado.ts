@@ -471,18 +471,8 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
         },
 
         generarInsights: (campañaId) => {
-            // Lógica preliminar de insights (se expandirá con IA real)
-            const insightDemo: InsightIA = {
-                id: `ins_${Date.now()}`,
-                tipo: 'CONSEJO',
-                titulo: 'Optimiza tu QR',
-                descripcion: 'Hemos detectado que el 60% de tus escaneos ocurren por la tarde. Considera una oferta "Happy Hour".',
-                impactoEstimado: 'ALTO'
-            };
-
-            set((state) => ({
-                insightsIA: [...state.insightsIA, insightDemo]
-            }));
+            // Never manufacture findings. Real reports are requested explicitly from the server.
+            set({ insightsIA: [] });
         },
 
         cargarPorSlug: async (slug: string) => {

@@ -7,21 +7,24 @@ export async function POST(req: Request) {
     const raw=await req.text(); if(raw.length>16000) return NextResponse.json({error:'Solicitud demasiado grande'},{status:413});
     const b=JSON.parse(raw);
     const uuid=/^[0-9a-f-]{36}$/i;
-    if (!uuid.test(b.ownerId||'') || !['PRO','BUSINESS','ENTERPRISE'].includes(b.plan) || !['monthly','annual'].includes(b.billing)
+    if (!uuid.test(b.ownerId||'') || !['BASIC','PRO','BUSINESS','ENTERPRISE'].includes(b.plan) || !['monthly','annual'].includes(b.billing)
       || !['bizum','transfer','cash','card'].includes(b.paymentMethod) || typeof b.reference!=='string' || b.reference.length<3 || b.reference.length>160
       || typeof b.documentReference!=='string' || b.documentReference.length<3 || b.documentReference.length>500
       || !Number.isSafeInteger(b.netCents) || b.netCents<0 || !Number.isSafeInteger(b.taxCents) || b.taxCents<0
-      || !Number.isFinite(Date.parse(b.periodStart)) || !Number.isFinite(Date.parse(b.periodEnd)) || Date.parse(b.periodEnd)<=Date.parse(b.periodStart)||Date.parse(b.periodStart)>Date.now()
+      || !Number.isFinite(Date.parse(b.periodStart)) || !Number.isFinite(Date.parse(b.periodEnd)) || Date.parse(b.periodEnd)<=Date.parse(b.periodStart)
       || (b.monthlyCredits!=null && (!Number.isSafeInteger(b.monthlyCredits)||b.monthlyCredits<0||b.monthlyCredits>1000000))
       || (b.operationCost!=null && (!Number.isSafeInteger(b.operationCost)||b.operationCost<1||b.operationCost>1000000))
       || (b.plan==='ENTERPRISE' && (!Number.isSafeInteger(b.activeLimit)||b.activeLimit<1||b.activeLimit>10000)))
       return NextResponse.json({error:'Revisa los datos del contrato y las condiciones aprobadas.'},{status:400});
     if(b.paymentMethod==='cash' && b.netCents+b.taxCents>=100000) return NextResponse.json({error:'Esta operación requiere un medio distinto de efectivo.'},{status:400});
-    if(b.plan==='PRO'||b.plan==='BUSINESS'){b.monthlyCredits=1000;b.operationCost=b.plan==='PRO'?200:100;}
+    if(b.plan==='BASIC'&&(b.netCents!==(b.billing==='annual'?6000:600)||b.taxCents!==Math.round(b.netCents*.21)))return NextResponse.json({error:'BASIC cuesta 6 €/mes o 60 €/año, más IVA.'},{status:400});
+    if(['BASIC','PRO','BUSINESS'].includes(b.plan)){b.monthlyCredits=b.plan==='BASIC'?100:b.plan==='PRO'?200:400;b.operationCost=5;}
     const sql=commercialDB();
     await sql.begin(async tx=>{
       await tx`select pg_advisory_xact_lock(hashtextextended(${b.ownerId}::text,813))`;
       await tx`select private.innova_accrue(${b.ownerId}::uuid)`;
+      const [previous]=await tx`select plan,billing,paid_until from private.innova_accounts where owner_id=${b.ownerId}::uuid`;
+      if(Date.parse(b.periodStart)>Date.now()&&(!previous||previous.plan!==b.plan||previous.billing!==b.billing||Date.parse(previous.paid_until)!==Date.parse(b.periodStart)))throw Error('INVALID_FUTURE_PERIOD');
       const existing=await tx`select owner_id from private.innova_contracts where reference=${b.reference}`;
       if(existing.length) throw new Error('DUPLICATE');
       await tx`insert into private.innova_contracts(owner_id,reference,plan,billing,net_cents,tax_cents,payment_method,paid_at,period_start,period_end,accepted_document_ref,recorded_by)

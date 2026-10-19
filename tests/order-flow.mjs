@@ -52,5 +52,26 @@ assert.equal((await server.accountSummary(u)).plan,'FREE','customer claiming pay
 await db.exec('set role authenticated');await assert.rejects(db.query('select * from private.innova_orders'),/permission denied/);await db.exec('reset role');
 const safe=load('lib/auth/return-path.ts',{}).returnPath;
 assert.equal(safe('//evil.test'),'/dashboard');assert.equal(safe('/checkout?plan=PRO'),'/checkout?plan=PRO');assert.equal(safe('/checkout\\evil'),'/dashboard');
+const campaign='20000000-0000-4000-8000-000000000001';
+await db.query("insert into public.escaparates_campaigns(id,owner_id,name) values($1,$2,'Purchase test')",[campaign,u]);
+const experience=load('app/api/experience/route.ts',{'next/server':{NextResponse:Response},'@/lib/ai/access':{requireAIUser:async()=>owner?{userId:owner}:{response:Response.json({error:'auth'},{status:401})}},'@/lib/commercial/server':server});
+assert.equal((await experience.POST(req({action:'campaign_trial',campaignId:campaign},'POST','https://evil.test'))).status,403);
+owner=other;assert.equal((await experience.POST(req({action:'campaign_trial',campaignId:campaign}))).status,409);owner=u;
+assert.equal((await experience.POST(req({action:'campaign_trial',campaignId:campaign}))).status,200);
+assert.equal((await experience.POST(req({action:'campaign_trial',campaignId:campaign}))).status,200,'Retry keeps original trial');
+const buying={kind:'campaign',product:campaign,billing:'once',mode:'manual',requestId:crypto.randomUUID(),netCents:1};
+owner=other;assert.equal((await route.POST(req(buying))).status,409);owner=u;
+const purchase=(await (await route.POST(req(buying))).json()).order;assert.equal(purchase.net_cents,4000);assert.equal(purchase.tax_cents,840);
+assert.equal((await (await route.POST(req(buying))).json()).order.id,purchase.id);
+operator=false;assert.equal((await staff.POST(req({id:purchase.id,action:'verify_campaign_payment',reference:'proof-campaign',paymentVerified:true}))).status,403);
+operator=true;assert.equal((await staff.POST(req({id:purchase.id,action:'verify_campaign_payment',reference:'proof-campaign',paymentVerified:false}))).status,409);
+assert.equal((await staff.POST(req({id:purchase.id,action:'verify_campaign_payment',reference:'proof-campaign',paymentVerified:true}))).status,200);
+assert.equal((await server.accountSummary(u)).purchasedCampaignIds[0],campaign);
+const basic=(await (await route.POST(req({kind:'plan',product:'BASIC',billing:'annual',mode:'manual',requestId:crypto.randomUUID()}))).json()).order;assert.equal(basic.net_cents,6000);assert.equal(basic.tax_cents,1260);
+const contracts=load('app/api/operator/contracts/route.ts',{'next/server':{NextResponse:Response},'@/lib/commercial/operator':{requireOperator:async()=>({userId:other})},'@/lib/commercial/server':server});
+assert.equal((await contracts.POST(req({ownerId:u,plan:'BASIC',billing:'annual',paymentMethod:'transfer',reference:'basic-proof',documentReference:'accepted-basic-contract',netCents:6000,taxCents:1260,periodStart:new Date(Date.now()-60000).toISOString(),periodEnd:new Date(Date.now()+365*86400000).toISOString()}))).status,200);
+assert.equal((await server.accountSummary(u)).plan,'BASIC');assert.equal((await server.accountSummary(u)).monthlyCredits,100);
+console.log('PASS experience routes: owner and origin checks, trial replay, server-priced campaign purchase, operator verification, BASIC checkout and actual activation.');
+
 console.log('PASS checkout: server pricing, CSRF, authentication, isolation, replay, failed/successful test payment, no production entitlements, Free top-up denial, operator proof and private-table permissions.');
 }finally{await db.close();}
