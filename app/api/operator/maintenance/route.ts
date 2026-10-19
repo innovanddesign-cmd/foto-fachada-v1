@@ -9,6 +9,7 @@ export async function POST(req:Request){
  if(process.env.INNOVA_MAINTENANCE_ENABLED!=='true')return NextResponse.json({error:'Mantenimiento pendiente de configurar y validar.'},{status:503,headers});
  try{
   const raw=await req.text();if(raw.length>1000)throw Error();const body=JSON.parse(raw);const sql=commercialDB();
+  if(body.action==='email_status'){const [result]=await sql`select private.innova_email_status() as result`;return NextResponse.json(result,{headers});}
   if(body.action==='retention'){const [result]=await sql`select private.innova_process_retention() as result`;return NextResponse.json(result,{headers});}
   if(body.action==='prepare_contact_emails'){const [result]=await sql`select private.innova_prepare_contact_emails() as prepared`;return NextResponse.json({...result,sent:0},{headers});}
   if(body.action==='scheduled_publication'){
