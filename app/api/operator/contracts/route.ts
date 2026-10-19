@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       || !['bizum','transfer','cash','card'].includes(b.paymentMethod) || typeof b.reference!=='string' || b.reference.length<3 || b.reference.length>160
       || typeof b.documentReference!=='string' || b.documentReference.length<3 || b.documentReference.length>500
       || !Number.isSafeInteger(b.netCents) || b.netCents<0 || !Number.isSafeInteger(b.taxCents) || b.taxCents<0
-      || !Number.isFinite(Date.parse(b.periodStart)) || !Number.isFinite(Date.parse(b.periodEnd)) || Date.parse(b.periodEnd)<=Date.parse(b.periodStart)||Date.parse(b.periodStart)>Date.now()
+      || !Number.isFinite(Date.parse(b.periodStart)) || !Number.isFinite(Date.parse(b.periodEnd)) || Date.parse(b.periodEnd)<=Date.parse(b.periodStart)
       || (b.monthlyCredits!=null && (!Number.isSafeInteger(b.monthlyCredits)||b.monthlyCredits<0||b.monthlyCredits>1000000))
       || (b.operationCost!=null && (!Number.isSafeInteger(b.operationCost)||b.operationCost<1||b.operationCost>1000000))
       || (b.plan==='ENTERPRISE' && (!Number.isSafeInteger(b.activeLimit)||b.activeLimit<1||b.activeLimit>10000)))
@@ -23,6 +23,8 @@ export async function POST(req: Request) {
     await sql.begin(async tx=>{
       await tx`select pg_advisory_xact_lock(hashtextextended(${b.ownerId}::text,813))`;
       await tx`select private.innova_accrue(${b.ownerId}::uuid)`;
+      const [previous]=await tx`select plan,billing,paid_until from private.innova_accounts where owner_id=${b.ownerId}::uuid`;
+      if(Date.parse(b.periodStart)>Date.now()&&(!previous||previous.plan!==b.plan||previous.billing!==b.billing||Date.parse(previous.paid_until)!==Date.parse(b.periodStart)))throw Error('INVALID_FUTURE_PERIOD');
       const existing=await tx`select owner_id from private.innova_contracts where reference=${b.reference}`;
       if(existing.length) throw new Error('DUPLICATE');
       await tx`insert into private.innova_contracts(owner_id,reference,plan,billing,net_cents,tax_cents,payment_method,paid_at,period_start,period_end,accepted_document_ref,recorded_by)

@@ -14,8 +14,8 @@ export function orderPrice(input: OrderInput) {
   if(input.kind==='campaign')return {netCents:4000,taxCents:840,credits:0};
   const pack = CREDIT_POLICY.packs.find(p=>p.id===input.product);
   const plan = PLANS[input.product as 'BASIC'|'PRO'|'BUSINESS'];
-  // Annual launch eligibility is confirmed with the customer before accepting payment.
-  const netCents = input.kind === 'credits' ? pack!.netCents : (input.billing === 'annual' ? plan.launchAnnual : plan.monthly) * 100;
+  // Public fallback is the normal price. Only the server can quote a launch concession.
+  const netCents = input.kind === 'credits' ? pack!.netCents : (input.billing === 'annual' ? plan.annual : plan.monthly) * 100;
   return { netCents, taxCents: Math.round(netCents * .21), credits: pack?.credits || 0 };
 }
 export const ORDER_STATES: Record<string,string> = { requested:'Solicitud recibida', awaiting_payment:'Pendiente de pago', payment_review:'Pago comunicado · pendiente de verificar', fulfilled:'Activado', cancelled:'Cancelado', test_succeeded:'Prueba completada · sin cobro', test_failed:'Pago de prueba rechazado' };

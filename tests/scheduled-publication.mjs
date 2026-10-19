@@ -1,0 +1,75 @@
+import { PGlite } from '@electric-sql/pglite';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+import vm from 'node:vm';
+const db=new PGlite();
+try {
+await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
+ create schema innova; create table innova.organizations(id uuid primary key); create table innova.organization_memberships(organization_id uuid,user_email text,role text,active boolean);
+ create schema auth; create table auth.users(id uuid primary key,email text);
+ create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+ grant usage on schema auth to anon,authenticated,service_role; grant execute on function auth.uid() to public;
+ create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+ create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);
+ create function storage.foldername(text) returns text[] language sql immutable as $$select string_to_array($1,'/')$$;
+ grant usage on schema public to anon,authenticated,service_role;`);
+await db.exec(fs.readFileSync('supabase/escaparates-setup.sql','utf8'));
+for(const name of fs.readdirSync('supabase/migrations').filter(n=>n.endsWith('.sql')).sort())await db.exec(fs.readFileSync('supabase/migrations/'+name,'utf8'));
+const u='00000000-0000-4000-8000-000000000001',v='00000000-0000-4000-8000-000000000002';
+await db.query('insert into auth.users(id) values($1),($2)',[u,v]);
+await db.query("insert into private.innova_accounts(owner_id,plan,paid_until) values($1,'PRO',now()+interval '1 year')",[u]);
+const ids=Array.from({length:7},(_,i)=>`20000000-0000-4000-8000-${String(i).padStart(12,'0')}`);
+for(let i=0;i<ids.length;i++)await db.query("insert into public.escaparates_campaigns(id,owner_id,name,snapshot) values($1,$2,'Schedule','{}')",[ids[i],u]);
+const payload={datosEscaparate:{titularPrincipal:'Confirmed version'}};
+const schedule=async(i,owner=u,zone='Europe/Madrid',data=payload)=>(await db.query("select private.innova_schedule_publication($1,$2,$3,$4,now()+interval '1 day',$5) r",[owner,ids[i],'scheduled-'+i,data,zone])).rows[0].r;
+const due=async(i,ago='1 minute')=>db.query(`update private.innova_publication_schedule set due_at=now()-interval '${ago}',next_attempt_at=now()-interval '1 second' where campaign_id=$1`,[ids[i]]);
+const run=async()=>(await db.query('select private.innova_run_scheduled_publication() r')).rows[0].r;
+await assert.rejects(schedule(0,v),/CAMPAIGN_NOT_FOUND/);
+await assert.rejects(schedule(0,u,'Invalid/Zone'),/INVALID_SCHEDULE_TIME/);
+await assert.rejects(schedule(0,u,'Europe/Madrid',null),/INVALID_PUBLICATION/);
+const first=await schedule(0);assert.equal(await run(),null,'never early');
+await db.query("update public.escaparates_campaigns set snapshot='{\"datosEscaparate\":{\"titularPrincipal\":\"Later draft\"}}' where id=$1",[ids[0]]);
+await due(0);await db.exec('set role innova_mvp_runtime');assert.equal((await run()).state,'published');await db.exec('reset role');
+assert.equal((await db.query('select payload from public.escaparates_published where campaign_id=$1',[ids[0]])).rows[0].payload.datosEscaparate.titularPrincipal,'Confirmed version');
+assert.equal(await run(),null);assert.equal((await db.query('select count(*)::int n from private.innova_publication_notices')).rows[0].n,1);
+const second=await schedule(0);assert.notEqual(first,second);await db.query("update public.escaparates_published set payload=payload where campaign_id=$1",[ids[0]]);
+assert.equal((await db.query('select state from private.innova_publication_schedule where campaign_id=$1',[ids[0]])).rows[0].state,'cancelled','Publish now cancels future copy');
+await schedule(1);await due(1);await db.query("update private.innova_accounts set paid_until=now()-interval '1 day' where owner_id=$1",[u]);
+assert.equal((await run()).reason,'PERMISSION_LOST');assert.equal((await db.query('select count(*)::int n from public.escaparates_published where campaign_id=$1',[ids[1]])).rows[0].n,0);
+await assert.rejects(schedule(1),/SCHEDULING_NOT_INCLUDED/);
+await db.query("update private.innova_accounts set paid_until=now()+interval '1 year' where owner_id=$1",[u]);
+await schedule(1);await due(1,'16 minutes');assert.equal((await run()).reason,'MISSED_WINDOW');
+await schedule(1);assert.equal((await db.query('select private.innova_cancel_schedule($1,$2) r',[v,ids[1]])).rows[0].r,false);assert.equal((await db.query('select private.innova_cancel_schedule($1,$2) r',[u,ids[1]])).rows[0].r,true);
+await schedule(6);
+for(let i=1;i<=4;i++)await db.query("insert into public.escaparates_published(campaign_id,owner_id,slug,payload,plan) values($1,$2,$3,$4,'PRO')",[ids[i],u,'manual-'+i,payload]);
+await due(6);assert.equal((await run()).reason,'CAPACITY_REACHED');assert.equal((await db.query('select count(*)::int n from public.escaparates_published')).rows[0].n,5);
+await assert.rejects(schedule(5),/CAPACITY_REACHED/);
+await db.query('delete from public.escaparates_published where campaign_id=$1',[ids[4]]);
+await schedule(5);await due(5);
+await db.exec(`create function public.test_transient() returns trigger language plpgsql as $$begin raise exception using errcode='40001',message='temporary'; end$$; create trigger test_transient before insert on public.escaparates_published for each row execute function public.test_transient();`);
+for(let i=0;i<4;i++){
+ const r=await run();assert.equal(r.state,i<3?'pending':'failed');
+ if(i<3){assert.equal(await run(),null,'retry backs off');await db.query("update private.innova_publication_schedule set next_attempt_at=now()-interval '1 second' where campaign_id=$1",[ids[5]]);}
+}
+assert.equal((await db.query('select attempts from private.innova_publication_schedule where campaign_id=$1',[ids[5]])).rows[0].attempts,4,'initial plus three retries');
+await db.exec('drop trigger test_transient on public.escaparates_published; drop function public.test_transient();');
+await schedule(5);await db.query('delete from public.escaparates_campaigns where id=$1',[ids[5]]);assert.equal((await db.query('select count(*)::int n from private.innova_publication_schedule where campaign_id=$1',[ids[5]])).rows[0].n,0);
+await db.exec('set role authenticated');await assert.rejects(db.query('select private.innova_run_scheduled_publication()'),/permission denied/);await db.exec('reset role');
+const sql=async(parts,...values)=>{let query=parts[0];values.forEach((_,i)=>{query+='$'+(i+1)+parts[i+1]});return(await db.query(query,values)).rows;};
+let owner=u;const env={INNOVA_SCHEDULING_ENABLED:'false'};
+function load(file,deps){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require:n=>deps[n],Response,URL,Intl,process:{env}});return exports;}
+const route=load('app/api/publication-schedule/route.ts',{'next/server':{NextResponse:Response},'@/lib/ai/access':{requireAIUser:async()=>owner?{userId:owner}:{response:Response.json({error:'auth'},{status:401})}},'@/lib/commercial/server':{commercialDB:()=>sql},'@/lib/supabase/sanitize':load('lib/supabase/sanitize.ts',{})});
+const body={action:'schedule',campaignId:ids[6],slug:'route-schedule',payload:{...payload,privateAnalysis:'never public'},confirmed:true,dueAt:new Date(Date.now()+86400000).toISOString(),timezone:'Europe/Madrid'};
+const req=(b,origin='https://example.test')=>new Request('https://example.test/api/publication-schedule',{method:'POST',headers:{origin},body:JSON.stringify(b)});
+assert.equal((await route.POST(req(body))).status,503);env.INNOVA_SCHEDULING_ENABLED='true';
+assert.equal((await route.POST(req(body,'https://evil.test'))).status,403);
+owner=null;assert.equal((await route.POST(req(body))).status,401);owner=v;assert.equal((await route.POST(req(body))).status,409);owner=u;
+assert.equal((await route.POST(req({...body,confirmed:false}))).status,409);
+assert.equal((await route.POST(req({...body,dueAt:'2027-01-01T12:00'}))).status,409,'ambiguous local time rejected');
+assert.equal((await route.POST(req(body))).status,200);
+assert.equal((await db.query('select payload from private.innova_publication_schedule where campaign_id=$1',[ids[6]])).rows[0].payload.privateAnalysis,undefined);
+owner=v;assert.equal((await (await route.GET(req({}))).json()).schedules.length,0);owner=u;
+env.INNOVA_SCHEDULING_ENABLED='false';assert.equal((await (await route.POST(req({action:'cancel',campaignId:ids[6]}))).json()).cancelled,true,'cancellation remains available while scheduling disabled');
+console.log('PASS scheduling SQL and API: frozen version, owner/plan/time validation, no early/late publication, cancellation, downgrade/capacity recheck, four attempts maximum, backoff, notice deduplication, deletion, private runtime permissions, feature gate, explicit confirmation and sanitization.');
+}finally{await db.close();}

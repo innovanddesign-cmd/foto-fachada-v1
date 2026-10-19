@@ -33,6 +33,10 @@ export async function POST(req:Request) {
       if(count.n>=20)throw Error('LIMIT');
       const [pending]=await tx`select * from private.innova_orders where owner_id=${a.userId!}::uuid and mode=${selection.mode} and kind=${selection.kind} and product=${selection.product} and billing=${selection.billing} and state in ('requested','awaiting_payment','payment_review')`;
       if(pending)return pending;
+      if(selection.kind==='plan'){
+        const [quoted]=await tx`select private.innova_plan_quote(${a.userId!}::uuid,${selection.product},${selection.billing}) as price`;
+        price.netCents=quoted.price.netCents;price.taxCents=quoted.price.taxCents;
+      }
       const [created]=await tx`insert into private.innova_orders(owner_id,request_id,kind,product,billing,mode,net_cents,tax_cents,credits) values(${a.userId!}::uuid,${b.requestId}::uuid,${selection.kind},${selection.product},${selection.billing},${selection.mode},${price.netCents},${price.taxCents},${price.credits}) returning *`;
       return created;
     });
