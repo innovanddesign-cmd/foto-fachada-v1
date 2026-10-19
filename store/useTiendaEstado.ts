@@ -266,7 +266,31 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
             set({
                 redesSociales: nuevasRedes,
                 ultimaModificacion: obtenerMarcaTiempo(),
-…198 tokens truncated…f (mensaje) {
+            });
+
+            registrarCambio(
+                { redesSociales: anterior.redesSociales },
+                { redesSociales: nuevasRedes },
+                'actualizarRedes'
+            );
+        },
+
+        setLogoStatus: (status: LogoStatus) => {
+            const anterior = get();
+            set({
+                logoStatus: status,
+                ultimaModificacion: obtenerMarcaTiempo(),
+            });
+            registrarCambio(
+                { logoStatus: anterior.logoStatus },
+                { logoStatus: status },
+                'setLogoStatus'
+            );
+        },
+
+        mostrarExito: (mensaje: string | null) => {
+            set({ mensajeExito: mensaje });
+            if (mensaje) {
                 setTimeout(() => set({ mensajeExito: null }), 4000);
             }
         },
