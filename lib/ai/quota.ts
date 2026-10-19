@@ -36,7 +36,7 @@ export async function withAIQuota(userId: string, requestId: string, run: () => 
       const code=rows[0]?.state;
       if(code==='price_changed')return NextResponse.json({error:'El coste ha cambiado. Consulta de nuevo la tarifa.',code:'AI_PRICE_CONFIRMATION_REQUIRED'},{status:409});
       if(code==='unavailable')return NextResponse.json({error:'Tu tarifa de IA todavía no está activada. Puedes seguir editando manualmente.',code:'AI_UNAVAILABLE'},{status:503});
-      return NextResponse.json({error: code==='quota'?(credits?'No tienes créditos suficientes. Puedes solicitar una recarga o seguir editando manualmente.':'Has alcanzado el límite mensual de IA. Puedes seguir editando sin IA.'):'Espera antes de volver a intentarlo.',code:code==='quota'?'AI_QUOTA':'AI_RETRY'}, {status:code==='duplicate'?409:429});
+      return NextResponse.json({error: code==='quota'?(credits?'No tienes créditos suficientes. Puedes esperar tu siguiente asignación o seguir editando manualmente.':'Has alcanzado el límite mensual de IA. Puedes seguir editando sin IA.'):'Espera antes de volver a intentarlo.',code:code==='quota'?'AI_QUOTA':'AI_RETRY'}, {status:code==='duplicate'?409:429});
     }
     reserved=true;
     let response:Response;

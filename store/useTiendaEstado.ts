@@ -266,31 +266,7 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
             set({
                 redesSociales: nuevasRedes,
                 ultimaModificacion: obtenerMarcaTiempo(),
-            });
-
-            registrarCambio(
-                { redesSociales: anterior.redesSociales },
-                { redesSociales: nuevasRedes },
-                'actualizarRedes'
-            );
-        },
-
-        setLogoStatus: (status: LogoStatus) => {
-            const anterior = get();
-            set({
-                logoStatus: status,
-                ultimaModificacion: obtenerMarcaTiempo(),
-            });
-            registrarCambio(
-                { logoStatus: anterior.logoStatus },
-                { logoStatus: status },
-                'setLogoStatus'
-            );
-        },
-
-        mostrarExito: (mensaje: string | null) => {
-            set({ mensajeExito: mensaje });
-            if (mensaje) {
+…198 tokens truncated…f (mensaje) {
                 setTimeout(() => set({ mensajeExito: null }), 4000);
             }
         },
@@ -471,18 +447,8 @@ export const useTiendaEstado = create<TiendaCompleta>()((set, get) => {
         },
 
         generarInsights: (campañaId) => {
-            // Lógica preliminar de insights (se expandirá con IA real)
-            const insightDemo: InsightIA = {
-                id: `ins_${Date.now()}`,
-                tipo: 'CONSEJO',
-                titulo: 'Optimiza tu QR',
-                descripcion: 'Hemos detectado que el 60% de tus escaneos ocurren por la tarde. Considera una oferta "Happy Hour".',
-                impactoEstimado: 'ALTO'
-            };
-
-            set((state) => ({
-                insightsIA: [...state.insightsIA, insightDemo]
-            }));
+            // Never manufacture findings. Real reports are requested explicitly from the server.
+            set({ insightsIA: [] });
         },
 
         cargarPorSlug: async (slug: string) => {

@@ -1,0 +1,44 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript');
+const cache={};
+function load(name){if(cache[name])return cache[name];const exp={};cache[name]=exp;vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/commercial/'+name+'.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{exports:exp,require:p=>load(p.replace('./',''))});return exp;}
+const p=load('approved-policy'),m=load('metrics-policy'),n=load('notification-policy');
+assert.equal(p.planPrice('BUSINESS','annual'),38000);
+assert.equal(p.planPrice('BUSINESS','annual',true),19000);
+assert.equal(p.planPrice('BUSINESS','monthly',true),3800);
+assert.equal(p.APPROVED_POLICY.launchCustomers,100);
+for(const [plan,quota,cap] of [['BASIC',100,200],['PRO',200,400],['BUSINESS',400,800]]){
+ assert.equal(p.grantMonthlyCredits(plan,0),quota);
+ assert.equal(p.grantMonthlyCredits(plan,cap-5),5);
+ assert.equal(p.grantMonthlyCredits(plan,cap+100),0,'Never remove existing balance');
+ assert.equal(p.operationCost(plan,'text'),5);
+ assert.equal(p.operationCost(plan,'image'),20);
+}
+assert.equal(p.operationCost('FREE','text'),null);
+assert.equal(p.operationCost('PRO','metrics_analysis'),null);
+assert.equal(p.operationCost('BUSINESS','metrics_comparison'),40);
+assert.throws(()=>p.grantMonthlyCredits('PRO',-1));
+const id='11111111-1111-4111-8111-111111111111';
+const selection={campaignIds:[id],from:'2026-01-01',to:'2026-03-31'};
+assert.equal(m.analysisSelection(selection).days,90);
+assert.equal(m.analysisSelection(selection).credits,20);
+assert.throws(()=>m.analysisSelection({...selection,to:'2026-04-01'}));
+assert.throws(()=>m.analysisSelection({...selection,from:'2026-02-30'}));
+assert.throws(()=>m.analysisSelection({...selection,campaignIds:[id,id]}));
+const row={campaignId:id,name:'Demo',sessions:0,interactingSessions:0,contactSessions:0,clicks:0,contacts:0};
+assert.equal(m.summarizeMetrics(row).interactionRate,null);
+assert.throws(()=>m.metricsPrompt([row]),/NO_DATA/);
+assert.throws(()=>m.summarizeMetrics({...row,interactingSessions:1}));
+const prompt=m.metricsPrompt([{...row,sessions:5,leadEmail:'private@example.test',message:'private message'}]);
+assert.ok(!prompt.includes('private@example.test')&&!prompt.includes('private message')&&!prompt.includes(id),'Only allowed aggregate fields reach the model');
+assert.throws(()=>m.validateAnalysis({summary:'ok',observations:[],limitations:[],recommendations:['a','b','c','d']}));
+assert.equal(n.emailDecision('contact','off',1000,null).send,false);
+assert.equal(n.emailDecision('payment_failure','off',1000,null).send,true);
+assert.equal(n.emailDecision('contact','immediate',1000,500).at,900500);
+assert.equal(n.emailDecision('contact','daily',1000,null).daily,true);
+assert.equal(n.quotaState(80,0).alert,80);
+assert.equal(n.quotaState(90,0).alert,90);
+assert.equal(n.quotaState(100,0).blocked,true);
+assert.equal(n.quotaState(0,3000).upgradeRequired,true);
+assert.throws(()=>n.quotaState(-1,0));
+assert.ok(!n.safeEmail('contact','Demo\r\nInjected').text.includes('\n'));
+console.log('Approved launch policy: prices, capped grants, AI permissions, privacy, periods and email quotas passed.');

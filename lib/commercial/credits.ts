@@ -1,7 +1,7 @@
 /** Customer credits are not provider tokens. Prices exclude VAT. */
 export const CREDIT_POLICY = {
-  version: '2026-10-10', monthly: { FREE: 0, PRO: 1000, BUSINESS: 1000 },
-  costs: { PRO: { campaign: 200, design: 100, marketing: 100, analysis: 100 }, BUSINESS: { campaign: 100, design: 50, marketing: 50, analysis: 50 } },
+  version: '2026-10-19', monthly: { FREE: 0, BASIC: 100, PRO: 200, BUSINESS: 400 },
+  costs: { text: 5, image: 20, metrics_analysis: 20, metrics_comparison: 40 }, topUpsEnabled: false,
   packs: [{ id: 'small', credits: 200, netCents: 500 }, { id: 'medium', credits: 600, netCents: 1200 }, { id: 'large', credits: 1400, netCents: 2500 }],
   providerBudgetUSD: 25, providerAlertUSD: 20,
 } as const;

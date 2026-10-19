@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       || (b.plan==='ENTERPRISE' && (!Number.isSafeInteger(b.activeLimit)||b.activeLimit<1||b.activeLimit>10000)))
       return NextResponse.json({error:'Revisa los datos del contrato y las condiciones aprobadas.'},{status:400});
     if(b.paymentMethod==='cash' && b.netCents+b.taxCents>=100000) return NextResponse.json({error:'Esta operación requiere un medio distinto de efectivo.'},{status:400});
-    if(b.plan==='PRO'||b.plan==='BUSINESS'){b.monthlyCredits=1000;b.operationCost=b.plan==='PRO'?200:100;}
+    if(b.plan==='PRO'||b.plan==='BUSINESS'){b.monthlyCredits=b.plan==='PRO'?200:400;b.operationCost=5;}
     const sql=commercialDB();
     await sql.begin(async tx=>{
       await tx`select pg_advisory_xact_lock(hashtextextended(${b.ownerId}::text,813))`;

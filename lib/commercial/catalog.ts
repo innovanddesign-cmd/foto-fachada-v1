@@ -6,7 +6,7 @@ export const PLANS = {
   BUSINESS: { name: 'Business', monthly: 38, annual: 380, launchAnnual: 190, activeCampaigns: 10 },
   ENTERPRISE: { name: 'Enterprise', monthly: null, annual: null, launchAnnual: null, activeCampaigns: null },
 } as const;
-export const LAUNCH_CUSTOMERS = 50;
+export const LAUNCH_CUSTOMERS = 100;
 export const POLICY_PENDING = ['legalApproval', 'fiscalIdentifierValidation', 'freeImageProviderValidation'] as const;
 export function normalizePlan(value: unknown): Plan {
   if (value === 'ESCAPARATE') return 'BUSINESS'; // Existing saved drafts remain readable.

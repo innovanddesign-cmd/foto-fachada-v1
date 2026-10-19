@@ -15,7 +15,7 @@ export async function POST(req:Request) {
     const raw=await req.text(); if(raw.length>4000)return NextResponse.json({error:'Solicitud demasiado grande'},{status:413,headers});
     const b=JSON.parse(raw), selection=orderSelection(b);
     if(!selection || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(b.requestId||''))return NextResponse.json({error:'Revisa el plan o recarga seleccionado.'},{status:400,headers});
-    if(selection.kind==='credits' && selection.mode==='manual' && !(await accountSummary(a.userId!)).canTopUp)return NextResponse.json({error:'Las recargas requieren un plan de pago vigente, fuera del mes de gracia.'},{status:403,headers});
+    if(selection.kind==='credits')return NextResponse.json({error:'Las recargas no están disponibles en el lanzamiento.'},{status:403,headers});
     const price=orderPrice(selection), sql=commercialDB();
     const order=await sql.begin(async tx=>{
       await tx`select pg_advisory_xact_lock(hashtextextended(${a.userId!}::text,815))`;
